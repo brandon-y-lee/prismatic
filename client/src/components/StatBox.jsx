@@ -1,9 +1,12 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import { Box, Typography, useTheme } from "@mui/material";
 import FlexBetween from "./FlexBetween";
 
-const StatBox = ({ title, value, increase, icon, description }) => {
+const StatBox = ({ title, value, increase, icon, description, page }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
+
   return (
     <Box
       gridColumn="span 2"
@@ -11,10 +14,11 @@ const StatBox = ({ title, value, increase, icon, description }) => {
       display="flex"
       flexDirection="column"
       justifyContent="space-between"
-      p="1.25rem 1rem"
+      p="1.15rem 1rem 1.25rem 1rem"
       flex="1 1 100%"
       backgroundColor={theme.palette.background.alt}
       borderRadius="0.55rem"
+      onClick={() => navigate(`/${page}`)}
     >
       <FlexBetween>
         <Typography variant="h6" sx={{ color: theme.palette.secondary[100] }}>

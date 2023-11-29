@@ -12802,6 +12802,27 @@ export const dataProductStat = [
   },
 ];
 
+export const dataTransactions = [
+  {
+    _id: "63701d74f03239c72c000192",
+    buyerId: "656655376a199713d4682d7f",
+    sellerId: "",
+    cost: 3584.18,
+    products: [
+      "63701d24f03239db6900012a",
+    ],
+  },
+  {
+    _id: "63701d74f03239c72c000193",
+    buyerId: "656655376a199713d4682d7f",
+    sellerId: "",
+    cost: 2872.78,
+    products: [
+      "63701d24f03239c72c00018e",
+    ],
+  },
+];
+
 export const dataTransaction = [
   {
     _id: "63701d74f03239c72c000192",

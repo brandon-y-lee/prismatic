@@ -15,6 +15,42 @@ export const api = createApi({
     "Dashboard",
   ],
   endpoints: (build) => ({
+    login: build.mutation({
+      query: ({ email, password }) => ({
+        url: 'auth/login',
+        method: 'POST',
+        body: { email, password },
+      }),
+    }),
+    logout: build.mutation({
+      query: () => ({
+        url: 'auth/logout',
+        method: 'POST'
+      }),
+    }),
+    register: build.mutation({
+      query: ({ name, email, password }) => ({
+        url: 'auth/register',
+        method: 'POST',
+        body: { name, email, password },
+      }),
+    }),
+    getDashboard: build.query({
+      query: ({ userId }) => ({
+        url: "general/dashboard",
+        method: "GET",
+        params: { userId },
+      }),
+    }),
+    getTransactions: build.query({
+      query: ({ page, pageSize, sort, search }) => ({
+        url: "client/transactions",
+        method: "GET",
+        params: { page, pageSize, sort, search },
+      }),
+      providesTags: ["Transactions"],
+    }),
+
     getUser: build.query({
       query: (id) => `general/user/${id}`,
       providesTags: ["User"],
@@ -26,14 +62,6 @@ export const api = createApi({
     getCustomers: build.query({
       query: () => "client/customers",
       providesTags: ["Customers"],
-    }),
-    getTransactions: build.query({
-      query: ({ page, pageSize, sort, search }) => ({
-        url: "client/transactions",
-        method: "GET",
-        params: { page, pageSize, sort, search },
-      }),
-      providesTags: ["Transactions"],
     }),
     getGeography: build.query({
       query: () => "client/geography",
@@ -51,14 +79,13 @@ export const api = createApi({
       query: (id) => `management/performance/${id}`,
       providesTags: ["Performance"],
     }),
-    getDashboard: build.query({
-      query: () => "general/dashboard",
-      providesTags: ["Dashboard"],
-    }),
   }),
 });
 
 export const {
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
   useGetUserQuery,
   useGetProductsQuery,
   useGetCustomersQuery,

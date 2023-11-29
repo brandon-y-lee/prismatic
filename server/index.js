@@ -5,6 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
+import authRoutes from "./routes/auth.js";
 import clientRoutes from "./routes/client.js";
 import generalRoutes from "./routes/general.js";
 import managementRoutes from "./routes/management.js";
@@ -22,6 +23,7 @@ import {
   dataProduct,
   dataProductStat,
   dataTransaction,
+  dataTransactions,
   dataOverallStat,
   dataAffiliateStat,
 } from "./data/index.js";
@@ -38,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
 /* ROUTES */
+app.use("/auth", authRoutes);
 app.use("/client", clientRoutes);
 app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
@@ -60,5 +63,6 @@ mongoose
     // ProductStat.insertMany(dataProductStat);
     // Transaction.insertMany(dataTransaction);
     // User.insertMany(dataUser);
+    // Transaction.insertMany(dataTransactions);
   })
   .catch((error) => console.log(`${error} did not connect`));

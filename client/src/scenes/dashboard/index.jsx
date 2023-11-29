@@ -1,12 +1,10 @@
 import React from "react";
-import FlexBetween from "components/FlexBetween";
-import Header from "components/Header";
 import {
   DownloadOutlined,
-  Email,
   PointOfSale,
   PersonAdd,
   Traffic,
+  ShoppingCartOutlined
 } from "@mui/icons-material";
 import {
   Box,
@@ -16,16 +14,24 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import { useGetDashboardQuery } from "state/api";
+import { getLoggedInUser } from "utils/token";
+import FlexBetween from "components/FlexBetween";
+import Header from "components/Header";
 import BreakdownChart from "components/BreakdownChart";
 import OverviewChart from "components/OverviewChart";
-import { useGetDashboardQuery } from "state/api";
 import StatBox from "components/StatBox";
+import GlobalHeader from "components/GlobalHeader";
 
 const Dashboard = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-  const { data, isLoading } = useGetDashboardQuery();
 
+  const user = getLoggedInUser();
+  console.log('UserId from getLoggedInUser: ', user.id);
+
+  const { data, isLoading } = useGetDashboardQuery({ userId: user.id });
+  
   const columns = [
     {
       field: "_id",
@@ -59,6 +65,7 @@ const Dashboard = () => {
 
   return (
     <Box m="1.5rem 2.5rem">
+      <GlobalHeader />
       <FlexBetween>
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
 
@@ -90,19 +97,20 @@ const Dashboard = () => {
       >
         {/* ROW 1 */}
         <StatBox
-          title="Total Customers"
-          value={data && data.totalCustomers}
-          increase="+14%"
+          title="Active Orders"
+          value={data ? data.activeTransactions : "Loading..."}
+          increase="+0%"
           description="Since last month"
+          page="orders"
           icon={
-            <Email
+            <ShoppingCartOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
         <StatBox
           title="Sales Today"
-          value={data && data.todayStats.totalSales}
+          value={data ? data.activeTransactions : "Loading..."}
           increase="+21%"
           description="Since last month"
           icon={
@@ -122,7 +130,7 @@ const Dashboard = () => {
         </Box>
         <StatBox
           title="Monthly Sales"
-          value={data && data.thisMonthStats.totalSales}
+          value={data ? data.activeTransactions : "Loading..."}
           increase="+5%"
           description="Since last month"
           icon={
@@ -133,7 +141,7 @@ const Dashboard = () => {
         />
         <StatBox
           title="Yearly Sales"
-          value={data && data.yearlySalesTotal}
+          value={data ? data.activeTransactions : "Loading..."}
           increase="+43%"
           description="Since last month"
           icon={
@@ -176,7 +184,7 @@ const Dashboard = () => {
           <DataGrid
             loading={isLoading || !data}
             getRowId={(row) => row._id}
-            rows={(data && data.transactions) || []}
+            rows={[]}
             columns={columns}
           />
         </Box>
