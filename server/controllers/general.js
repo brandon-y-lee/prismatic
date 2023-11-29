@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import OverallStat from "../models/OverallStat.js";
 import Transaction from "../models/Transaction.js";
+import { TransactionStatus } from "../configs/TransactionStatus.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -14,45 +15,28 @@ export const getUser = async (req, res) => {
 
 export const getDashboardStats = async (req, res) => {
   try {
-    // hardcoded values
-    const currentMonth = "November";
-    const currentYear = 2021;
-    const currentDay = "2021-11-15";
+    console.log("Finding Dashboard Stats with User Id: ", req.query);
+    const { userId } = req.query;
 
-    /* Recent Transactions */
-    const transactions = await Transaction.find()
-      .limit(50)
-      .sort({ createdOn: -1 });
+    if (!userId || userId === "null") {
+      return res.status(400).json({ message: "UserId is missing" });
+    }
 
-    /* Overall Stats */
-    const overallStat = await OverallStat.find({ year: currentYear });
-
-    const {
-      totalCustomers,
-      yearlyTotalSoldUnits,
-      yearlySalesTotal,
-      monthlyData,
-      salesByCategory,
-    } = overallStat[0];
-
-    const thisMonthStats = overallStat[0].monthlyData.find(({ month }) => {
-      return month === currentMonth;
+    /* Active Transactions */
+    const activeTransactions = await Transaction.countDocuments({
+      $or: [{ buyerId: userId }, { sellerId: userId }],
+      status: { 
+        $in: [
+          TransactionStatus.NEW_ORDER, 
+          TransactionStatus.PROCESSING, 
+          TransactionStatus.EN_ROUTE
+        ]
+      }
     });
 
-    const todayStats = overallStat[0].dailyData.find(({ date }) => {
-      return date === currentDay;
-    });
+    console.log('Active Transactions: ', activeTransactions);
 
-    res.status(200).json({
-      totalCustomers,
-      yearlyTotalSoldUnits,
-      yearlySalesTotal,
-      monthlyData,
-      salesByCategory,
-      thisMonthStats,
-      todayStats,
-      transactions,
-    });
+    res.status(200).json({ activeTransactions });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
