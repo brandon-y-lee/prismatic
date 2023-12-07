@@ -14,6 +14,18 @@ const UserSchema = new mongoose.Schema(
       max: 50,
       unique: true,
     },
+    phone: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    availableCredit: {
+      type: Number,
+    },
+    totalCredit: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );

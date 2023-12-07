@@ -1,19 +1,41 @@
 import mongoose from "mongoose";
 import { TransactionStatus } from "../configs/TransactionStatus.js";
+import { PaymentStatus } from "../configs/PaymentStatus.js";
+
 
 const TransactionSchema = new mongoose.Schema(
   {
-    buyerId: String,
-    sellerId: String,
-    cost: String,
+    buyerId: {
+      type: String,
+      required: true,
+    },
+    sellerId: {
+      type: String,
+      required: true,
+    },
     status: {
       type: Number,
       enum: Object.values(TransactionStatus),
-      default: TransactionStatus.NEW_ORDER
+      default: TransactionStatus.DRAFT
     },
-    products: {
-      type: [mongoose.Types.ObjectId],
-      of: Number,
+    payment: {
+      type: Number,
+      enum: Object.values(PaymentStatus),
+      default: PaymentStatus.UNPAID
+    },
+    products: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+    }],
+    cost: {
+      type: Number,
+    },
+    initialDate: {
+      type: Date,
+      default: Date.now
+    },
+    expiryDate: {
+      type: Date
     },
   },
   { timestamps: true }

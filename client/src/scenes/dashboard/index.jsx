@@ -13,15 +13,12 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGridPro } from "@mui/x-data-grid-pro";
 import { useGetDashboardQuery } from "state/api";
 import { getLoggedInUser } from "utils/token";
 import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
-import BreakdownChart from "components/BreakdownChart";
-import OverviewChart from "components/OverviewChart";
 import StatBox from "components/StatBox";
-import GlobalHeader from "components/GlobalHeader";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -65,7 +62,6 @@ const Dashboard = () => {
 
   return (
     <Box m="1.5rem 2.5rem">
-      <GlobalHeader />
       <FlexBetween>
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
 
@@ -126,7 +122,6 @@ const Dashboard = () => {
           p="1rem"
           borderRadius="0.55rem"
         >
-          <OverviewChart view="sales" isDashboard={true} />
         </Box>
         <StatBox
           title="Monthly Sales"
@@ -181,7 +176,7 @@ const Dashboard = () => {
             },
           }}
         >
-          <DataGrid
+          <DataGridPro
             loading={isLoading || !data}
             getRowId={(row) => row._id}
             rows={[]}
@@ -198,7 +193,6 @@ const Dashboard = () => {
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100] }}>
             Sales By Category
           </Typography>
-          <BreakdownChart isDashboard={true} />
           <Typography
             p="0 0.6rem"
             fontSize="0.8rem"

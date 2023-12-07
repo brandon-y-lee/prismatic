@@ -1,0 +1,23 @@
+.ant-form-item-label label {
+font-weight: bold;
+}
+
+.ant-input,
+.ant-picker {
+  font-weight: normal;
+}
+
+.body-section {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.summary-section {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.button-section {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}

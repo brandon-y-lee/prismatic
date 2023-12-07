@@ -48,12 +48,8 @@ const GlobalHeader = () => {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: 'bottom',
+            horizontal: 'left',
           }}
         >
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
