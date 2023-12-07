@@ -1,10 +1,7 @@
 export const TransactionStatus = {
-  NEW_ORDER: 0,
-  BUYER_ACCEPTED : 1,
-  SELLER_ACCEPTED : 2,
-  BUYER_DENIED : 3,
-  SELLER_DENIED: 4,
-  PROCESSING: 5,
-  EN_ROUTE: 6,
-  RECEIVED: 7
+  DRAFT: 0,
+  PENDING: 1,
+  PROCESSED: 2,
+  EN_ROUTE: 3,
+  RECEIVED: 4
 };

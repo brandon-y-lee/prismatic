@@ -2,12 +2,27 @@ import mongoose from "mongoose";
 
 const ProductSchema = new mongoose.Schema(
   {
-    name: String,
-    price: Number,
+    transactionId: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    totalCost: {
+      type: Number,
+      required: true,
+    },
     description: String,
-    category: String,
-    rating: Number,
-    supply: Number,
   },
   { timestamps: true }
 );

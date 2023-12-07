@@ -1,6 +1,5 @@
 // color design tokens export
 export const tokensDark = {
-  
   grey: {
     0: "#ffffff", // manually adjusted
     10: "#f6f6f6", // manually adjusted
@@ -104,7 +103,7 @@ export const themeSettings = (mode) => {
             },
             background: {
               default: tokensDark.grey[0],
-              alt: tokensDark.grey[50],
+              alt: tokensDark.grey[10],
             },
           }),
     },

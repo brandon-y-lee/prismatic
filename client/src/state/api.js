@@ -6,13 +6,10 @@ export const api = createApi({
   tagTypes: [
     "User",
     "Products",
-    "Customers",
     "Transactions",
-    "Geography",
-    "Sales",
-    "Admins",
-    "Performance",
     "Dashboard",
+    "Invoices",
+    "Funds"
   ],
   endpoints: (build) => ({
     login: build.mutation({
@@ -35,6 +32,105 @@ export const api = createApi({
         body: { name, email, password },
       }),
     }),
+
+    /* TRANSACTION - CRUD */
+    getTransactions: build.query({
+      query: ({ userId, page, pageSize, sort, search }) => ({
+        url: "client/transactions",
+        method: "GET",
+        params: { userId, page, pageSize, sort, search },
+      }),
+      providesTags: ['Transactions', 'Products'],
+    }),
+    createTransaction: build.mutation({
+      query: ({ buyerId, sellerId, products, cost, initialDate, expiryDate }) => ({
+        url: "client/createTransaction",
+        method: "POST",
+        body: { buyerId, sellerId, products, cost, initialDate, expiryDate },
+      }),
+      invalidatesTags: ['Transactions', 'Products'],
+    }),
+    viewTransaction: build.query({
+      query: (id) => `client/transactions/${id}`,
+      providesTags: ['Transactions', 'Products'],
+    }),
+    updateTransaction: build.mutation({
+      query: ({ id, ...updateData }) => ({
+        url: `client/updateTransaction/${id}`,
+        method: "PUT",
+        body: updateData
+      }),
+      invalidatesTags: ['Transactions', 'Products'],
+    }),
+    deleteTransaction: build.mutation({
+      query: ({ id }) => ({
+        url: `client/deleteTransaction/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ['Transactions', 'Products'],
+    }),
+
+
+    /* INVOICE - CRUD */
+    createInvoice: build.mutation({
+      query: ({ userId, clientId, invoiceDate, invoiceTotal }) => ({
+        url: "funds/invoice",
+        method: "POST",
+        body: { userId, clientId, invoiceDate, invoiceTotal },
+      }),
+      invalidatesTags: ['Invoices', 'Funds'],
+    }),
+    viewInvoice: build.query({
+      query: (id) => `funds/invoice/${id}`,
+      providesTags: ['Invoices', 'Funds'],
+    }),
+    updateInvoice: build.mutation({
+      query: ({ id, ...updateData }) => ({
+        url: `funds/updateInvoice/${id}`,
+        method: "PUT",
+        body: updateData
+      }),
+      invalidatesTags: ['Invoices', 'Funds'],
+    }),
+    deleteInvoice: build.mutation({
+      query: ({ id }) => ({
+        url: `funds/invoice/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ['Invoices', 'Funds'],
+    }),
+
+    /* FUND - CRUD */
+    createFund: build.mutation({
+      query: ({ userId, clientId, invoiceDate, invoiceTotal }) => ({
+        url: "funds/fund",
+        method: "POST",
+        body: { userId, clientId, invoiceDate, invoiceTotal },
+      }),
+      invalidatesTags: ['Invoices', 'Funds'],
+    }),
+    viewFund: build.query({
+      query: (id) => `funds/fund/${id}`,
+      providesTags: ['Invoices', 'Funds'],
+    }),
+    updateFund: build.mutation({
+      query: ({ id, ...updateData }) => ({
+        url: `funds/updateFund/${id}`,
+        method: "PUT",
+        body: updateData
+      }),
+      invalidatesTags: ['Invoices', 'Funds'],
+    }),
+    deleteFund: build.mutation({
+      query: ({ id }) => ({
+        url: `funds/fund/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ['Invoices', 'Funds'],
+    }),
+
+
+    /* DASHBOARD - GET */
     getDashboard: build.query({
       query: ({ userId }) => ({
         url: "general/dashboard",
@@ -42,42 +138,16 @@ export const api = createApi({
         params: { userId },
       }),
     }),
-    getTransactions: build.query({
-      query: ({ page, pageSize, sort, search }) => ({
-        url: "client/transactions",
-        method: "GET",
-        params: { page, pageSize, sort, search },
-      }),
-      providesTags: ["Transactions"],
-    }),
-
     getUser: build.query({
-      query: (id) => `general/user/${id}`,
+      query: ({ id }) => ({
+        url: "general/user",
+        method: "GET",
+        params: { id },
+      }),
       providesTags: ["User"],
     }),
-    getProducts: build.query({
-      query: () => "client/products",
-      providesTags: ["Products"],
-    }),
-    getCustomers: build.query({
-      query: () => "client/customers",
-      providesTags: ["Customers"],
-    }),
-    getGeography: build.query({
-      query: () => "client/geography",
-      providesTags: ["Geography"],
-    }),
-    getSales: build.query({
-      query: () => "sales/sales",
-      providesTags: ["Sales"],
-    }),
-    getAdmins: build.query({
-      query: () => "management/admins",
-      providesTags: ["Admins"],
-    }),
-    getUserPerformance: build.query({
-      query: (id) => `management/performance/${id}`,
-      providesTags: ["Performance"],
+    getSupplier: build.query({
+      query: (userId) => `client/getSupplier/${userId}`,
     }),
   }),
 });
@@ -87,12 +157,13 @@ export const {
   useLogoutMutation,
   useRegisterMutation,
   useGetUserQuery,
-  useGetProductsQuery,
-  useGetCustomersQuery,
+
+  useGetSupplierQuery,
   useGetTransactionsQuery,
-  useGetGeographyQuery,
-  useGetSalesQuery,
-  useGetAdminsQuery,
-  useGetUserPerformanceQuery,
+  useViewTransactionQuery,
+  useCreateTransactionMutation,
+  useUpdateTransactionMutation,
+  useDeleteTransactionMutation,
+
   useGetDashboardQuery,
 } = api;

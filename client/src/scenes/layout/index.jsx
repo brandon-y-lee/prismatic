@@ -5,12 +5,14 @@ import { useSelector } from "react-redux";
 import Navbar from "components/Navbar";
 import Sidebar from "components/Sidebar";
 import { useGetUserQuery } from "state/api";
+import { getLoggedInUser } from "utils/token";
 
 const Layout = () => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const userId = useSelector((state) => state.global.userId);
-  const { data } = useGetUserQuery(userId);
+
+  const user = getLoggedInUser();
+  const { data } = useGetUserQuery(user.id);
 
   return (
     <Box display={isNonMobile ? "flex" : "block"} width="100%" height="100%">

@@ -27,19 +27,16 @@ const Form = () => {
   const isLogin = pageType === "login";
 
   const handleFormSubmit = async (values, { resetForm }) => {
-    console.log("Values: ", values);
     if (isLogin) {
       try {
         const response = await login({ email: values.email, password: values.password }).unwrap();
-
-        console.log('Response: ', response);
 
         if (response && response.token) {
           setToken(response.token);
           setLoggedInUser(response.user);
           console.log("Local Storage User", getLoggedInUser());
           console.log("Local Storage Token", getToken());
-          navigate("/dashboard");
+          window.location.reload();
         } else {
           console.log("Login failed: Response doesn't include token.");
         }
