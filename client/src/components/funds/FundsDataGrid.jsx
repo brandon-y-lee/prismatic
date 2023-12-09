@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { CircularProgress, Box, Button } from '@mui/material';
-import { useGetTransactionsQuery } from 'state/api';
-import { renderStatusChip, renderPaymentChip } from 'utils/transaction';
+import { renderPaymentChip } from 'utils/transaction';
+import { formatDistanceToNow } from 'date-fns';
+import FundingOptionsModal from './modal/FundingOptionsModal';
 
 const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
   const [page, setPage] = useState(0);
@@ -10,78 +11,67 @@ const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
   const [sort, setSort] = useState({});
   const [search] = useState("");
 
-  const { data, isLoading, isError } = useGetTransactionsQuery({
-    userId: user.id,
-    page,
-    pageSize,
-    sort: JSON.stringify(sort),
-    search,
-  });
+  const [fundingOptionsModalOpen, setFundingOptionsModalOpen] = useState(false);
+  const [selectedFundingDetails, setSelectedFundingDetails] = useState(null);
 
-  useEffect(() => {
+  const handleFundingOptionsClick = (transaction) => {
+    if (transaction) {
+      setSelectedFundingDetails(transaction);
+      setFundingOptionsModalOpen(true);
+    } else {
+      console.error('Transaction details are missing');
+    }
+  };
 
-  }, [tabValue, page, pageSize, sort, search]);
-
-  if (!transactionsData || transactionsData.length === 0) return <CircularProgress />;
-  if (isError || !data) return <Box>Error loading data.</Box>;
-
-  // Flatten the transaction data for DataGridPro
-  const bookedTransactions = transactionsData?.booked || [];
-
-  const flattenedTransactions = bookedTransactions.map(transaction => ({
-    ...transaction,
-    _id: transaction.transactionId,
-    amount: transaction.transactionAmount.amount,
-    currency: transaction.transactionAmount.currency
-  }));
-
-  // Define the columns for the transaction data
   const transactionColumns = [
     { field: 'transactionId', headerName: 'Transaction ID', flex: 1 },
-    { field: 'bookingDate', headerName: 'Booking Date', flex: 1 },
-    { field: 'valueDate', headerName: 'Value Date', flex: 1 },
-    { field: 'amount', headerName: 'Amount', flex: 1, valueGetter: (params) => `${params.row.transactionAmount.amount} ${params.row.transactionAmount.currency}` },
-    { field: 'description', headerName: 'Description', flex: 2, valueGetter: (params) => params.row.remittanceInformationUnstructured || '' },
-  ];
-
-
-  const invoiceColumns = [
-    {
-      field: "invoice",
+    { 
+      field: 'issuedDue', 
+      headerName: 'Issued / Due', 
       flex: 1,
-      renderHeader: () => (
-        <strong>
-          {"Invoice"}
-        </strong>
-      ),
-    },
-    {
-      field: "status",
-      flex: 1.5,
-      renderHeader: () => (
-        <strong>
-          {"Issued / Due"}
-        </strong>
-      ),
       renderCell: (params) => {
+        const issued = formatDistanceToNow(new Date(params.row.bookingDate), { addSuffix: true });
+        const due = formatDistanceToNow(new Date(params.row.valueDate), { addSuffix: true });
         return (
-          renderStatusChip(params.row.status)
-        )
-      },
+          <Box>
+            <div>Issued: {issued}</div>
+            <div>Due: {due}</div>
+          </Box>
+        );
+      }
     },
-    {
-      field: "amount",
-      flex: 0.5,
-      renderHeader: () => (
-        <strong>
-          {"Amount"}
-        </strong>
-      ),
-      renderCell: (params) => {
-        return (
-          renderPaymentChip(params.row.payment)
-        )
-      },
+    { 
+      field: 'amount', 
+      headerName: 'Total', 
+      flex: 0.5, 
+      valueGetter: (params) => `${params.row.transactionAmount.amount} ${params.row.transactionAmount.currency}`,
+      cellClassName: 'amount-cell'
+    },
+    { 
+      field: 'fundingOptions',
+      headerName: '',
+      flex: 0.50,
+      renderCell: (params) => (
+        <Button 
+          variant="contained"
+          sx={{
+            backgroundColor: 'white',
+            color: '#1677FF',
+            textTransform: 'capitalize',
+            fontSize: '14px',
+            fontWeight: '550',
+            border: 'none',
+            boxShadow: 'none',
+            '&:hover': {
+              backgroundColor: '#1677FF',
+              color: 'white',
+            },
+          }}
+          onClick={() => handleFundingOptionsClick(params.row)}
+        >
+          Funding Options
+        </Button>
+      )
     },
   ];
 
@@ -122,32 +112,55 @@ const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
 
   const columns = tabValue === 0 ? transactionColumns : repaymentColumns;
 
+  if (!transactionsData || transactionsData.length === 0) return <CircularProgress />;
+
+  const bookedTransactions = transactionsData?.booked || [];
+  const flattenedTransactions = bookedTransactions.map(transaction => ({
+    ...transaction,
+    _id: transaction.transactionId,
+    amount: transaction.transactionAmount.amount,
+    currency: transaction.transactionAmount.currency
+  }));
+
+
   return (
-    <DataGridPro
-      loading={!flattenedTransactions}
-      getRowId={(row) => row._id}
-      rows={flattenedTransactions}
-      columns={transactionColumns}
-      disableColumnResize
-      pagination
-      page={page}
-      pageSize={pageSize}
-      paginationMode="server"
-      sortingMode="server"
-      onPageChange={(newPage) => setPage(newPage)}
-      onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-      onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-      sx={{
-        border: 'none',
-        '& .MuiDataGrid-columnHeaders': {
-          borderBottom: '1px solid rgba(224, 224, 224, 1)',
-        },
-        '& .MuiDataGrid-row': {
-          borderBottom: '1px solid rgba(224, 224, 224, 0.1)',
-          fontWeight: '550',
-        },
-      }}
-    />
+    <>
+      <DataGridPro
+        loading={!flattenedTransactions.length}
+        getRowId={(row) => row._id}
+        rows={flattenedTransactions}
+        columns={transactionColumns}
+        rowHeight={80}
+        disableColumnResize
+        hideFooter={true}
+        pagination
+        page={page}
+        pageSize={pageSize}
+        paginationMode="server"
+        sortingMode="server"
+        onPageChange={(newPage) => setPage(newPage)}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+        sx={{
+          border: 'none',
+          '& .MuiDataGrid-columnHeaders': {
+            borderBottom: '1px solid rgba(224, 224, 224, 1)',
+          },
+          '& .MuiDataGrid-row': {
+            borderBottom: '1px solid rgba(224, 224, 224, 0.1)',
+            fontWeight: '550',
+          },
+          '& .amount-cell': {
+            fontSize: '14px',
+          },
+        }}
+      />
+      <FundingOptionsModal
+        isOpen={fundingOptionsModalOpen}
+        onClose={() => setFundingOptionsModalOpen(false)}
+        fundingDetails={selectedFundingDetails}
+      />
+    </>
   );
 };
 

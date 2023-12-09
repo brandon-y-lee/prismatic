@@ -23,7 +23,7 @@ const BankSelection = ({ isOpen, onClose, accessToken, onAccountSet }) => {
     }
   };
 
-  const { data: accounts, isFetching } = useListAccountsQuery({
+  const { data: accounts } = useListAccountsQuery({
     requisitionId,
     accessToken
   }, { skip: !requisitionId });
