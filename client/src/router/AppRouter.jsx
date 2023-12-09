@@ -15,8 +15,6 @@ import ViewOrder from "scenes/orders/ViewOrder";
 import CreateOrder from "scenes/orders/CreateOrder";
 import UpdateOrder from "scenes/orders/UpdateOrder";
 import Funds from "scenes/funds";
-import CreateInvoice from "scenes/funds/CreateInvoice";
-import CreateFund from "scenes/funds/CreateFund";
 
 function AppRouter() {
   const location = useLocation();
@@ -44,16 +42,6 @@ function AppRouter() {
             <Route path="/funds" element={
               <PrivateRoute>
                 <Funds />
-              </PrivateRoute>
-            } />
-            <Route path="/funds/invoice/create" element={
-              <PrivateRoute>
-                <CreateInvoice />
-              </PrivateRoute>
-            } />
-            <Route path="/funds/fund/create" element={
-              <PrivateRoute>
-                <CreateFund />
               </PrivateRoute>
             } />
             <Route path="/orders" element={

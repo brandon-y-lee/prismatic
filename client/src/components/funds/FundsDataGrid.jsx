@@ -4,7 +4,7 @@ import { CircularProgress, Box, Button } from '@mui/material';
 import { useGetTransactionsQuery } from 'state/api';
 import { renderStatusChip, renderPaymentChip } from 'utils/transaction';
 
-const FundsDataGrid = ({ user, tabValue }) => {
+const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
@@ -22,19 +22,47 @@ const FundsDataGrid = ({ user, tabValue }) => {
 
   }, [tabValue, page, pageSize, sort, search]);
 
-  if (isLoading) return <CircularProgress />;
+  if (!transactionsData || transactionsData.length === 0) return <CircularProgress />;
   if (isError || !data) return <Box>Error loading data.</Box>;
+
+  // Flatten the transaction data for DataGridPro
+  const bookedTransactions = transactionsData?.booked || [];
+
+  const flattenedTransactions = bookedTransactions.map(transaction => ({
+    ...transaction,
+    _id: transaction.transactionId,
+    amount: transaction.transactionAmount.amount,
+    currency: transaction.transactionAmount.currency
+  }));
+
+  // Define the columns for the transaction data
+  const transactionColumns = [
+    { field: 'transactionId', headerName: 'Transaction ID', flex: 1 },
+    { field: 'bookingDate', headerName: 'Booking Date', flex: 1 },
+    { field: 'valueDate', headerName: 'Value Date', flex: 1 },
+    { field: 'amount', headerName: 'Amount', flex: 1, valueGetter: (params) => `${params.row.transactionAmount.amount} ${params.row.transactionAmount.currency}` },
+    { field: 'description', headerName: 'Description', flex: 2, valueGetter: (params) => params.row.remittanceInformationUnstructured || '' },
+  ];
+
 
   const invoiceColumns = [
     {
       field: "invoice",
       flex: 1,
-      headerName: "Invoice",
+      renderHeader: () => (
+        <strong>
+          {"Invoice"}
+        </strong>
+      ),
     },
     {
       field: "status",
       flex: 1.5,
-      headerName: "Issued / Due",
+      renderHeader: () => (
+        <strong>
+          {"Issued / Due"}
+        </strong>
+      ),
       renderCell: (params) => {
         return (
           renderStatusChip(params.row.status)
@@ -44,7 +72,11 @@ const FundsDataGrid = ({ user, tabValue }) => {
     {
       field: "amount",
       flex: 0.5,
-      headerName: "Amount",
+      renderHeader: () => (
+        <strong>
+          {"Amount"}
+        </strong>
+      ),
       renderCell: (params) => {
         return (
           renderPaymentChip(params.row.payment)
@@ -88,14 +120,14 @@ const FundsDataGrid = ({ user, tabValue }) => {
     },
   ];
 
-  const columns = tabValue === 0 ? invoiceColumns : repaymentColumns;
+  const columns = tabValue === 0 ? transactionColumns : repaymentColumns;
 
   return (
     <DataGridPro
-      loading={isLoading || data.transactions.length === 0}
-      getRowId={(row) => row["_id"]}
-      rows={(data && data.transactions) || []}
-      columns={columns}
+      loading={!flattenedTransactions}
+      getRowId={(row) => row._id}
+      rows={flattenedTransactions}
+      columns={transactionColumns}
       disableColumnResize
       pagination
       page={page}
@@ -108,9 +140,7 @@ const FundsDataGrid = ({ user, tabValue }) => {
       sx={{
         border: 'none',
         '& .MuiDataGrid-columnHeaders': {
-          fontSize: '0.875rem',
-          fontWeight: 'semibold',
-          color: 'black',
+          borderBottom: '1px solid rgba(224, 224, 224, 1)',
         },
         '& .MuiDataGrid-row': {
           borderBottom: '1px solid rgba(224, 224, 224, 0.1)',

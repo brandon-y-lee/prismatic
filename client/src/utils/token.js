@@ -27,4 +27,29 @@ export const getLoggedInUser = () => {
 
 export const removeLoggedInUser = () => {
   localStorage.removeItem('user');
+};
+
+export const setAccessToken = (accessToken) => {
+  localStorage.setItem('accessToken', accessToken);
+};
+
+export const getAccessToken = () => {
+  return localStorage.getItem('accessToken');
 }
+
+export const removeAccessToken = () => {
+  localStorage.removeItem('accessToken');
+};
+
+export const setLocalRequisitionId = (requisitionId) => {
+  localStorage.setItem('requisitionId', requisitionId);
+};
+
+export const getLocalRequisitionId = () => {
+  return localStorage.getItem('requisitionId');
+}
+
+export const removeLocalRequisitionId = () => {
+  localStorage.removeItem('requisitionId');
+};
+

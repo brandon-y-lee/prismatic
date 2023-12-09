@@ -1,7 +1,32 @@
 import Invoice from "../models/Invoice.js";
 import Fund from "../models/Fund.js";
+import axios from "axios";
 
 
+/* GENERATE ID */
+function generateId() {
+  // Get current year
+  const year = new Date().getFullYear();
+  
+  // Generate a 3-digit random number
+  // This will generate a number between 100 and 999
+  const randomDigits = Math.floor(Math.random() * 899) + 100;
+  
+  // Generate 2 random uppercase letters
+  // This will generate a number between 65(A) and 90(Z)
+  const randomChars = String.fromCharCode(
+    65 + Math.floor(Math.random() * 26), 
+    65 + Math.floor(Math.random() * 26)
+  );
+  
+  // Concatenate the parts
+  // e.g., PT2023756HS
+  const id = 'PT' + year + randomDigits + randomChars;
+  
+  return id;
+};
+
+/* INVOICE - CRUD */
 export const getInvoices = async (req, res) => {
   try {
     const { userId, page, pageSize, sort, search } = req.query;
@@ -125,6 +150,9 @@ export const deleteInvoice = async (req, res) => {
   };
 };
 
+
+/* FUND - CRUD */
+
 export const getFunds = async (req, res) => {
   try {
     const { userId, page, pageSize, sort, search } = req.query;
@@ -232,27 +260,4 @@ export const deleteFund = async (req, res) => {
   } catch (error) {
     res.status(404).json({ message: error.message });
   };
-};
-
-
-function generateId() {
-  // Get current year
-  const year = new Date().getFullYear();
-  
-  // Generate a 3-digit random number
-  // This will generate a number between 100 and 999
-  const randomDigits = Math.floor(Math.random() * 899) + 100;
-  
-  // Generate 2 random uppercase letters
-  // This will generate a number between 65(A) and 90(Z)
-  const randomChars = String.fromCharCode(
-    65 + Math.floor(Math.random() * 26), 
-    65 + Math.floor(Math.random() * 26)
-  );
-  
-  // Concatenate the parts
-  // e.g., PT2023756HS
-  const id = 'PT' + year + randomDigits + randomChars;
-  
-  return id;
 };

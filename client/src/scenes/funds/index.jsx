@@ -1,23 +1,35 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Button, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
 
 import Header from 'components/Header';
 import FlexBetween from 'components/FlexBetween';
 import KpiCard from 'components/funds/KpiCard';
-import { getLoggedInUser } from 'utils/token';
 import FundsDataGrid from 'components/funds/FundsDataGrid';
+import BankSelection from 'components/funds/BankSelection';
+import { useGenerateTokenQuery } from 'state/api';
+import AccountSwitcher from 'components/funds/AccountSwitcher';
+import { getLoggedInUser, setAccessToken, getAccessToken } from 'utils/token';
 
 const Funds = () => {
-  const navigate = useNavigate();
   const user = getLoggedInUser();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const [tabValue, setTabValue] = useState(0);
 
-  const handleCreateInvoice = () => {
-    navigate('/invoice/create');
-  };
+  const [isBankDialogOpen, setBankDialogOpen] = useState(false);
 
+  const { data: token } = useGenerateTokenQuery();
+  const [accountIds, setAccountIds] = useState([]);
+  const [selectedAccount, setSelectedAccount] = useState('');
+  const [transactionsData, setTransactionsData] = useState({});
+
+  const handleOpenBankDialog = () => {
+    setBankDialogOpen(true);
+  };
+  
+  const handleCloseBankDialog = () => {
+    setBankDialogOpen(false);
+  };
+  
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -42,19 +54,75 @@ const Funds = () => {
     }
     // ... additional KPIs as needed
   ];
+
+  /* WE ARE HARD-SETTING SELECTED ACCOUNT */
+  const handleAccountSet = (ids) => {
+    setAccountIds(ids);
+    console.log("Received account IDs: ", ids);
+    if (!selectedAccount && ids.length > 0) {
+      setSelectedAccount(ids[0]);
+    }
+    console.log("Set account ID: ", selectedAccount);
+  };
+
+  const handleAccountChange = (newAccountId) => {
+    setSelectedAccount(newAccountId);
+  };
+
+  /* SET ACCESS TOKEN IN LOCAL STORAGE */
+  useEffect(() => {
+    if (token?.access) {
+      setAccessToken(token.access);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await fetch(`http://localhost:5001/nordigen/accounts/${selectedAccount}/transactions`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${token.access}` },
+        });
   
+        if (response.ok) {
+          const data = await response.json();
+          setTransactionsData({ [selectedAccount]: data });
+        } else {
+          console.error('Error fetching transactions', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Error in fetchTransactions:', error);
+      }
+    };
+  
+    if (selectedAccount) {
+      fetchTransactions();
+    }
+  }, [selectedAccount, token]);
+
+  useEffect(() => {
+    if (transactionsData) {
+      console.log("Transactions Data: ", transactionsData);
+    }
+  }, [transactionsData]);
+
   return (
     <Box>
       <Box m="1.5rem 2.5rem">
         <FlexBetween>
           <Header title="FUNDS" />
-          <Button
-            variant="primary"
-            size="small"
-            onClick={handleCreateInvoice}
-          >
-            Upload New Invoice
-          </Button>
+          <AccountSwitcher
+            accountIds={accountIds}
+            selectedAccount={selectedAccount}
+            onAccountChange={handleAccountChange}
+            onConnectBank={handleOpenBankDialog}
+          />
+          <BankSelection
+            isOpen={isBankDialogOpen}
+            onClose={handleCloseBankDialog}
+            accessToken={getAccessToken()}
+            onAccountSet={handleAccountSet}
+          />
         </FlexBetween>
 
         <Box
@@ -112,6 +180,7 @@ const Funds = () => {
         <FundsDataGrid
           user={user}
           tabValue={tabValue}
+          transactionsData={transactionsData[selectedAccount]?.transactions || []}
         />
       </Box>
     </Box>

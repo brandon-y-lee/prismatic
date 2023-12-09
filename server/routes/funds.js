@@ -1,5 +1,14 @@
 import express from "express";
-import { createFund, createInvoice, deleteFund, deleteInvoice, getFunds, updateFund, updateInvoice, viewInvoice } from "../controllers/funds";
+import { 
+  createFund, 
+  createInvoice, 
+  deleteFund, 
+  deleteInvoice, 
+  getFunds, 
+  updateFund, 
+  updateInvoice, 
+  viewInvoice 
+} from "../controllers/funds.js";
 
 const router = express.Router();
 

@@ -4,7 +4,7 @@ import FlexBetween from "components/FlexBetween";
 import { AppBar, Avatar, IconButton, InputBase, Toolbar, Menu, MenuItem, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "state/api";
-import { removeToken, removeLoggedInUser } from "utils/token";
+import { removeToken, removeLoggedInUser, removeAccessToken, removeLocalRequisitionId } from "utils/token";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const theme = useTheme();
@@ -20,6 +20,8 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
       await logout().unwrap();
       removeToken();
       removeLoggedInUser();
+      removeAccessToken();
+      removeLocalRequisitionId();
       navigate('/login');
       window.location.reload();
     } catch (error) {
