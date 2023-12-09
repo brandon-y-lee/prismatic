@@ -38,11 +38,23 @@ const FundSchema = new mongoose.Schema(
     },
     weeklyInstallment: {
       type: Number,
-      default: totalFunding / repaymentPlan,
+      default: 0,
     },
   },
   { timestamps: true }
 );
+
+// Pre-save hook to calculate weeklyInstallment
+FundSchema.pre('save', function(next) {
+  if (this.isModified('totalFunding') || this.isModified('repaymentPlan')) {
+    if (this.repaymentPlan && this.repaymentPlan > 0) {
+      this.weeklyInstallment = this.totalFunding / this.repaymentPlan;
+    } else {
+      this.weeklyInstallment = 0; // Or some default value
+    }
+  }
+  next();
+});
 
 const Fund = mongoose.model("Fund", FundSchema);
 export default Fund;

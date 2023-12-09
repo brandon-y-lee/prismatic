@@ -129,7 +129,44 @@ export const api = createApi({
       invalidatesTags: ['Invoices', 'Funds'],
     }),
 
-
+    /* NORDIGEN - GET */
+    generateToken: build.query({
+      query: () => ({
+        url: 'nordigen/token',
+        method: 'GET',
+      }),
+    }),
+    getInstitutions: build.query({
+      query: ({ accessToken }) => ({
+        url: 'nordigen/institutions',
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      }),
+    }),
+    createRequisition: build.mutation({
+      query: ({ accessToken, institution_id }) => ({
+        url: 'nordigen/create-requisition',
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        body: { institution_id },
+      }),
+    }),
+    listAccounts: build.query({
+      query: ({ requisitionId, accessToken }) => ({
+        url: `nordigen/list-accounts`,
+        params: { requisitionId },
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      }),
+    }),
+    listAccountTransactions: build.query({
+      query: ({ accessToken, accountId }) => ({
+        url: `nordigen/accounts/${accountId}/transactions`,
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      }),
+    }),
+    
     /* DASHBOARD - GET */
     getDashboard: build.query({
       query: ({ userId }) => ({
@@ -156,14 +193,30 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useRegisterMutation,
+  useGetDashboardQuery,
   useGetUserQuery,
-
   useGetSupplierQuery,
+
   useGetTransactionsQuery,
-  useViewTransactionQuery,
   useCreateTransactionMutation,
+  useViewTransactionQuery,
   useUpdateTransactionMutation,
   useDeleteTransactionMutation,
 
-  useGetDashboardQuery,
+  useCreateInvoiceMutation,
+  useViewInvoiceQuery,
+  useUpdateInvoiceMutation,
+  useDeleteInvoiceMutation,
+
+  useCreateFundMutation,
+  useViewFundQuery,
+  useUpdateFundMutation,
+  useDeleteFundMutation,
+
+  useGenerateTokenQuery,
+  useGetInstitutionsQuery,
+  useCreateRequisitionMutation,
+  useListAccountsQuery,
+  useListAccountTransactionsQuery,
+
 } = api;

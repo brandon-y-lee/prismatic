@@ -5,8 +5,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
+import NordigenClient from "nordigen-node";
+
 import authRoutes from "./routes/auth.js";
 import clientRoutes from "./routes/client.js";
+import fundRoutes from "./routes/funds.js";
+import nordigenRoutes from "./routes/nordigen.js";
 import generalRoutes from "./routes/general.js";
 import managementRoutes from "./routes/management.js";
 import salesRoutes from "./routes/sales.js";
@@ -42,12 +46,15 @@ app.use(cors());
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/client", clientRoutes);
+app.use("/funds", fundRoutes);
+app.use("/nordigen", nordigenRoutes);
 app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
 app.use("/sales", salesRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 9000;
+
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
