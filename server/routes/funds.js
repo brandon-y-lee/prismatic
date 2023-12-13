@@ -19,8 +19,8 @@ router.put('/updateInvoice/:id', updateInvoice);
 router.delete('/invoice/:id', deleteInvoice);
 
 // Fund routes
-router.post('/fund', createFund);
-router.get('/fund/:id', getFunds);
+router.post('/get-funds', getFunds);
+router.post('/create-fund', createFund);
 router.put('/updateFund/:id', updateFund);
 router.delete('/fund/:id', deleteFund);
 

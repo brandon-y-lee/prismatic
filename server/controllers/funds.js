@@ -1,6 +1,8 @@
 import Invoice from "../models/Invoice.js";
 import Fund from "../models/Fund.js";
-import axios from "axios";
+import { RepaymentPlan } from "../configs/RepaymentPlan.js";
+import { addWeeks } from 'date-fns';
+
 
 
 /* GENERATE ID */
@@ -151,49 +153,50 @@ export const deleteInvoice = async (req, res) => {
 };
 
 
+
 /* FUND - CRUD */
 
 export const getFunds = async (req, res) => {
   try {
-    const { userId, page, pageSize, sort, search } = req.query;
+    const { accountIds } = req.body;
+    let fundsData = {};
 
-    // formatted sort should look like { userId: -1 }
-    const generateSort = () => {
-      const sortParsed = JSON.parse(sort);
-      const sortFormatted = {
-        [sortParsed.field]: (sortParsed.sort = "asc" ? 1 : -1),
-      };
-
-      return sortFormatted;
-    };
-    const sortFormatted = Boolean(sort) ? generateSort() : {};
-
-    const query = { userId: userId };
-
-    const funds = await Fund.find(query)
-      .sort(sortFormatted)
-      .skip(page * pageSize)
-      .limit(pageSize);
-    
-    if (!funds) {
-      return res.status(404).json({ message: 'Funds not found.' });
+    for (const accountId of accountIds) {
+      const funds = await Fund.find({ accountId: accountId });
+      fundsData[accountId] = funds || [];
     }
 
-    res.status(200).json({ funds });
+    res.status(200).json(fundsData);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 };
 
 export const createFund = async (req, res) => {
+  const { invoiceAmount, accountId, invoiceId, userId, merchant, totalFunding, totalFees, repaymentPlan, weeklyInstallment } = req.body;
+
   try {
-    const { invoiceId, userId, totalFunding, repaymentPlan } = req.body;
+    const fundingDate = new Date();
+    const expiryDate = addWeeks(fundingDate, repaymentPlan);
+    const nextPaymentDate = addWeeks(fundingDate, 1);
 
     const newFund = new Fund({
+      invoiceAmount: invoiceAmount,
+      accountId: accountId,
       id: invoiceId,
-      userId,
-      totalFunding,
-      repaymentPlan
+      userId: userId,
+      merchant: merchant,
+      totalFunding: totalFunding,
+      expiryDate: expiryDate,
+      nextPaymentDate: nextPaymentDate,
+      totalFunding: totalFunding,
+      totalFees: totalFees,
+      amountLeft: totalFunding,
+      amountRepaid: 0,
+      repaymentPlan: repaymentPlan,
+      paymentsLeft: repaymentPlan,
+      paymentsMade: 0,
+      weeklyInstallment: weeklyInstallment
     });
 
     await newFund.save();

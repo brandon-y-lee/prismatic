@@ -3,13 +3,21 @@ import { Drawer, Box } from '@mui/material';
 import ModalHeader from './ModalHeader';
 import ModalBody from './ModalBody';
 import ModalSummary from './ModalSummary';
+import { useCreateFundMutation } from 'state/api';
+import { getLoggedInUser } from 'utils/token';
 
-const FundingOptionsModal = ({ isOpen, onClose, fundingDetails }) => {
-  const [agreementChecked, setAgreementChecked] = useState(false);
+const FundingOptionsModal = ({ isOpen, onClose, transactionDetails, onNewFund }) => {
+  const user = getLoggedInUser();
   const [tabValue, setTabValue] = useState(0);
+  const [agreementChecked, setAgreementChecked] = useState(false);
+  const [repaymentPlanDetails, setRepaymentPlanDetails] = useState({});
 
-  const invoiceNumber = fundingDetails?.transactionId ?? 'No Invoice Selected';
-  const amount = fundingDetails?.transactionAmount.amount ?? 'N/A';
+  const accountNumber = transactionDetails?.account_id ?? 'N/A';
+  const invoiceNumber = transactionDetails?.transaction_id ?? 'No Invoice Selected';
+  const merchant = transactionDetails?.merchant_name ?? transactionDetails?.name;
+  const amount = transactionDetails?.amount ?? (0);
+
+  const [createFund] = useCreateFundMutation();
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -19,10 +27,32 @@ const FundingOptionsModal = ({ isOpen, onClose, fundingDetails }) => {
     setAgreementChecked(event.target.checked);
   };
 
-  const handleConfirm = () => {
-    // Implement confirmation logic here
-    console.log('Confirmed funding details:', fundingDetails);
-    onClose(); // Close the modal after confirmation
+  const handleConfirm = async (repaymentPlanDetails) => {
+    if (agreementChecked && repaymentPlanDetails && repaymentPlanDetails.weeks) {
+      try {
+        const fundData = {
+          accountId: accountNumber,
+          invoiceId: invoiceNumber,
+          invoiceAmount: amount,
+          userId: user.id,
+          merchant: merchant,
+          totalFunding: repaymentPlanDetails.totalFunding,
+          totalFees: repaymentPlanDetails.totalFees,
+          repaymentPlan: repaymentPlanDetails.weeks,
+          weeklyInstallment: repaymentPlanDetails.weeklyTotal
+        };
+
+        const response = await createFund(fundData).unwrap();
+        console.log("createFund response: ", response);
+
+        onNewFund(response);
+        onClose();
+      } catch (error) {
+        console.error('Error creating fund:', error);
+      }
+    } else {
+      console.log("Agreement not checked or repayment plan not set.");
+    }
   };
 
   return (
@@ -61,6 +91,8 @@ const FundingOptionsModal = ({ isOpen, onClose, fundingDetails }) => {
           agreementChecked={agreementChecked}
           handleAgreementChange={handleAgreementChange}
           handleConfirm={handleConfirm}
+          repaymentPlanDetails={repaymentPlanDetails}
+          setRepaymentPlanDetails={setRepaymentPlanDetails}
         />
       </Box>
     </Drawer>

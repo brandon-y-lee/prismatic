@@ -8,9 +8,20 @@ const FundSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    invoiceAmount: {
+      type: Number,
+      required: true,
+    },
+    accountId: {
+      type: String,
+      required: true,
+    },
     userId: {
       type: String,
       required: true,
+    },
+    merchant: {
+      type: String,
     },
     fundingDate: {
       type: Date,
@@ -26,6 +37,10 @@ const FundSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    totalFees: {
+      type: Number,
+      required: true,
+    },
     amountLeft: {
       type: Number,
     },
@@ -36,6 +51,12 @@ const FundSchema = new mongoose.Schema(
       type: Number,
       enum: Object.values(RepaymentPlan),
     },
+    paymentsLeft: {
+      type: Number,
+    },
+    paymentsMade: {
+      type: Number,
+    },
     weeklyInstallment: {
       type: Number,
       default: 0,
@@ -43,18 +64,6 @@ const FundSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// Pre-save hook to calculate weeklyInstallment
-FundSchema.pre('save', function(next) {
-  if (this.isModified('totalFunding') || this.isModified('repaymentPlan')) {
-    if (this.repaymentPlan && this.repaymentPlan > 0) {
-      this.weeklyInstallment = this.totalFunding / this.repaymentPlan;
-    } else {
-      this.weeklyInstallment = 0; // Or some default value
-    }
-  }
-  next();
-});
 
 const Fund = mongoose.model("Fund", FundSchema);
 export default Fund;
