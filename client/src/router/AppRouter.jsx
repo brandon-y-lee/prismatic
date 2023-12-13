@@ -15,6 +15,7 @@ import ViewOrder from "scenes/orders/ViewOrder";
 import CreateOrder from "scenes/orders/CreateOrder";
 import UpdateOrder from "scenes/orders/UpdateOrder";
 import Funds from "scenes/funds";
+import Funding from "scenes/funding";
 
 function AppRouter() {
   const location = useLocation();
@@ -42,6 +43,11 @@ function AppRouter() {
             <Route path="/funds" element={
               <PrivateRoute>
                 <Funds />
+              </PrivateRoute>
+            } />
+            <Route path="/funding" element={
+              <PrivateRoute>
+                <Funding />
               </PrivateRoute>
             } />
             <Route path="/orders" element={

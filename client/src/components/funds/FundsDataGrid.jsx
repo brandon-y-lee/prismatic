@@ -1,40 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataGridPro } from '@mui/x-data-grid-pro';
-import { CircularProgress, Box, Button } from '@mui/material';
-import { renderPaymentChip } from 'utils/transaction';
+import { CircularProgress, Box, Button, LinearProgress } from '@mui/material';
 import { formatDistanceToNow } from 'date-fns';
 import FundingOptionsModal from './modal/FundingOptionsModal';
+import FlexBetween from 'components/FlexBetween';
+import { format, parseISO } from 'date-fns';
 
-const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
+
+const FundsDataGrid = ({ tabValue, transactionsData, fundsData, handleNewFund }) => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
-  const [sort, setSort] = useState({});
-  const [search] = useState("");
+  const [setSort] = useState({});
 
   const [fundingOptionsModalOpen, setFundingOptionsModalOpen] = useState(false);
-  const [selectedFundingDetails, setSelectedFundingDetails] = useState(null);
+  const [selectedTransactionDetails, setSelectedTransactionDetails] = useState(null);
 
   const handleFundingOptionsClick = (transaction) => {
     if (transaction) {
-      setSelectedFundingDetails(transaction);
+      setSelectedTransactionDetails(transaction);
       setFundingOptionsModalOpen(true);
     } else {
       console.error('Transaction details are missing');
     }
   };
 
+  const isFundsDataEmpty = () => {
+    return tabValue === 1 && (!fundsData || fundsData.length === 0);
+  };
+  
   const transactionColumns = [
-    { field: 'transactionId', headerName: 'Transaction ID', flex: 1 },
+    { 
+      field: 'transactionDetails',
+      headerName: 'Transaction',
+      flex: 0.55,
+      renderCell: (params) => {
+        const merchant = (params.row.name);
+        const transactionDate = (params.row.date);
+        return (
+          <Box>
+            <div>{merchant}</div>
+            <div>{transactionDate}</div>
+          </Box>
+        );
+      }
+    },
     { 
       field: 'issuedDue', 
       headerName: 'Issued / Due', 
-      flex: 1,
+      flex: 0.55,
       renderCell: (params) => {
-        const issued = formatDistanceToNow(new Date(params.row.bookingDate), { addSuffix: true });
-        const due = formatDistanceToNow(new Date(params.row.valueDate), { addSuffix: true });
+        const due = formatDistanceToNow(new Date(params.row.date), { addSuffix: true });
         return (
           <Box>
-            <div>Issued: {issued}</div>
+            <div>Issued: {due}</div>
             <div>Due: {due}</div>
           </Box>
         );
@@ -42,19 +60,25 @@ const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
     },
     { 
       field: 'amount', 
-      headerName: 'Total', 
+      headerName: 'Available Funds', 
+      headerAlign: 'right',
+      align: 'right',
       flex: 0.5, 
-      valueGetter: (params) => `${params.row.transactionAmount.amount} ${params.row.transactionAmount.currency}`,
+      renderCell: (params) => (
+        <div style={{ fontSize: '1rem' }}>${(params.row.amount).toFixed(2)}</div>
+      ),
       cellClassName: 'amount-cell'
     },
     { 
       field: 'fundingOptions',
       headerName: '',
-      flex: 0.50,
+      align: 'right',
+      flex: 0.5,
       renderCell: (params) => (
         <Button 
           variant="contained"
           sx={{
+            width: '75%',
             backgroundColor: 'white',
             color: '#1677FF',
             textTransform: 'capitalize',
@@ -75,62 +99,115 @@ const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
     },
   ];
 
+  const renderProgressBar = (paymentsMade, totalPayments) => {
+    const progress = (paymentsMade / totalPayments) * 100;
+    return <LinearProgress variant="determinate" value={progress} />;
+  };
+
   const repaymentColumns = [
     {
-      field: "fundingDetails",
-      flex: 1,
+      field: "id",
+      flex: 0.5,
       headerName: "Funding Details",
+      renderCell: (params) => (
+        <Box>
+          <div>#{params.row.id.substring(0, 4)}</div>
+          <div style={{ fontSize: 'larger' }}>{params.row.merchant}</div>
+          <div>${(params.row.invoiceAmount).toFixed(2)}</div>
+        </Box>
+      )
     },
     {
       field: "activity",
-      flex: 1,
+      flex: 0.65,
       headerName: "Activity",
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', gap: '2rem' }}>
-          {/* Left side content */}
-          <Box sx={{ fontWeight: '550' }}>
-            {params.value}
-          </Box>
-          {/* Right side content, such as buttons or icons */}
-          <Button variant="contained" size="small" onClick={() => {/* handle action */}}>
-            Repay Early
-          </Button>
-        </Box>
-      ),
+      renderCell: (params) => {
+        const formattedDate = format(parseISO(params.row.expiryDate), "MMM. dd, yyyy");
+        return (
+          <FlexBetween sx={{ width: '100%' }}>
+            <Box>
+              <div>Next Payment:</div>
+              <div style={{ fontSize: '1.25rem' }}>${params.row.weeklyInstallment}</div>
+            </Box>
+            <Box display='flex' flexDirection='column' gap='5px'>
+              <div>{params.row.paymentsLeft} payments left</div>
+              {renderProgressBar(params.row.paymentsMade, params.row.repaymentPlan)}
+              <div>Ends on: {formattedDate}</div>
+            </Box>
+          </FlexBetween>
+        )
+      }
     },
     {
-      field: "leftToPay",
-      flex: 0.75,
+      field: "amountLeft",
+      flex: 0.5,
       headerName: "Left to Pay",
-      renderCell: (params) => {
-        return (
-          renderPaymentChip(params.row.payment)
-        )
-      },
+      headerAlign: 'right',
+      renderCell: (params) => (
+        <Box sx={{ width: '100%', textAlign: 'end' }}>
+          <div style={{ fontSize: '1.25rem' }}>${params.row.amountLeft}</div>
+          <div>Incl. ${params.row.totalFees} in fees</div>
+        </Box>
+      )
+    },
+    { 
+      field: 'repayEarly',
+      headerName: '',
+      align: 'right',
+      flex: 0.5,
+      renderCell: (params) => (
+        <Button 
+          variant="contained"
+          sx={{
+            width: '75%',
+            backgroundColor: 'white',
+            color: '#1677FF',
+            textTransform: 'capitalize',
+            fontSize: '14px',
+            fontWeight: '550',
+            border: 'none',
+            boxShadow: 'none',
+            '&:hover': {
+              backgroundColor: '#1677FF',
+              color: 'white',
+            },
+          }}
+        >
+          Repay Early
+        </Button>
+      )
     },
   ];
 
+  useEffect(() => {
+    console.log("Tab value changed to:", tabValue);
+
+  }, [tabValue]);
+
+  if (!transactionsData && !fundsData) return <CircularProgress />;
+
+  if (isFundsDataEmpty()) {
+    return (
+      <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+        No active Funds
+      </Box>
+    );
+  }
+
   const columns = tabValue === 0 ? transactionColumns : repaymentColumns;
-
-  if (!transactionsData || transactionsData.length === 0) return <CircularProgress />;
-
-  const bookedTransactions = transactionsData?.booked || [];
-  const flattenedTransactions = bookedTransactions.map(transaction => ({
-    ...transaction,
-    _id: transaction.transactionId,
-    amount: transaction.transactionAmount.amount,
-    currency: transaction.transactionAmount.currency
-  }));
+  const rows = tabValue === 0
+    ? transactionsData.map(txn => ({ ...txn, _id: txn.transaction_id }))
+    : fundsData.map(fund => ({ ...fund, _id: fund.id }))
 
 
   return (
-    <>
+    <Box width="100%">
       <DataGridPro
-        loading={!flattenedTransactions.length}
+        loading={!rows.length}
         getRowId={(row) => row._id}
-        rows={flattenedTransactions}
-        columns={transactionColumns}
-        rowHeight={80}
+        rows={rows}
+        columns={columns}
+        rowHeight={90}
         disableColumnResize
         hideFooter={true}
         pagination
@@ -145,6 +222,7 @@ const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
           border: 'none',
           '& .MuiDataGrid-columnHeaders': {
             borderBottom: '1px solid rgba(224, 224, 224, 1)',
+            fontWeight: 'bold',
           },
           '& .MuiDataGrid-row': {
             borderBottom: '1px solid rgba(224, 224, 224, 0.1)',
@@ -158,9 +236,10 @@ const FundsDataGrid = ({ user, tabValue, transactionsData }) => {
       <FundingOptionsModal
         isOpen={fundingOptionsModalOpen}
         onClose={() => setFundingOptionsModalOpen(false)}
-        fundingDetails={selectedFundingDetails}
+        transactionDetails={selectedTransactionDetails}
+        onNewFund={handleNewFund}
       />
-    </>
+    </Box>
   );
 };
 

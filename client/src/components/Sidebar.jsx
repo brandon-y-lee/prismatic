@@ -32,6 +32,10 @@ const navItems = [
     icon: <CreditCardOutlined />,
   },
   {
+    text: "Funding",
+    icon: <CreditCardOutlined />,
+  },
+  {
     text: "Orders",
     icon: <ShoppingCartOutlined />,
   },

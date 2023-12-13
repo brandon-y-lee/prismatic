@@ -101,13 +101,20 @@ export const api = createApi({
     }),
 
     /* FUND - CRUD */
-    createFund: build.mutation({
-      query: ({ userId, clientId, invoiceDate, invoiceTotal }) => ({
-        url: "funds/fund",
+    getFunds: build.mutation({
+      query: ({ accountIds }) => ({
+        url: 'funds/get-funds',
         method: "POST",
-        body: { userId, clientId, invoiceDate, invoiceTotal },
+        body: { accountIds },
       }),
-      invalidatesTags: ['Invoices', 'Funds'],
+      providesTags: ['Funds'],
+    }),
+    createFund: build.mutation({
+      query: ({ invoiceAmount, accountId, invoiceId, userId, merchant, totalFunding, totalFees, repaymentPlan, weeklyInstallment }) => ({
+        url: 'funds/create-fund',
+        method: "POST",
+        body: { invoiceAmount, accountId, invoiceId, userId, merchant, totalFunding, totalFees, repaymentPlan, weeklyInstallment },
+      }),
     }),
     viewFund: build.query({
       query: (id) => `funds/fund/${id}`,
@@ -166,7 +173,37 @@ export const api = createApi({
         headers: { 'Authorization': `Bearer ${accessToken}` },
       }),
     }),
-    
+
+    /* PLAID */
+    getLinkToken: build.mutation({
+      query: ({ userId }) => ({
+        url: 'plaid/get-link-token',
+        method: 'POST',
+        body: { userId },
+      }),
+    }),
+    exchangePublicToken: build.mutation({
+      query: ({ public_token, userId }) => ({
+        url: 'plaid/exchange-public-token',
+        method: 'POST',
+        body: { public_token, userId },
+      }),
+    }),
+    getPlaidAccounts: build.mutation({
+      query: ({ userId }) => ({
+        url: 'plaid/get-accounts',
+        method: 'POST',
+        body: { userId },
+      }),
+    }),
+    getPlaidTransactions: build.mutation({
+      query: ({ userId }) => ({
+        url: 'plaid/get-transactions',
+        method: 'POST',
+        body: { userId },
+      }),
+    }),
+  
     /* DASHBOARD - GET */
     getDashboard: build.query({
       query: ({ userId }) => ({
@@ -208,6 +245,7 @@ export const {
   useUpdateInvoiceMutation,
   useDeleteInvoiceMutation,
 
+  useGetFundsMutation,
   useCreateFundMutation,
   useViewFundQuery,
   useUpdateFundMutation,
@@ -219,4 +257,8 @@ export const {
   useListAccountsQuery,
   useListAccountTransactionsQuery,
 
+  useGetLinkTokenMutation,
+  useExchangePublicTokenMutation,
+  useGetPlaidAccountsMutation,
+  useGetPlaidTransactionsMutation,
 } = api;

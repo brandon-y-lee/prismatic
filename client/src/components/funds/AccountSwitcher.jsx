@@ -1,12 +1,12 @@
 import { Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
-const AccountSwitcher = ({ accountIds, selectedAccount, onAccountChange, onConnectBank }) => {
+const AccountSwitcher = ({ accountIds, selectedAccount, onAccountChange, openDialog }) => {
   if (!accountIds.length) {
     return (
       <Button
         variant="primary"
         size="small"
-        onClick={onConnectBank}
+        onClick={openDialog}
       >
         Connect Your Bank
       </Button>

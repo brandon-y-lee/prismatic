@@ -19,11 +19,22 @@ const ModalSummary = ({ amount, tabValue, handleTabChange, agreementChecked, han
   const weeklyFee = tabValue === 0 ? weeklyFee12 : weeklyFee24;
   const weeklyTotal = tabValue === 0 ? weeklyTotal12 : weeklyTotal24;
   const totalRepayment = (weeklyTotal * weeks);
+  const totalFees = Math.round((totalRepayment - numericAmount) * 100) / 100;
 
   // Calculate dates
   const now = new Date();
   const firstPaymentDate = addWeeks(now, 1);
   const lastPaymentDate = addWeeks(now, weeks);
+
+  const handleConfirmRepaymentPlan = () => {
+    const currentRepaymentPlanDetails = {
+      weeks: tabValue === 0 ? 12 : 24,
+      weeklyTotal: tabValue === 0 ? weeklyTotal12 : weeklyTotal24,
+      totalFunding: totalRepayment,
+      totalFees: totalFees,
+    };
+    handleConfirm(currentRepaymentPlanDetails);
+  };
 
   return (
     <Box display='flex' flexDirection='column' px={4} gap={2}>
@@ -78,7 +89,7 @@ const ModalSummary = ({ amount, tabValue, handleTabChange, agreementChecked, han
           variant="contained"
           color="primary"
           fullWidth
-          onClick={handleConfirm}
+          onClick={handleConfirmRepaymentPlan}
           sx={{
             backgroundColor: '#1677FF',
             color: 'white',

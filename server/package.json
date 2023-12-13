@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "country-iso-2-to-3": "^1.1.0",
     "crypto": "^1.0.1",
+    "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "helmet": "^6.2.0",
@@ -26,6 +27,7 @@
     "mongoose": "^6.12.3",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.22",
-    "nordigen-node": "^1.2.7"
+    "nordigen-node": "^1.2.7",
+    "plaid": "^18.1.0"
   }
 }

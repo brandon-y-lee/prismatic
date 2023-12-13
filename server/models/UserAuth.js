@@ -4,7 +4,8 @@ import bcrypt from 'bcrypt';
 const UserAuthSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  accessToken: { type: String },
 });
 
 UserAuthSchema.pre('save', async function (next) {
