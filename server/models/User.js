@@ -23,7 +23,16 @@ const UserSchema = new mongoose.Schema(
     availableCredit: {
       type: Number,
     },
-    totalCredit: {
+    receivedCredit: {
+      type: Number,
+    },
+    nextRepaymentIds: {
+      type: [String],
+    },
+    nextRepaymentDate: {
+      type: Date,
+    },
+    nextRepaymentAmount: {
       type: Number,
     },
   },

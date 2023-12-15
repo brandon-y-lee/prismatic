@@ -21,15 +21,16 @@ const FundKpiExpanded = ({ expandedCard, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ fontSize: '22px', fontWeight: '500' }}>Cash Flow Insights</DialogTitle>
-
-      <DialogContent>
+      <DialogTitle variant='h4' sx={{ textAlign: 'center', fontWeight: '500', mt: 2 }}>
+        <span>Cash Flow Insights</span>
+      </DialogTitle>
+      <DialogContent sx={{ mb: 2 }}>
         <Box
           display='grid'
           gridTemplateColumns="repeat(12, 1fr)"
           gridAutoRows="100px"
           gap="20px"
-          sx={{ "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" }, mt: 1, mb: 2 }}
+          sx={{ "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" }, mx: 2, my: 2 }}
         >
           <KpiBox
             title='Cash Flow'

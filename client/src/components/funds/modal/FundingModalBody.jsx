@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
 
-const ModalBody = ({ amount }) => {
+const FundingModalBody = ({ amount }) => {
   const displayAmount = Math.abs(amount).toFixed(2);
 
   return (
@@ -19,4 +19,4 @@ const ModalBody = ({ amount }) => {
   );
 };
 
-export default ModalBody;
+export default FundingModalBody;

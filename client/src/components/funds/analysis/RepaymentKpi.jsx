@@ -1,8 +1,13 @@
 import React from 'react';
 import { Card, CardActionArea, CardContent, Typography} from '@mui/material';
+import { format, parseISO, isValid } from 'date-fns';
 
-const RepaymentKpi = ({ title, metric, paymentDate, onCardClick, isExpanded }) => {
-  
+const RepaymentKpi = ({ repaymentDetails, onCardClick }) => {
+  const formatDate = (date) => {
+    const parsedDate = parseISO(date);
+    return isValid(parsedDate) ? format(parsedDate, 'MMM-d-yyyy') : '';
+  };
+
   return (
     <Card sx={{
       transition: 'box-shadow 0.3s',
@@ -17,11 +22,15 @@ const RepaymentKpi = ({ title, metric, paymentDate, onCardClick, isExpanded }) =
         boxShadow: theme => theme.shadows[3],
       },
     }}>
-      <CardActionArea onClick={onCardClick}>
-        <CardContent>
-          <Typography variant="h6" sx={{ fontWeight: '550', mb: 1 }}>{title}</Typography>
-          <Typography variant="h3" gutterBottom sx={{ fontWeight: '550', mb: 1 }}>{metric}</Typography>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: '500' }}>{paymentDate}</Typography>
+      <CardActionArea onClick={onCardClick} sx={{ height: '100%' }}>
+        <CardContent sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1
+        }}>
+          <Typography variant="h6" sx={{ fontWeight: '550' }}>Upcoming Payment</Typography>
+          <Typography variant="h3" sx={{ fontWeight: '550' }}>${repaymentDetails?.nextRepaymentAmount}</Typography>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: '500' }}>{formatDate(repaymentDetails?.nextRepaymentDate)}</Typography>
         </CardContent>
       </CardActionArea>
     </Card>

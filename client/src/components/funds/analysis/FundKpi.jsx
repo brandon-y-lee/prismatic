@@ -17,11 +17,15 @@ const FundKpi = ({ title, metric, progress, target, onCardClick }) => {
         boxShadow: theme => theme.shadows[3],
       },
     }}>
-      <CardActionArea onClick={onCardClick}>
-        <CardContent>
-          <Typography variant="h6" sx={{ fontWeight: '550', mb: 1 }}>{title}</Typography>
-          <Typography variant="h3" gutterBottom sx={{ fontWeight: '550', mb: 1 }}>{metric}</Typography>
-          <Typography variant="body1" sx={{ mb: 1.5 }}>{`of ${target}`}</Typography>
+      <CardActionArea onClick={onCardClick} sx={{ height: '100%' }}>
+        <CardContent sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1
+        }}>
+          <Typography variant="h6" sx={{ fontWeight: '550' }}>{title}</Typography>
+          <Typography variant="h3" sx={{ fontWeight: '550' }}>{metric}</Typography>
+          <Typography variant="body1" gutterBottom>{`of ${target}`}</Typography>
           <LinearProgress variant="determinate" value={progress} color={'secondary'} />
         </CardContent>
       </CardActionArea>

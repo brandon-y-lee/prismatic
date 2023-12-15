@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Drawer, Box } from '@mui/material';
-import ModalHeader from './ModalHeader';
-import ModalBody from './ModalBody';
-import ModalSummary from './ModalSummary';
-import { useCreateFundMutation } from 'state/api';
+import FundingModalHeader from './FundingModalHeader';
+import FundingModalBody from './FundingModalBody';
+import FundingModalSummary from './FundingModalSummary';
 import { getLoggedInUser } from 'utils/token';
 
 const FundingOptionsModal = ({ isOpen, onClose, transactionDetails, onNewFund }) => {
@@ -16,8 +15,6 @@ const FundingOptionsModal = ({ isOpen, onClose, transactionDetails, onNewFund })
   const invoiceNumber = transactionDetails?.transaction_id ?? 'No Invoice Selected';
   const merchant = transactionDetails?.merchant_name ?? transactionDetails?.name;
   const amount = transactionDetails?.amount ?? (0);
-
-  const [createFund] = useCreateFundMutation();
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -36,16 +33,10 @@ const FundingOptionsModal = ({ isOpen, onClose, transactionDetails, onNewFund })
           invoiceAmount: amount,
           userId: user.id,
           merchant: merchant,
-          totalFunding: repaymentPlanDetails.totalFunding,
-          totalFees: repaymentPlanDetails.totalFees,
           repaymentPlan: repaymentPlanDetails.weeks,
-          weeklyInstallment: repaymentPlanDetails.weeklyTotal
         };
 
-        const response = await createFund(fundData).unwrap();
-        console.log("createFund response: ", response);
-
-        onNewFund(response);
+        onNewFund(fundData);
         onClose();
       } catch (error) {
         console.error('Error creating fund:', error);
@@ -77,14 +68,14 @@ const FundingOptionsModal = ({ isOpen, onClose, transactionDetails, onNewFund })
           flexDirection: 'column',
         }}
       >
-        <ModalHeader 
+        <FundingModalHeader 
           invoiceNumber={invoiceNumber}
           onClose={onClose}
         />
-        <ModalBody
+        <FundingModalBody
           amount={amount}
         />
-        <ModalSummary
+        <FundingModalSummary
           amount={amount}
           tabValue={tabValue}
           handleTabChange={handleTabChange}

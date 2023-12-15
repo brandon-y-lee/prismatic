@@ -37,7 +37,7 @@ const Link = ({ isOpen, onClose, onAccountSet }) => {
             getAccounts({ userId: userId }).then(accountsResponse => {
               console.log('Plaid Accounts:', accountsResponse);
               const accountIds = accountsResponse.data.accounts.map(account => account.account_id);
-              onAccountSet(accountIds); // Pass the account IDs to Funds component
+              onAccountSet(accountIds);
             }).catch(error => {
               console.error('Account fetch error:', error);
             });

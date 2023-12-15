@@ -29,7 +29,7 @@ const KpiBox = ({ title, value, increase, icon }) => {
       <FlexBetween>
         {icon}
         <Typography variant="h3" sx={{ fontWeight: '500' }}>
-          {value}
+          ${value}
         </Typography>
       </FlexBetween>
     </Box>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Dialog, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
+import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
 
 import Header from 'components/Header';
 import FlexBetween from 'components/FlexBetween';
@@ -11,12 +11,12 @@ import FundKpiExpanded from 'components/funds/analysis/FundKpiExpanded';
 import RepaymentKpiExpanded from 'components/funds/analysis/RepaymentKpiExpanded';
 import FundsDataGrid from 'components/funds/FundsDataGrid';
 
-import { useGetFundsMutation, useGetPlaidTransactionsMutation } from 'state/api';
+import { useGetFundsMutation, useGetPlaidTransactionsMutation, useCreateFundMutation, useGetUserRepaymentDetailsQuery } from 'state/api';
 import { getLoggedInUser } from 'utils/token';
-
 
 const Funds = () => {
   const user = getLoggedInUser();
+  const userId = user.id;
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const [tabValue, setTabValue] = useState(0);
 
@@ -26,10 +26,24 @@ const Funds = () => {
   const [fundsData, setFundsData] = useState({});
 
   const [isLinkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [expandedCard, setExpandedCard] = useState(null);
+
   const [getTransactions] = useGetPlaidTransactionsMutation();
   const [getFunds] = useGetFundsMutation();
+  const [createFund] = useCreateFundMutation();
 
-  const [expandedCard, setExpandedCard] = useState(null);
+  const [hasFundsForSelectedAccount, setHasFundsForSelectedAccount] = useState(false);
+
+  const { data: userDetails } = useGetUserRepaymentDetailsQuery({
+    userId,
+    selectedAccount
+  }, { skip: !hasFundsForSelectedAccount });
+
+  const [repaymentDetails, setRepaymentDetails] = useState({
+    nextRepaymentIds: [''],
+    nextRepaymentAmount: 0,
+    nextRepaymentDate: '',
+  });
 
   const handleCardClick = (card) => {
     setExpandedCard(expandedCard === card ? null : card);
@@ -43,12 +57,12 @@ const Funds = () => {
     setLinkDialogOpen(false);
   };
 
-  const handleAccountUpdate = (updatedAccountIds) => {
-    setAccountIds(updatedAccountIds);
-    if (updatedAccountIds.length > 0) {
-      setSelectedAccount(updatedAccountIds[0]);
-      fetchTransactionsAndFunds();
+  const handleAccountSet = (connectedAccountIds) => {
+    setAccountIds(connectedAccountIds);
+    if (connectedAccountIds.length > 0) {
+      setSelectedAccount(connectedAccountIds[0]);
     }
+    fetchTransactionsAndFunds();
   };
 
   const handleAccountChange = (accountId) => {
@@ -59,27 +73,14 @@ const Funds = () => {
     setTabValue(newValue);
   };
 
-  const handleNewFund = (newFund) => {
-    // Assumes fundsData is structured as { accountId: [funds] }
-    if (fundsData[newFund.accountId]) {
-      setFundsData(prev => ({
-        ...prev,
-        [newFund.accountId]: [...prev[newFund.accountId], newFund]
-      }));
+  const handleNewFund = async (newFundData) => {
+    try {
+      const response = await createFund(newFundData).unwrap();
+      console.log("createFund response: ", response);
 
-      setTransactionsData(prev => {
-        const accountId = newFund.accountId;
-        if (!prev[accountId]) {
-          return prev; // No transactions for this account
-        }
-    
-        // Filter out the transaction that matches the new fund's invoiceId
-        const updatedTransactions = prev[accountId].filter(txn => txn.transaction_id !== newFund.id);
-        return {
-          ...prev,
-          [accountId]: updatedTransactions
-        };
-      });
+      fetchTransactionsAndFunds();
+    } catch (error) {
+      console.error('Error creating new Fund: ', error);
     }
   };
 
@@ -105,27 +106,29 @@ const Funds = () => {
 
   const fetchTransactionsAndFunds = async () => {
     try {
+      const fundsResponse = await getFunds({ accountIds: accountIds }).unwrap();
+      console.log('Initial getFunds response: ', fundsResponse);
+  
       const transactionsResponse = await getTransactions({ userId: user.id }).unwrap();
-      console.log('getTransactions Response: ', transactionsResponse);
-
       let organizedTransactions = {};
+  
       transactionsResponse.transactions.forEach(txn => {
         if (!organizedTransactions[txn.account_id]) {
           organizedTransactions[txn.account_id] = [];
         }
-        organizedTransactions[txn.account_id].push(txn);
+  
+        const isFund = (fundsResponse[txn.account_id] && fundsResponse[txn.account_id].some(fund => fund.id === txn.transaction_id));
+  
+        if (!isFund) {
+          organizedTransactions[txn.account_id].push(txn);
+        }
       });
-
+  
       setTransactionsData(organizedTransactions);
-
-      const accountIdsArray = Object.keys(organizedTransactions);
-      const fundsResponse = await getFunds({ accountIds: accountIdsArray }).unwrap();
-      console.log('getFunds Response: ', fundsResponse);
-
       setFundsData(fundsResponse);
-
+  
     } catch (error) {
-      console.error('Error fetching transactions:', error);
+      console.error('Error fetching transactions and funds: ', error);
     }
   };
 
@@ -141,6 +144,29 @@ const Funds = () => {
     }
   }, [fundsData]);
 
+  useEffect(() => {
+    if (fundsData[selectedAccount] && fundsData[selectedAccount].length > 0) {
+      setHasFundsForSelectedAccount(true);
+    }
+  }, [fundsData, selectedAccount]);
+
+  useEffect(() => {
+    if (userDetails) {
+      setRepaymentDetails({
+        nextRepaymentIds: userDetails.nextRepaymentIds,
+        nextRepaymentAmount: userDetails.nextRepaymentAmount,
+        nextRepaymentDate: userDetails.nextRepaymentDate,
+      });
+    }
+    setHasFundsForSelectedAccount(false);
+  }, [userDetails]);
+
+  useEffect(() => {
+    if (repaymentDetails) {
+      console.log("Repayment Details: ", repaymentDetails);
+    }
+  }, [repaymentDetails]);
+
   return (
     <Box>
       <Box m="1.5rem 2.5rem">
@@ -155,7 +181,7 @@ const Funds = () => {
           <Link
             isOpen={isLinkDialogOpen}
             onClose={handleCloseLinkDialog}
-            onAccountSet={handleAccountUpdate}
+            onAccountSet={handleAccountSet}
           />
         </FlexBetween>
 
@@ -179,26 +205,27 @@ const Funds = () => {
           </Box>
           <Box gridColumn={isNonMediumScreens ? 'span 4' : 'span 12'}>
             <RepaymentKpi 
-              {...kpiData[1]}
+              repaymentDetails={repaymentDetails}
               onCardClick={() => handleCardClick('repayment')}
               isExpanded={expandedCard === 'repayment'} 
             />
           </Box>
         </Box>
 
-        <Dialog
-          open={expandedCard !== null}
-          onClose={() => setExpandedCard(null)}
-          fullWidth
-          maxWidth="md"
-        >
-          {expandedCard === 'fund' && (
-            <FundKpiExpanded expandedCard={expandedCard} onClose={() => setExpandedCard(null)} />
-          )}
-          {expandedCard === 'repayment' && (
-            <RepaymentKpiExpanded expandedCard={expandedCard} onClose={() => setExpandedCard(null)} />
-          )}
-        </Dialog>
+        {expandedCard === 'fund' && (
+          <FundKpiExpanded
+            expandedCard={expandedCard}
+            onClose={() => setExpandedCard(null)}
+          />
+        )}
+        {expandedCard === 'repayment' && (
+          <RepaymentKpiExpanded
+            expandedCard={expandedCard}
+            onClose={() => setExpandedCard(null)}
+            fundsData={fundsData[selectedAccount] || []}
+            repaymentDetails={repaymentDetails}
+          />
+        )}
 
         <Tabs
           value={tabValue}
@@ -240,6 +267,7 @@ const Funds = () => {
             transactionsData={tabValue === 0 ? transactionsData[selectedAccount] || [] : []}
             fundsData={tabValue === 1 ? fundsData[selectedAccount] || [] : []}
             handleNewFund={handleNewFund}
+            repaymentDetails={repaymentDetails}
           />
         )}
       </Box>
