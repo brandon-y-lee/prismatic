@@ -5,20 +5,32 @@ import { formatDistanceToNow } from 'date-fns';
 import FundingOptionsModal from './modal/FundingOptionsModal';
 import FlexBetween from 'components/FlexBetween';
 import { format, parseISO } from 'date-fns';
+import RepaymentOptionsModal from './repayment/RepaymentOptionsModal';
 
-
-const FundsDataGrid = ({ tabValue, transactionsData, fundsData, handleNewFund }) => {
+const FundsDataGrid = ({ tabValue, transactionsData, fundsData, handleNewFund, repaymentDetails }) => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [setSort] = useState({});
 
   const [fundingOptionsModalOpen, setFundingOptionsModalOpen] = useState(false);
+  const [repaymentOptionsModalOpen, setRepaymentOptionsModalOpen] = useState(false);
+
   const [selectedTransactionDetails, setSelectedTransactionDetails] = useState(null);
+  const [selectedFundDetails, setSelectedFundDetails] = useState(null);
 
   const handleFundingOptionsClick = (transaction) => {
     if (transaction) {
       setSelectedTransactionDetails(transaction);
       setFundingOptionsModalOpen(true);
+    } else {
+      console.error('Transaction details are missing');
+    }
+  };
+
+  const handleRepaymentOptionsClick = (fund) => {
+    if (fund) {
+      setSelectedFundDetails(fund);
+      setRepaymentOptionsModalOpen(true);
     } else {
       console.error('Transaction details are missing');
     }
@@ -127,10 +139,10 @@ const FundsDataGrid = ({ tabValue, transactionsData, fundsData, handleNewFund })
           <FlexBetween sx={{ width: '100%' }}>
             <Box>
               <div>Next Payment:</div>
-              <div style={{ fontSize: '1.25rem' }}>${params.row.weeklyInstallment}</div>
+              <div style={{ fontSize: '1.15rem' }}>${params.row.weeklyInstallment}</div>
             </Box>
             <Box display='flex' flexDirection='column' gap='5px'>
-              <div>{params.row.paymentsLeft} payments left</div>
+              <div>{params.row.paymentsRemaining} payments left</div>
               {renderProgressBar(params.row.paymentsMade, params.row.repaymentPlan)}
               <div>Ends on: {formattedDate}</div>
             </Box>
@@ -145,8 +157,8 @@ const FundsDataGrid = ({ tabValue, transactionsData, fundsData, handleNewFund })
       headerAlign: 'right',
       renderCell: (params) => (
         <Box sx={{ width: '100%', textAlign: 'end' }}>
-          <div style={{ fontSize: '1.25rem' }}>${params.row.amountLeft}</div>
-          <div>Incl. ${params.row.totalFees} in fees</div>
+          <div style={{ fontSize: '1.15rem' }}>${params.row.debitRemaining}</div>
+          <div>Incl. ${params.row.totalFee} in fees</div>
         </Box>
       )
     },
@@ -172,6 +184,7 @@ const FundsDataGrid = ({ tabValue, transactionsData, fundsData, handleNewFund })
               color: 'white',
             },
           }}
+          onClick={() => handleRepaymentOptionsClick(params.row)}
         >
           Repay Early
         </Button>
@@ -198,7 +211,6 @@ const FundsDataGrid = ({ tabValue, transactionsData, fundsData, handleNewFund })
   const rows = tabValue === 0
     ? transactionsData.map(txn => ({ ...txn, _id: txn.transaction_id }))
     : fundsData.map(fund => ({ ...fund, _id: fund.id }))
-
 
   return (
     <Box width="100%">
@@ -238,6 +250,12 @@ const FundsDataGrid = ({ tabValue, transactionsData, fundsData, handleNewFund })
         onClose={() => setFundingOptionsModalOpen(false)}
         transactionDetails={selectedTransactionDetails}
         onNewFund={handleNewFund}
+      />
+      <RepaymentOptionsModal
+        isOpen={repaymentOptionsModalOpen}
+        onClose={() => setRepaymentOptionsModalOpen(false)}
+        fundDetails={selectedFundDetails}
+        repaymentDetails={repaymentDetails}
       />
     </Box>
   );

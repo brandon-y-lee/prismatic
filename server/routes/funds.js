@@ -5,6 +5,7 @@ import {
   deleteFund, 
   deleteInvoice, 
   getFunds, 
+  getUserRepaymentDetails, 
   updateFund, 
   updateInvoice, 
   viewInvoice 
@@ -23,5 +24,7 @@ router.post('/get-funds', getFunds);
 router.post('/create-fund', createFund);
 router.put('/updateFund/:id', updateFund);
 router.delete('/fund/:id', deleteFund);
+
+router.get('/get-user-repayment-details', getUserRepaymentDetails);
 
 export default router;

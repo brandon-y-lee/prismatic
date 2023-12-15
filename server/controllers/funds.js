@@ -1,5 +1,7 @@
 import Invoice from "../models/Invoice.js";
 import Fund from "../models/Fund.js";
+import UserAuth from "../models/UserAuth.js";
+import User from "../models/User.js";
 import { RepaymentPlan } from "../configs/RepaymentPlan.js";
 import { addWeeks } from 'date-fns';
 
@@ -173,30 +175,43 @@ export const getFunds = async (req, res) => {
 };
 
 export const createFund = async (req, res) => {
-  const { invoiceAmount, accountId, invoiceId, userId, merchant, totalFunding, totalFees, repaymentPlan, weeklyInstallment } = req.body;
+  const { invoiceAmount, accountId, invoiceId, userId, merchant, repaymentPlan } = req.body;
 
   try {
-    const fundingDate = new Date();
+    const fundingDate = new Date().setHours(12, 0, 0, 0);
     const expiryDate = addWeeks(fundingDate, repaymentPlan);
     const nextPaymentDate = addWeeks(fundingDate, 1);
 
+    const totalRepayment = parseFloat((invoiceAmount * 1.2).toFixed(2));
+    const totalFee = parseFloat((totalRepayment - invoiceAmount).toFixed(2));
+    const weeklyInstallment = parseFloat((totalRepayment / repaymentPlan).toFixed(2));
+
+    const firstHalfFee = parseFloat(((totalFee * 0.75) / (repaymentPlan / 2)).toFixed(2));
+    const weeklyFee = firstHalfFee;
+    const weeklyPrincipal = parseFloat((weeklyInstallment - firstHalfFee).toFixed(2));
+
     const newFund = new Fund({
-      invoiceAmount: invoiceAmount,
-      accountId: accountId,
+      userId,
+      accountId,
       id: invoiceId,
-      userId: userId,
-      merchant: merchant,
-      totalFunding: totalFunding,
-      expiryDate: expiryDate,
-      nextPaymentDate: nextPaymentDate,
-      totalFunding: totalFunding,
-      totalFees: totalFees,
-      amountLeft: totalFunding,
-      amountRepaid: 0,
-      repaymentPlan: repaymentPlan,
-      paymentsLeft: repaymentPlan,
+      merchant,
+      invoiceAmount,
+      totalRepayment,
+      totalFee,
+      feePaid: 0,
+      feeRemaining: totalFee,
+      principalPaid: 0,
+      principalRemaining: invoiceAmount,
+      debitRemaining: totalRepayment,
+      repaymentPlan,
+      expiryDate,
+      weeklyInstallment,
+      weeklyPrincipal,
+      weeklyFee,
       paymentsMade: 0,
-      weeklyInstallment: weeklyInstallment
+      paymentsRemaining: repaymentPlan,
+      nextPaymentAmount: weeklyInstallment,
+      nextPaymentDate,
     });
 
     await newFund.save();
@@ -263,4 +278,77 @@ export const deleteFund = async (req, res) => {
   } catch (error) {
     res.status(404).json({ message: error.message });
   };
+};
+
+/* USER REPAYMENT - RU */
+
+export const getUserRepaymentDetails = async (req, res) => {
+  const { userId, selectedAccount } = req.query;
+
+  try {
+    const activeFunds = await Fund.find({ accountId: selectedAccount });
+    if (!activeFunds) return res.status(404).json({ message: 'No active Funds found.' });
+    console.log('activeFunds: ', activeFunds);
+
+    const today = new Date();
+    let ids = [];
+    let nearestDate = new Date('9999-12-31');
+    let totalAmount = 0;
+
+    activeFunds.forEach((fund) => {
+      if (fund.nextPaymentDate > today && fund.nextPaymentDate < nearestDate) {
+        nearestDate = fund.nextPaymentDate;
+        totalAmount = fund.weeklyInstallment;
+        ids = [fund.id];
+      } else if (fund.nextPaymentDate.getTime() === nearestDate.getTime()) {
+        totalAmount += fund.weeklyInstallment;
+        ids.push(fund.id);
+      }
+    });
+
+    const userAuth = await UserAuth.findById(userId).populate('user');
+    console.log('userAuth: ', userAuth);
+
+    if (!userAuth || !userAuth.user) return res.status(404).json({ message: 'User not found.' });
+
+    userAuth.user.nextRepaymentIds = ids;
+    userAuth.user.nextRepaymentDate = nearestDate;
+    userAuth.user.nextRepaymentAmount = totalAmount;
+
+    await userAuth.user.save();
+
+    res.status(200).json(userAuth.user);
+  } catch (error) {
+    console.error('Error updating user repayment info:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateUserRepaymentDetails = async (req, res) => {
+  const { fundId, nextPayment, nextRepaymentAmount } = req.body;
+
+  try {
+    const fund = await Fund.find({ id: fundId });
+    if (!fund) return res.status(404).json({ message: 'No active Fund found.' });
+    console.log('fund: ', fund);
+
+    const userId = fund.userId;
+    const userAuth = await UserAuth.findById(userId).populate('user');
+    if (!userId || !userAuth.user) return res.status(404).json({ message: 'User not found.' });
+    console.log('userAuth: ', userAuth);
+
+    if (!userAuth.user.nextRepaymentIds.includes(fund.id))
+      userAuth.user.nextRepaymentIds.push(fund.id);
+
+    userAuth.user.nextRepaymentAmount = nextRepaymentAmount;
+    fund.nextPayment = nextPayment;
+
+    await userAuth.user.save();
+    await fund.save();
+
+    res.status(200).json({ fund });
+  } catch (error) {
+    console.error('Error updating user repayment info:', error);
+    res.status(500).json({ message: error.message });
+  }
 };

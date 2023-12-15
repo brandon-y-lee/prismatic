@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import FlexBetween from 'components/FlexBetween';
 
 
-const ModalHeader = ({ invoiceNumber, onClose }) => {
+const FundingModalHeader = ({ invoiceNumber, onClose }) => {
 
   return (
     <>
@@ -23,4 +23,4 @@ const ModalHeader = ({ invoiceNumber, onClose }) => {
   );
 };
 
-export default ModalHeader;
+export default FundingModalHeader;

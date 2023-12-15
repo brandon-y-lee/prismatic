@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button, Checkbox, Tabs, Tab, Typography, FormControlLabel } from '@mui/material';
 import { addWeeks, format } from 'date-fns';
 
-const ModalSummary = ({ amount, tabValue, handleTabChange, agreementChecked, handleAgreementChange, handleConfirm }) => {
+const FundingModalSummary = ({ amount, tabValue, handleTabChange, agreementChecked, handleAgreementChange, handleConfirm }) => {
   const numericAmount = Math.abs(parseFloat(amount));
 
   // Calculate weekly amounts and fees for both 12 and 24 weeks
@@ -19,7 +19,6 @@ const ModalSummary = ({ amount, tabValue, handleTabChange, agreementChecked, han
   const weeklyFee = tabValue === 0 ? weeklyFee12 : weeklyFee24;
   const weeklyTotal = tabValue === 0 ? weeklyTotal12 : weeklyTotal24;
   const totalRepayment = (weeklyTotal * weeks);
-  const totalFees = Math.round((totalRepayment - numericAmount) * 100) / 100;
 
   // Calculate dates
   const now = new Date();
@@ -28,10 +27,7 @@ const ModalSummary = ({ amount, tabValue, handleTabChange, agreementChecked, han
 
   const handleConfirmRepaymentPlan = () => {
     const currentRepaymentPlanDetails = {
-      weeks: tabValue === 0 ? 12 : 24,
-      weeklyTotal: tabValue === 0 ? weeklyTotal12 : weeklyTotal24,
-      totalFunding: totalRepayment,
-      totalFees: totalFees,
+      weeks: tabValue === 0 ? 12 : 24
     };
     handleConfirm(currentRepaymentPlanDetails);
   };
@@ -109,4 +105,4 @@ const ModalSummary = ({ amount, tabValue, handleTabChange, agreementChecked, han
   );
 };
 
-export default ModalSummary;
+export default FundingModalSummary;

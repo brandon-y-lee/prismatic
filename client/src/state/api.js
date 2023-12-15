@@ -110,11 +110,12 @@ export const api = createApi({
       providesTags: ['Funds'],
     }),
     createFund: build.mutation({
-      query: ({ invoiceAmount, accountId, invoiceId, userId, merchant, totalFunding, totalFees, repaymentPlan, weeklyInstallment }) => ({
+      query: ({ invoiceId, invoiceAmount, accountId, userId, merchant, repaymentPlan }) => ({
         url: 'funds/create-fund',
         method: "POST",
-        body: { invoiceAmount, accountId, invoiceId, userId, merchant, totalFunding, totalFees, repaymentPlan, weeklyInstallment },
+        body: { invoiceId, invoiceAmount, accountId, userId, merchant, repaymentPlan },
       }),
+      invalidatesTags: ['Funds'],
     }),
     viewFund: build.query({
       query: (id) => `funds/fund/${id}`,
@@ -134,6 +135,14 @@ export const api = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ['Invoices', 'Funds'],
+    }),
+    getUserRepaymentDetails: build.query({
+      query: ({ userId, selectedAccount }) => ({
+        url: 'funds/get-user-repayment-details',
+        method: 'GET',
+        params: { userId, selectedAccount },
+      }),
+      providesTags: ['Funds'],
     }),
 
     /* NORDIGEN - GET */
@@ -250,6 +259,7 @@ export const {
   useViewFundQuery,
   useUpdateFundMutation,
   useDeleteFundMutation,
+  useGetUserRepaymentDetailsQuery,
 
   useGenerateTokenQuery,
   useGetInstitutionsQuery,

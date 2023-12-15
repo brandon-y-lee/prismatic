@@ -4,62 +4,79 @@ import { RepaymentPlan } from "../configs/RepaymentPlan.js";
 
 const FundSchema = new mongoose.Schema(
   {
-    id: {
+    userId: {
       type: String,
-      required: true,
-    },
-    invoiceAmount: {
-      type: Number,
       required: true,
     },
     accountId: {
       type: String,
       required: true,
     },
-    userId: {
+    id: {
       type: String,
       required: true,
     },
     merchant: {
       type: String,
     },
-    fundingDate: {
-      type: Date,
-      default: Date.now
-    },
-    expiryDate: {
-      type: Date,
-    },
-    nextPaymentDate: {
-      type: Date,
-    },
-    totalFunding: {
+    invoiceAmount: {
       type: Number,
       required: true,
     },
-    totalFees: {
+    totalRepayment: {
       type: Number,
       required: true,
     },
-    amountLeft: {
+    totalFee: {
+      type: Number,
+      required: true,
+    },
+    feePaid: {
       type: Number,
     },
-    amountRepaid: {
-      type: Number
+    feeRemaining: {
+      type: Number,
+    },
+    principalPaid: {
+      type: Number,
+    },
+    principalRemaining: {
+      type: Number,
+    },
+    debitRemaining: {
+      type: Number,
     },
     repaymentPlan: {
       type: Number,
       enum: Object.values(RepaymentPlan),
     },
-    paymentsLeft: {
+    fundingDate: {
+      type: Date,
+      default: () => new Date().setHours(12, 0, 0, 0),
+    },
+    expiryDate: {
+      type: Date,
+    },
+    weeklyInstallment: {
+      type: Number,
+    },
+    weeklyPrincipal: {
+      type: Number,
+    },
+    weeklyFee: {
       type: Number,
     },
     paymentsMade: {
       type: Number,
     },
-    weeklyInstallment: {
+    paymentsRemaining: {
       type: Number,
-      default: 0,
+    },
+    nextPaymentAmount: {
+      type: Number,
+    },
+    nextPaymentDate: {
+      type: Date,
     },
   },
   { timestamps: true }
