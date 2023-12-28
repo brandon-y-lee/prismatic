@@ -20,20 +20,10 @@ const UserSchema = new mongoose.Schema(
     address: {
       type: String,
     },
-    availableCredit: {
-      type: Number,
-    },
-    receivedCredit: {
-      type: Number,
-    },
-    nextRepaymentIds: {
-      type: [String],
-    },
-    nextRepaymentDate: {
-      type: Date,
-    },
-    nextRepaymentAmount: {
-      type: Number,
+    accounts: { 
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'Account',
+      default: [],
     },
   },
   { timestamps: true }

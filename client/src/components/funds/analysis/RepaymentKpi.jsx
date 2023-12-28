@@ -2,7 +2,13 @@ import React from 'react';
 import { Card, CardActionArea, CardContent, Typography} from '@mui/material';
 import { format, parseISO, isValid } from 'date-fns';
 
-const RepaymentKpi = ({ repaymentDetails, onCardClick }) => {
+import { useContext } from 'react';
+import { FundsContext } from 'context/FundsContext';
+
+const RepaymentKpi = ({ onCardClick }) => {
+
+  const { repaymentDetails } = useContext(FundsContext);
+
   const formatDate = (date) => {
     const parsedDate = parseISO(date);
     return isValid(parsedDate) ? format(parsedDate, 'MMM-d-yyyy') : '';
@@ -29,7 +35,7 @@ const RepaymentKpi = ({ repaymentDetails, onCardClick }) => {
           gap: 1
         }}>
           <Typography variant="h6" sx={{ fontWeight: '550' }}>Upcoming Payment</Typography>
-          <Typography variant="h3" sx={{ fontWeight: '550' }}>${repaymentDetails?.nextRepaymentAmount}</Typography>
+          <Typography variant="h3" sx={{ fontWeight: '550' }}>${repaymentDetails?.nextRepaymentAmount.toFixed(2)}</Typography>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: '500' }}>{formatDate(repaymentDetails?.nextRepaymentDate)}</Typography>
         </CardContent>
       </CardActionArea>

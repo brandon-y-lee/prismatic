@@ -1,5 +1,7 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 import UserAuth from '../models/UserAuth.js';
+import User from '../models/User.js';
+import Account from '../models/Account.js';
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -7,9 +9,6 @@ dotenv.config();
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
 const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
-
-console.log('Plaid Client ID:', PLAID_CLIENT_ID);
-console.log('Plaid Secret:', PLAID_SECRET);
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[PLAID_ENV],
@@ -24,12 +23,12 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 export const getLinkToken = async (req, res) => {
-  const { userId } = req.body;
+  const { authId } = req.body;
 
   try {
     const configs = {
       user: {
-        client_user_id: userId,
+        client_user_id: authId,
       },
       client_name: 'Plaid Quickstart',
       products: (process.env.PLAID_PRODUCTS || 'transactions').split(','),
@@ -47,11 +46,11 @@ export const getLinkToken = async (req, res) => {
 export const exchangePublicTokenForAccessToken = async (req, res) => {
   try {
     console.log('Request body:', req.body);
-    const { public_token, userId } = req.body;
+    const { public_token, authId } = req.body;
     const tokenResponse = await client.itemPublicTokenExchange({ public_token });
     const accessToken = tokenResponse.data.access_token;
 
-    await UserAuth.updateOne({ id: userId }, { accessToken: accessToken });
+    await UserAuth.updateOne({ _id: authId }, { accessToken: accessToken });
 
     res.status(200).json({ message: "Access Token exchanged and stored successfully" });
   } catch (error) {
@@ -60,11 +59,13 @@ export const exchangePublicTokenForAccessToken = async (req, res) => {
 };
 
 export const getAccounts = async (req, res) => {
-  const { userId } = req.body;
+  console.log('Request body:', req.body);
+  const { authId, userId } = req.body;
 
   try {
-    const user = await UserAuth.findById(userId);
-    const accessToken = user.accessToken;
+    const userAuth = await UserAuth.findById(authId);
+    const accessToken = userAuth.accessToken;
+
     if (!accessToken) {
       return res.status(404).json({ message: 'Access Token not found.' });
     }
@@ -73,7 +74,28 @@ export const getAccounts = async (req, res) => {
       access_token: accessToken,
     });
 
-    console.log('Accounts response:', accountsResponse.data);
+    console.log('accountsResponse: ', accountsResponse);
+
+    const user = await User.findById(userId).populate('accounts');
+
+    const accountPromises = accountsResponse.data.accounts.map( async (accountInfo) => {
+      const accountExists = user.accounts.some(acc => acc.accountId === accountInfo.account_id);
+
+      if (!accountExists) {
+        const newAccount = new Account({
+          accountId: accountInfo.account_id,
+        });
+        await newAccount.save();
+
+        user.accounts.push(newAccount);
+      }
+    });
+
+    await Promise.all(accountPromises);
+
+    await user.save();
+    
+    console.log('Accounts updated:', accountsResponse.data);
     res.status(200).json(accountsResponse.data);
   } catch (error) {
     console.error('Error getting accounts:', error);
@@ -82,10 +104,11 @@ export const getAccounts = async (req, res) => {
 };
 
 export const getTransactions = async (req, res) => {
-  const { userId } = req.body;
+  const { authId } = req.body;
 
-  const user = await UserAuth.findById(userId);
-  const accessToken = user.accessToken;
+  const userAuth = await UserAuth.findById(authId);
+  const accessToken = userAuth.accessToken;
+  
   if (!accessToken) {
     return res.status(404).json({ message: 'Access Token not found.' });
   }

@@ -6,7 +6,7 @@ const RepayEarlyHeader = ({ earlyRepaymentAmount, invoiceNumber, merchant, onClo
   return (
     <Box sx={{
       position: 'relative',
-      background: 'linear-gradient(145deg, #E6F4FF, #D1E3F2)',
+      backgroundColor: '#1677FF',
       display: 'flex',
       flexDirection: 'column',
       textAlign: 'center',
@@ -19,19 +19,20 @@ const RepayEarlyHeader = ({ earlyRepaymentAmount, invoiceNumber, merchant, onClo
         sx={{
           position: 'absolute',
           top: 16,
-          right: 16
+          right: 16,
+          color: 'white'
         }}
       >
         <CloseIcon />
       </IconButton>
 
-      <Typography variant="body1" fontWeight={500}>
+      <Typography variant="body1" fontWeight={525} color={'white'}>
         You Pay
       </Typography>
-      <Typography variant="h1" fontWeight={500}>
-        ${earlyRepaymentAmount}
+      <Typography variant="h1" fontWeight={500} color={'white'}>
+        ${earlyRepaymentAmount.toFixed(2)}
       </Typography>
-      <Typography variant="body1" fontWeight={500}>
+      <Typography variant="body1" fontWeight={500} color={'white'}>
         No. {invoiceNumber.substring(0, 4)} | {merchant}
       </Typography>
     </Box>

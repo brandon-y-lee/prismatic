@@ -22,8 +22,8 @@ const CreateOrder = () => {
     console.log("Items at handleSubmit:", items); 
 
     const transactionData = {
-      buyerId: user.id,
-      sellerId: user.id,
+      buyerId: user.authId,
+      sellerId: user.authId,
       products: items,
       cost: items.reduce((total, item) => total + (item.price * item.quantity), 0),
       initialDate: formValues.initialDate,

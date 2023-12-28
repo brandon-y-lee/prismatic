@@ -4,7 +4,7 @@ import RepaymentModalHeader from './RepaymentModalHeader';
 import RepaymentModalBody from './RepaymentModalBody';
 import RepayEarlyModal from './RepayEarlyModal';
 
-const RepaymentOptionsModal = ({ isOpen, onClose, fundDetails, repaymentDetails }) => {
+const RepaymentOptionsModal = ({ isOpen, onClose, fundDetails, repaymentDetails, handleRepayEarly }) => {
   const [isRepayEarlyModalOpen, setRepayEarlyModalOpen] = useState(false);
 
   const handleClose = () => {
@@ -51,7 +51,7 @@ const RepaymentOptionsModal = ({ isOpen, onClose, fundDetails, repaymentDetails 
           }}
         >
           <RepaymentModalHeader 
-            invoiceNumber={fundDetails?.id ?? 'No Fund ID'}
+            invoiceNumber={fundDetails?.invoiceId ?? 'No Fund ID'}
             merchant={fundDetails?.merchant ?? ''}
             onClose={onClose}
           />
@@ -69,6 +69,7 @@ const RepaymentOptionsModal = ({ isOpen, onClose, fundDetails, repaymentDetails 
           onClose={closeRepayEarly}
           fundDetails={fundDetails}
           repaymentDetails={repaymentDetails}
+          handleRepayEarly={handleRepayEarly}
         />
       )}
     </>

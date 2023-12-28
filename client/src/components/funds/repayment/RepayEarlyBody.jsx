@@ -4,29 +4,45 @@ import { format, parseISO } from 'date-fns';
 import FlexBetween from "components/FlexBetween";
 import { Divider } from "antd";
 
-const RepayEarlyBody = ({ fundDetails, repaymentDetails, onClose, onRepayEarly }) => {
+const RepayEarlyBody = ({ fundDetails, repaymentDetails, onClose, handleRepayEarly }) => {
   const [nextRepayment, setNextRepayment] = useState(0);
 
+  const formatDate = (date) => {
+    return format(parseISO(date), 'MMM-d-yyyy');
+  };
+
+  const handleConfirm = () => {
+    try {
+      const updateData = {
+        userId: fundDetails.userId,
+        selectedAccount: fundDetails?.accountId,
+        fundId: fundDetails?.invoiceId,
+        nextPaymentAmount: nextRepayment,
+      };
+
+      handleRepayEarly(updateData);
+      onClose();
+    } catch (error) {
+      console.error('Error creating fund:', error);
+    }
+  };
+
   useEffect(() => {
-    if (repaymentDetails?.nextRepaymentIds.includes(fundDetails?.id)) {
+    if (repaymentDetails?.nextRepaymentIds.includes(fundDetails?.invoiceId)) {
       setNextRepayment(repaymentDetails?.nextRepaymentAmount - fundDetails?.weeklyInstallment + fundDetails?.principalRemaining);
     } else {
       setNextRepayment(repaymentDetails?.nextRepaymentAmount + fundDetails?.principalRemaining);
     }
   }, [fundDetails, repaymentDetails]);
 
-  const formatDate = (date) => {
-    return format(parseISO(date), 'MMM-d-yyyy');
-  }
-
   return (
     <Box display='flex' flexDirection='column' sx={{ textAlign: 'center', m: 4 }}>
       <Box display='flex' flexDirection='column' gap={0.5} px={3} py={2}>
-        <Typography variant="body1" gutterBottom fontWeight={500}>
+        <Typography variant="body1" gutterBottom fontWeight={525}>
           You Save
         </Typography>
         <Typography variant="h2" gutterBottom>
-          ${fundDetails?.feeRemaining}
+          ${fundDetails?.feeRemaining.toFixed(2)}
         </Typography>
         <Typography variant="body1" gutterBottom fontWeight={500}>
           in fees
@@ -48,14 +64,14 @@ const RepayEarlyBody = ({ fundDetails, repaymentDetails, onClose, onRepayEarly }
             Cumulative next payment
           </Typography>
           <Typography variant="body1" gutterBottom sx={{ fontWeight: 525 }}>
-            ${nextRepayment}
+            ${nextRepayment.toFixed(2)}
           </Typography>
         </FlexBetween>
       </Box>
 
       <Box py={4}>
         <Button
-          onClick={onRepayEarly}
+          onClick={handleConfirm}
           variant="contained"
           color="primary"
           fullWidth

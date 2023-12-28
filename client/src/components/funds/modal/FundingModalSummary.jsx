@@ -59,7 +59,7 @@ const FundingModalSummary = ({ amount, tabValue, handleTabChange, agreementCheck
         {[['Weekly fee', `$${weeklyFee.toFixed(2)}`],
           ['First payment due date', format(firstPaymentDate, 'PPP')],
           ['Last payment due date', format(lastPaymentDate, 'PPP')],
-          ['Total repayment inc. fees', `$${totalRepayment.toFixed(2)}`]
+          ['Total repayment incl. fees', `$${totalRepayment.toFixed(2)}`]
         ].map(([label, value], index) => (
           <Typography key={index} variant="body1" gutterBottom display="flex" justifyContent="space-between" sx={{
             color: 'grey',

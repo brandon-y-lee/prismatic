@@ -11,10 +11,10 @@ const FundingOptionsModal = ({ isOpen, onClose, transactionDetails, onNewFund })
   const [agreementChecked, setAgreementChecked] = useState(false);
   const [repaymentPlanDetails, setRepaymentPlanDetails] = useState({});
 
-  const accountNumber = transactionDetails?.account_id ?? 'N/A';
-  const invoiceNumber = transactionDetails?.transaction_id ?? 'No Invoice Selected';
+  const accountNumber = transactionDetails?.account_id;
+  const invoiceNumber = transactionDetails?.transaction_id;
   const merchant = transactionDetails?.merchant_name ?? transactionDetails?.name;
-  const amount = transactionDetails?.amount ?? (0);
+  const amount = transactionDetails?.amount;
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -28,10 +28,10 @@ const FundingOptionsModal = ({ isOpen, onClose, transactionDetails, onNewFund })
     if (agreementChecked && repaymentPlanDetails && repaymentPlanDetails.weeks) {
       try {
         const fundData = {
+          userId: user.userId,
           accountId: accountNumber,
           invoiceId: invoiceNumber,
           invoiceAmount: amount,
-          userId: user.id,
           merchant: merchant,
           repaymentPlan: repaymentPlanDetails.weeks,
         };
@@ -70,6 +70,7 @@ const FundingOptionsModal = ({ isOpen, onClose, transactionDetails, onNewFund })
       >
         <FundingModalHeader 
           invoiceNumber={invoiceNumber}
+          merchant={merchant}
           onClose={onClose}
         />
         <FundingModalBody

@@ -8,6 +8,7 @@ import {
   getUserRepaymentDetails, 
   updateFund, 
   updateInvoice, 
+  updateUserRepaymentDetails, 
   viewInvoice 
 } from "../controllers/funds.js";
 
@@ -25,6 +26,7 @@ router.post('/create-fund', createFund);
 router.put('/updateFund/:id', updateFund);
 router.delete('/fund/:id', deleteFund);
 
-router.get('/get-user-repayment-details', getUserRepaymentDetails);
+router.get('/get-account-repayment-details', getUserRepaymentDetails);
+router.post('/update-account-repayment-details', updateUserRepaymentDetails);
 
 export default router;
