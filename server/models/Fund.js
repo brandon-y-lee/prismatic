@@ -12,16 +12,16 @@ const FundSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    id: {
+    invoiceId: {
       type: String,
       required: true,
-    },
-    merchant: {
-      type: String,
     },
     invoiceAmount: {
       type: Number,
       required: true,
+    },
+    merchant: {
+      type: String,
     },
     totalRepayment: {
       type: Number,
@@ -77,6 +77,13 @@ const FundSchema = new mongoose.Schema(
     },
     nextPaymentDate: {
       type: Date,
+    },
+    nextFeeAmount: {
+      type: Number,
+    },
+    repayEarly: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

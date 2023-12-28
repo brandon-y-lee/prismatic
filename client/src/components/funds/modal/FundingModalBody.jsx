@@ -6,7 +6,7 @@ const FundingModalBody = ({ amount }) => {
 
   return (
     <Box display='flex' flexDirection='column' py={2} px={3} sx={{ textAlign: 'center', m: 4 }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom fontWeight={525}>
         You Get
       </Typography>
       <Typography variant="h2" gutterBottom fontWeight={500}>

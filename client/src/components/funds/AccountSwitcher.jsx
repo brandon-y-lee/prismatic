@@ -1,6 +1,10 @@
 import { Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { useContext } from 'react';
+import { FundsContext } from 'context/FundsContext';
 
-const AccountSwitcher = ({ accountIds, selectedAccount, onAccountChange, openDialog }) => {
+const AccountSwitcher = ({ openDialog }) => {
+  const { accountIds, selectedAccount, handleAccountChange } = useContext(FundsContext);
+  
   if (!accountIds.length) {
     return (
       <Button
@@ -14,7 +18,7 @@ const AccountSwitcher = ({ accountIds, selectedAccount, onAccountChange, openDia
   };
 
   const handleAccountSelection = (event) => {
-    onAccountChange(event.target.value);
+    handleAccountChange(event.target.value);
   };
 
   return (

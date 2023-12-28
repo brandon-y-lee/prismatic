@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
-import { setToken, getToken, setLoggedInUser, getLoggedInUser } from "utils/token";
+import { setToken, setLoggedInUser } from "utils/token";
 import { useLoginMutation, useRegisterMutation } from "state/api";
 
 
@@ -20,7 +19,6 @@ const loginSchema = yup.object().shape({
 
 const Form = () => {
   const [pageType, setPageType] = useState("login");
-  const navigate = useNavigate();
   const [login] = useLoginMutation();
   const [register] = useRegisterMutation();
   const theme = useTheme();
@@ -34,8 +32,6 @@ const Form = () => {
         if (response && response.token) {
           setToken(response.token);
           setLoggedInUser(response.user);
-          console.log("Local Storage User", getLoggedInUser());
-          console.log("Local Storage Token", getToken());
           window.location.reload();
         } else {
           console.log("Login failed: Response doesn't include token.");

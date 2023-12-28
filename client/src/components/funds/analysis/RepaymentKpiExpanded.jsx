@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, List, ListItem, ListItemText, Divider, Typography } from '@mui/material';
+import { useContext } from 'react';
+import { FundsContext } from 'context/FundsContext';
 
-const RepaymentKpiExpanded = ({ expandedCard, onClose, fundsData, repaymentDetails }) => {
+const RepaymentKpiExpanded = ({ expandedCard, onClose }) => {
+  const { selectedAccount, fundsData, repaymentDetails } = useContext(FundsContext);
+
   const formatDate = (date) => new Date(date).toLocaleDateString("en-US", {
     month: "short", day: "numeric", year: "numeric"
   });
@@ -10,27 +14,42 @@ const RepaymentKpiExpanded = ({ expandedCard, onClose, fundsData, repaymentDetai
   const [totals, setTotals] = useState({ fees: 0, payment: 0 });
 
   useEffect(() => {
-    if (expandedCard === 'repayment' && fundsData && repaymentDetails) {
-      console.log('fundsData: ', fundsData);
-      const filteredFunds = fundsData.filter(fund =>
-        repaymentDetails.nextRepaymentIds.includes(fund.id)
+    if (expandedCard === 'repayment' && fundsData[selectedAccount] && repaymentDetails) {
+      const filteredFunds = fundsData[selectedAccount].filter(fund =>
+        repaymentDetails.nextRepaymentIds.includes(fund.invoiceId)
       );
 
       let totalFees = 0;
       let totalPayment = 0;
 
       filteredFunds.forEach(fund => {
-        totalFees += fund.weeklyFee;
-        totalPayment += fund.weeklyInstallment;
+        totalFees += fund.nextFeeAmount;
+        totalPayment += fund.nextPaymentAmount;
       });
 
       setFundsForRepayment(filteredFunds);
       setTotals({ fees: totalFees, payment: totalPayment });
     }
-  }, [expandedCard, fundsData, repaymentDetails]);
+  }, [expandedCard, selectedAccount, fundsData, repaymentDetails]);
+
+  // Fallback content if no data is available
+  if (!fundsForRepayment.length) {
+    return (
+      <Dialog open={expandedCard === 'repayment'} onClose={onClose} maxWidth="md" fullWidth>
+        <DialogTitle variant='h4' sx={{ textAlign: 'center', fontWeight: '500', mt: 2 }}>
+          Upcoming Payment
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ textAlign: 'center', m: 2 }}>
+            No upcoming payments found.
+          </Typography>
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   const fundItems = fundsForRepayment.map((fund, index) => (
-    <React.Fragment key={fund.id}>
+    <React.Fragment key={fund.invoiceId}>
       <ListItem>
         <ListItemText 
           primary={`${fund.paymentsRemaining}/${fund.repaymentPlan} payments left`}

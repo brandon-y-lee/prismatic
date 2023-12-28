@@ -107,15 +107,15 @@ export const api = createApi({
         method: "POST",
         body: { accountIds },
       }),
-      providesTags: ['Funds'],
+      providesTags: ['Funds', 'Accounts'],
     }),
     createFund: build.mutation({
-      query: ({ invoiceId, invoiceAmount, accountId, userId, merchant, repaymentPlan }) => ({
+      query: ({ userId, accountId, invoiceId, invoiceAmount, merchant, repaymentPlan }) => ({
         url: 'funds/create-fund',
         method: "POST",
-        body: { invoiceId, invoiceAmount, accountId, userId, merchant, repaymentPlan },
+        body: { userId, accountId, invoiceId, invoiceAmount, merchant, repaymentPlan },
       }),
-      invalidatesTags: ['Funds'],
+      invalidatesTags: ['Funds', 'Accounts'],
     }),
     viewFund: build.query({
       query: (id) => `funds/fund/${id}`,
@@ -136,15 +136,22 @@ export const api = createApi({
       }),
       invalidatesTags: ['Invoices', 'Funds'],
     }),
-    getUserRepaymentDetails: build.query({
-      query: ({ userId, selectedAccount }) => ({
-        url: 'funds/get-user-repayment-details',
+    getAccountRepaymentDetails: build.query({
+      query: ({ selectedAccount }) => ({
+        url: 'funds/get-account-repayment-details',
         method: 'GET',
-        params: { userId, selectedAccount },
+        params: { selectedAccount },
       }),
-      providesTags: ['Funds'],
+      providesTags: ['Funds', 'Accounts'],
     }),
-
+    updateAccountRepaymentDetails: build.mutation({
+      query: ({ userId, selectedAccount, fundId, nextPaymentAmount }) => ({
+        url: 'funds/update-account-repayment-details',
+        method: 'POST',
+        body: { userId, selectedAccount, fundId, nextPaymentAmount },
+      }),
+      invalidatesTags: ['Funds', 'Accounts'],
+    }),
     /* NORDIGEN - GET */
     generateToken: build.query({
       query: () => ({
@@ -185,31 +192,40 @@ export const api = createApi({
 
     /* PLAID */
     getLinkToken: build.mutation({
-      query: ({ userId }) => ({
+      query: ({ authId }) => ({
         url: 'plaid/get-link-token',
         method: 'POST',
-        body: { userId },
+        body: { authId },
       }),
     }),
     exchangePublicToken: build.mutation({
-      query: ({ public_token, userId }) => ({
+      query: ({ public_token, authId }) => ({
         url: 'plaid/exchange-public-token',
         method: 'POST',
-        body: { public_token, userId },
+        body: { public_token, authId },
       }),
     }),
     getPlaidAccounts: build.mutation({
-      query: ({ userId }) => ({
+      query: ({ authId, userId }) => ({
         url: 'plaid/get-accounts',
         method: 'POST',
-        body: { userId },
+        body: { authId, userId },
       }),
     }),
     getPlaidTransactions: build.mutation({
-      query: ({ userId }) => ({
+      query: ({ authId }) => ({
         url: 'plaid/get-transactions',
         method: 'POST',
-        body: { userId },
+        body: { authId },
+      }),
+    }),
+
+    /* OPENAI ASSISTANT */
+    interactWithAssistant: build.mutation({
+      query: ({ userMessage }) => ({
+        url: 'assistant/message',
+        method: 'POST',
+        body: { userMessage }, 
       }),
     }),
   
@@ -259,7 +275,8 @@ export const {
   useViewFundQuery,
   useUpdateFundMutation,
   useDeleteFundMutation,
-  useGetUserRepaymentDetailsQuery,
+  useGetAccountRepaymentDetailsQuery,
+  useUpdateAccountRepaymentDetailsMutation,
 
   useGenerateTokenQuery,
   useGetInstitutionsQuery,
@@ -271,4 +288,6 @@ export const {
   useExchangePublicTokenMutation,
   useGetPlaidAccountsMutation,
   useGetPlaidTransactionsMutation,
+
+  useInteractWithAssistantMutation,
 } = api;

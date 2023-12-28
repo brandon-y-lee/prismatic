@@ -12,7 +12,7 @@ const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const user = getLoggedInUser();
-  const { data } = useGetUserQuery(user.id);
+  const { data } = useGetUserQuery(user.authId);
 
   return (
     <Box display={isNonMobile ? "flex" : "block"} width="100%" height="100%">

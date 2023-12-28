@@ -11,13 +11,16 @@ const RepaymentModalBody = ({ fundDetails, repaymentDetails, onClose, onRepayEar
   };
 
   useEffect(() => {
-    if (repaymentDetails?.nextRepaymentIds.includes(fundDetails?.id)) {
-      setNextRepayment(repaymentDetails?.nextRepaymentAmount - fundDetails?.weeklyInstallment + (fundDetails?.debitRemaining - fundDetails?.feeRemaining))
-    } else setNextRepayment(repaymentDetails?.nextRepaymentAmount);
+    if (repaymentDetails?.nextRepaymentIds.includes(fundDetails?.invoiceId)) {
+      let nextRepayment = repaymentDetails?.nextRepaymentAmount - fundDetails?.nextPaymentAmount + fundDetails?.principalRemaining;
+      setNextRepayment(nextRepayment);
+    } else {
+      setNextRepayment(repaymentDetails?.nextRepaymentAmount + fundDetails?.principalRemaining);
+    }
   }, [fundDetails, repaymentDetails]);
 
   return (
-    <Box display='flex' flexDirection='column' sx={{ textAlign: 'center', m: 4, gap: 4 }}>
+    <Box display='flex' flexDirection='column' sx={{ textAlign: 'center', m: 4, gap: 2 }}>
       <Box sx={{ display:'flex', flexDirection: 'column', gap: 0.5, px: 2, py: 2 }}>
         <Typography variant="h4" gutterBottom fontWeight={525}>
           Repay Early

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetTransactionsQuery, useDeleteTransactionMutation } from 'state/api';
-import { Box, Button, CircularProgress } from '@mui/material';
+import { Box, Button, CircularProgress, useMediaQuery } from '@mui/material';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 
 import Header from 'components/Header';
 import DataGridCustomToolbar from 'components/DataGridCustomToolbar';
 import ActionMenu from 'components/ActionMenu';
 import FlexBetween from 'components/FlexBetween';
+import ProjectBox from 'components/ProjectBox';
 
 import { getLoggedInUser } from 'utils/token';
 import { renderStatusChip, renderPaymentChip, formatDate } from 'utils/transaction';
@@ -16,6 +17,7 @@ const Orders = () => {
   const user = getLoggedInUser();
   const navigate = useNavigate();
 
+  const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
@@ -25,7 +27,7 @@ const Orders = () => {
 
   /* Potentially get rid of this and call it once in useEffect */
   const { data, isLoading, isError } = useGetTransactionsQuery({
-    userId: user.id,
+    userId: user.authId,
     page,
     pageSize,
     sort: JSON.stringify(sort),
@@ -68,13 +70,13 @@ const Orders = () => {
     return (
       <Box m="1.5rem 2.5rem">
         <FlexBetween>
-          <Header title="ORDERS" />
+          <Box />
           <Button
             variant="primary"
             size="small"
             onClick={handleCreateOrder}
           >
-            Create New Transaction
+            New Project
           </Button>
         </FlexBetween>
       </Box>
@@ -198,15 +200,54 @@ const Orders = () => {
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
-        <Header title="ORDERS" />
-        <Button
-          variant="primary"
-          size="small"
-          onClick={handleCreateOrder}
-        >
-          Create New Transaction
-        </Button>
+        <Header title="Projects" />
+        <FlexBetween sx={{ gap: 3 }}>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={handleCreateOrder}
+          >
+            All Projects {/* PROJECT COUNT */}
+          </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={handleCreateOrder}
+          >
+            New Project
+          </Button>
+        </FlexBetween>
       </FlexBetween>
+
+      <Box
+        my="20px"
+        display="grid"
+        gridTemplateColumns="repeat(12, 1fr)"
+        gridAutoRows="140px"
+        gap="30px"
+        sx={{
+          "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" },
+        }}
+      >
+        {/* ROW 1 */}
+        <ProjectBox
+          title="Draft"
+          value={data ? data.activeTransactions : "Loading..."}
+          page="orders"
+        />
+        <ProjectBox
+          title="In Review"
+          value={data ? data.activeTransactions : "Loading..."}
+        />
+        <ProjectBox
+          title="Active"
+          value={data ? data.activeTransactions : "Loading..."}
+        />
+        <ProjectBox
+          title="Not Approved"
+          value={data ? data.activeTransactions : "Loading..."}
+        />
+      </Box>
 
       <DataGridPro
         loading={isLoading || data.transactions.length === 0}

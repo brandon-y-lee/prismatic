@@ -28,6 +28,7 @@
     "morgan": "^1.10.0",
     "nodemon": "^2.0.22",
     "nordigen-node": "^1.2.7",
+    "openai": "^4.23.0",
     "plaid": "^18.1.0"
   }
 }

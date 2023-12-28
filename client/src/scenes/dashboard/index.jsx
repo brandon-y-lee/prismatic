@@ -25,9 +25,8 @@ const Dashboard = () => {
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
 
   const user = getLoggedInUser();
-  console.log('UserId from getLoggedInUser: ', user.id);
 
-  const { data, isLoading } = useGetDashboardQuery({ userId: user.id });
+  const { data, isLoading } = useGetDashboardQuery({ userId: user.userId });
   
   const columns = [
     {

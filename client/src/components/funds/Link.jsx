@@ -4,8 +4,15 @@ import { usePlaidLink } from 'react-plaid-link';
 import { useExchangePublicTokenMutation, useGetLinkTokenMutation, useGetPlaidAccountsMutation } from 'state/api';
 import { getLoggedInUser } from 'utils/token';
 
-const Link = ({ isOpen, onClose, onAccountSet }) => {
+import { useContext } from 'react';
+import { FundsContext } from 'context/FundsContext';
+
+const Link = ({ isOpen, onClose }) => {
+  const { handleAccountSet } = useContext(FundsContext);
+
   const user = getLoggedInUser();
+  const authId = user.authId;
+  const userId = user.userId;
   const [linkTokenData, setLinkTokenData] = useState(null);
   const [postLink, setPostLink] = useState(0);
   const [getLinkToken] = useGetLinkTokenMutation();
@@ -16,7 +23,7 @@ const Link = ({ isOpen, onClose, onAccountSet }) => {
     if (isOpen && !linkTokenData) {
       const fetchLinkToken = async () => {
         try {
-          const response = await getLinkToken({ userId: user.id }).unwrap();
+          const response = await getLinkToken({ authId: authId }).unwrap();
           setLinkTokenData(response);
         } catch (error) {
           console.error('Error fetching link token:', error);
@@ -24,20 +31,19 @@ const Link = ({ isOpen, onClose, onAccountSet }) => {
       };
       fetchLinkToken();
     }
-  }, [isOpen, linkTokenData, getLinkToken, user.id]);
+  }, [isOpen, linkTokenData, getLinkToken, authId]);
 
   const { open, ready } = usePlaidLink({
     token: linkTokenData?.link_token,
     onSuccess: (public_token) => {
       console.log('Received public token:', public_token);
       try {
-        const userId = user.id;
-        exchangePublicToken({ public_token, userId }).then(response => {
+        exchangePublicToken({ public_token, authId }).then(response => {
           if (response) {
-            getAccounts({ userId: userId }).then(accountsResponse => {
+            getAccounts({ authId: authId, userId: userId }).then(accountsResponse => {
               console.log('Plaid Accounts:', accountsResponse);
               const accountIds = accountsResponse.data.accounts.map(account => account.account_id);
-              onAccountSet(accountIds);
+              handleAccountSet(accountIds);
             }).catch(error => {
               console.error('Account fetch error:', error);
             });

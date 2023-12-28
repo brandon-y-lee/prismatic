@@ -3,7 +3,8 @@ import { Drawer, Box } from '@mui/material';
 import RepayEarlyHeader from './RepayEarlyHeader';
 import RepayEarlyBody from './RepayEarlyBody';
 
-const RepayEarlyModal = ({ isOpen, onClose, fundDetails, repaymentDetails }) => {
+const RepayEarlyModal = ({ isOpen, onClose, fundDetails, repaymentDetails, handleRepayEarly }) => {
+
   return (
     <Drawer
       anchor="right"
@@ -28,7 +29,7 @@ const RepayEarlyModal = ({ isOpen, onClose, fundDetails, repaymentDetails }) => 
         }}
       >
         <RepayEarlyHeader 
-          invoiceNumber={fundDetails?.id}
+          invoiceNumber={fundDetails?.invoiceId}
           merchant={fundDetails?.merchant}
           earlyRepaymentAmount={fundDetails?.principalRemaining}
           onClose={onClose}
@@ -37,7 +38,7 @@ const RepayEarlyModal = ({ isOpen, onClose, fundDetails, repaymentDetails }) => 
           fundDetails={fundDetails}
           repaymentDetails={repaymentDetails}
           onClose={onClose}
-          onRepayEarly={onClose}
+          handleRepayEarly={handleRepayEarly}
         />
       </Box>
     </Drawer>

@@ -12,7 +12,7 @@ import clientRoutes from "./routes/client.js";
 import fundRoutes from "./routes/funds.js";
 import nordigenRoutes from "./routes/nordigen.js";
 import plaidRoutes from "./routes/plaid.js";
-
+import assistantRoutes from "./routes/assistant.js";
 import generalRoutes from "./routes/general.js";
 import managementRoutes from "./routes/management.js";
 import salesRoutes from "./routes/sales.js";
@@ -51,6 +51,7 @@ app.use("/client", clientRoutes);
 app.use("/funds", fundRoutes);
 app.use("/nordigen", nordigenRoutes);
 app.use("/plaid", plaidRoutes);
+app.use("/assistant", assistantRoutes);
 app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
 app.use("/sales", salesRoutes);
