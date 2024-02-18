@@ -16,6 +16,7 @@ import {
   ChevronRightOutlined,
   CreditCardOutlined,
   HomeOutlined,
+  Search,
   ShoppingCartOutlined,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
@@ -26,6 +27,10 @@ const navItems = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
+  },
+  {
+    text: "Home",
+    icon: <Search />
   },
   {
     text: "Funds",

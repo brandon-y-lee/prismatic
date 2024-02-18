@@ -8,22 +8,70 @@ const openai = new OpenAI({
 });
 
 const assistant = await openai.beta.assistants.create({
-  name: "Finance Expert",
+  name: "Construction Expert",
   instructions:
-    "You are an expert in supply chain finance and working capital optimization for small and medium enterprises (SMEs). Provide detailed, practical advice on financial strategies, risk management, and capital optimization. Analyze financial scenarios based on the provided data and suggest the best courses of action to improve cash flow, reduce costs, and enhance supply chain efficiency. Ensure all advice is compliant with financial regulations and best practices.",
-  tools: [{ type: "code_interpreter" }],
-  model: "gpt-4",
-});
+  "You are a helpful assistant. Use the provided functions to answer questions.",
+  model: "gpt-4-turbo-preview",
+  tools: [{
+    "type": "function",
+    "function": {
+      "name": "findMaterialsAndSuppliers",
+      "description": "Find materials and suppliers based on user criteria",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "material": {"type": "string", "description": "The type of material needed e.g. concrete, steel"},
+        },
+        "required": ["material"]
+      }
+    }
+  }, 
+  //  {
+  //   "type": "function",
+  //   "function": {
+  //     "name": "rentEquipment",
+  //     "description": "Rent equipment for construction projects",
+  //     "parameters": {
+  //       "type": "object",
+  //       "properties": {
+  //         "equipmentType": {"type": "string", "description": "The type of equipment needed e.g. crane, excavator"},
+  //         "rentalDuration": {"type": "string", "description": "Rental duration e.g. 2 weeks, 1 month"},
+  //       },
+  //       "required": ["equipmentType", "rentalDuration"]
+  //     }
+  //   }
+  // }, {
+  //   "type": "function",
+  //   "function": {
+  //     "name": "findLaborAndSubcontracting",
+  //     "description": "Find labor and subcontracting options for construction projects",
+  //     "parameters": {
+  //       "type": "object",
+  //       "properties": {
+  //         "skillSet": {"type": "string", "description": "Required skills or professions e.g. electrician, architect"},
+  //       },
+  //       "required": ["skillSet"]
+  //     }
+  //   }
+  // }
+  ]}
+);
 
 console.log('assistant: ', assistant);
 
 export const interactWithAssistant = async (req, res) => {
   console.log('Request body:', req.body);
-  const { userMessage } = req.body;
+  const { userMessage, threadId } = req.body;
 
   try {
-    const thread = await openai.beta.threads.create();
-    console.log('thread: ', thread);
+    let thread;
+    if (threadId) {
+      thread = { id: threadId };
+      console.log('Existing thread found: ', thread);
+    } else {
+      thread = await openai.beta.threads.create();
+      console.log('New thread created: ', thread);
+    }
     
     const message = await openai.beta.threads.messages.create(
       thread.id,
@@ -36,13 +84,22 @@ export const interactWithAssistant = async (req, res) => {
       thread.id,
       { assistant_id: assistant.id }
     );
+    console.log('run: ', run);
+
     let runStatus = run.status;
       
     while (runStatus !== 'completed') {
       const updatedRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
       runStatus = updatedRun.status;
 
-      if (runStatus === 'completed' || runStatus === 'failed') {
+      console.log('updatedRun: ', updatedRun);
+      console.log('runStatus: ', runStatus);
+
+      if (runStatus === 'requires_action') {
+        console.log('tool calls: ', updatedRun.required_action.submit_tool_outputs.tool_calls);
+
+        runStatus = 'pending';
+      } else if (runStatus === 'completed' || runStatus === 'failed') {
         break;
       }
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -58,7 +115,9 @@ export const interactWithAssistant = async (req, res) => {
           content: textContent,
         };
       })
-      res.status(200).json({ messages: formattedMessages });
+      console.log('thread.id: ', thread.id);
+
+      res.status(200).json({ thread: thread.id, messages: formattedMessages });
     } else {
       console.error('Run did not complete successfully.');
       res.status(500).json({ error: 'Run did not complete successfully.' });

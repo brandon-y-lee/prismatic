@@ -1,10 +1,13 @@
-import React from "react";
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 
-const ProjectBox = ({ title, value, page }) => {
+const ProjectBox = ({ title, value, onSelect }) => {
   const theme = useTheme();
-  const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleClick = () => {
+    onSelect(title);
+  };
 
   return (
     <Box
@@ -16,17 +19,37 @@ const ProjectBox = ({ title, value, page }) => {
       p="1.5rem 1rem"
       flex="1 1 100%"
       backgroundColor={theme.palette.background.alt}
-      borderRadius="0.55rem"
-      onClick={() => navigate(`/${page}`)}
+      borderRadius="8px"
+      onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      sx={{
+        transition: 'box-shadow 0.3s',
+        boxShadow: 'none',
+        '&:hover': {
+          boxShadow: theme => theme.shadows[3],
+          backgroundColor: '#1677FF',
+        },
+      }}
     >
       <Typography
         variant="h1"
         fontWeight="600"
-        sx={{ color: '#1677FF', textAlign: 'center' }}
+        sx={{ 
+          color: isHovered ? 'white' : '#1677FF', 
+          textAlign: 'center' 
+        }}
       >
         10
       </Typography>
-      <Typography variant="h4" sx={{ color: '#1677FF', fontWeight: 500, textAlign: 'center' }}>
+      <Typography
+        variant="h4"
+        sx={{
+          color: isHovered ? 'white' : '#1677FF', 
+          fontWeight: 500, 
+          textAlign: 'center' 
+        }}
+      >
         {title}
       </Typography>
     </Box>

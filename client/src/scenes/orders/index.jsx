@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetTransactionsQuery, useDeleteTransactionMutation } from 'state/api';
+import { useGetTransactionsQuery } from 'state/api';
 import { Box, Button, CircularProgress, useMediaQuery } from '@mui/material';
-import { DataGridPro } from '@mui/x-data-grid-pro';
 
 import Header from 'components/Header';
-import DataGridCustomToolbar from 'components/DataGridCustomToolbar';
-import ActionMenu from 'components/ActionMenu';
 import FlexBetween from 'components/FlexBetween';
 import ProjectBox from 'components/ProjectBox';
+import AllProjects from 'components/transactions/data/AllProjects';
+import DraftProjects from 'components/transactions/data/DraftProjects';
+import ActiveProjects from 'components/transactions/data/ActiveProjects';
+import InReviewProjects from 'components/transactions/data/InReviewProjects';
+import NotApprovedProjects from 'components/transactions/data/NotApprovedProjects';
 
 import { getLoggedInUser } from 'utils/token';
-import { renderStatusChip, renderPaymentChip, formatDate } from 'utils/transaction';
 
 const Orders = () => {
   const user = getLoggedInUser();
@@ -23,7 +24,7 @@ const Orders = () => {
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
 
-  const [searchInput, setSearchInput] = useState("");
+  const [selectedKpi, setSelectedKpi] = useState(null);
 
   /* Potentially get rid of this and call it once in useEffect */
   const { data, isLoading, isError } = useGetTransactionsQuery({
@@ -34,9 +35,62 @@ const Orders = () => {
     search,
   });
 
-  console.log('Data from Orders: ', data);
+  const handleKpiSelect = (kpiType) => {
+    setSelectedKpi(kpiType.toLowerCase());
+    console.log('selectedKpi: ', selectedKpi);
+  };
 
-  const [deleteTransaction] = useDeleteTransactionMutation();
+  const handleCreateOrder = () => {
+    navigate('/orders/create');
+  };
+
+  const handleAllProjects = () => {
+    setSelectedKpi(null);
+  };
+
+  const generateButton = (label, onClick, variant, bcolor, color) => (
+    <Button
+      variant={variant}
+      size="large"
+      onClick={onClick}
+      sx={{
+        transition: 'box-shadow 0.3s',
+        boxShadow: 'none',
+        backgroundColor: bcolor,
+        borderColor: bcolor,
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        color: color,
+        padding: '0.5rem 1rem',
+        height: '100%',
+        '&:hover': {
+          boxShadow: theme => theme.shadows[3],
+          backgroundColor: bcolor,
+          borderColor: bcolor,
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          color: color,
+        },
+      }}
+    >
+      {label}
+    </Button>
+  );
+
+  const renderDataGrid = () => {
+    switch (selectedKpi) {
+      case 'draft':
+        return <DraftProjects data={data} />;
+      case 'active':
+        return <ActiveProjects data={data} />;
+      case 'in review':
+        return <InReviewProjects data={data} />;
+      case 'not approved':
+        return <NotApprovedProjects data={data} />;
+      default:
+        return <AllProjects data={data} />;
+    }
+  };
 
   if (isLoading) {
     return <CircularProgress />;
@@ -46,176 +100,13 @@ const Orders = () => {
     return <Box>Error loading transactions.</Box>;
   };
 
-  const handleCreateOrder = () => {
-    navigate('/orders/create');
-  };
-
-  const handleViewOrder = (id) => {
-    navigate(`/orders/view/${id}`);
-  };
-
-  const handleUpdateOrder = (id) => {
-    navigate(`/orders/update/${id}`);
-  };
-
-  const handleDeleteOrder = async (id) => {
-    try {
-      await deleteTransaction({ id }).unwrap();
-    } catch (error) {
-      console.log('Error during delete.', error);
-    };
-  };
-
-  if (data.transactions.length === 0) {
-    return (
-      <Box m="1.5rem 2.5rem">
-        <FlexBetween>
-          <Box />
-          <Button
-            variant="primary"
-            size="small"
-            onClick={handleCreateOrder}
-          >
-            New Project
-          </Button>
-        </FlexBetween>
-      </Box>
-    );
-  };
-
-  const columns = [
-    {
-      field: "_id",
-      flex: 1,
-      renderHeader: () => (
-        <strong>
-          {"ID"}
-        </strong>
-      ),
-    },
-    {
-      field: "seller",
-      flex: 1,
-      renderHeader: () => (
-        <strong>
-          {"Seller"}
-        </strong>
-      ),
-    },
-    {
-      field: "initialDate",
-      flex: 1,
-      renderHeader: () => (
-        <strong>
-          {"Date"}
-        </strong>
-      ),
-      valueFormatter: (params) => formatDate(params.value),
-    },
-    {
-      field: "expiryDate",
-      flex: 1,
-      renderHeader: () => (
-        <strong>
-          {"Expiry Date"}
-        </strong>
-      ),
-      valueFormatter: (params) => formatDate(params.value)
-    },
-    {
-      field: "cost",
-      flex: 1,
-      renderHeader: () => (
-        <strong>
-          {"Cost"}
-        </strong>
-      ),
-    },
-    {
-      field: "credit",
-      flex: 1,
-      renderHeader: () => (
-        <strong>
-          {"Credit"}
-        </strong>
-      ),
-    },
-    {
-      field: "status",
-      flex: 1,
-      renderHeader: () => (
-        <strong>
-          {"Status"}
-        </strong>
-      ),
-      renderCell: (params) => {
-        return (
-          renderStatusChip(params.row.status)
-        )
-      },
-    },
-    {
-      field: "payment",
-      flex: 0.75,
-      renderHeader: () => (
-        <strong>
-          {"Payment"}
-        </strong>
-      ),
-      renderCell: (params) => {
-        return (
-          renderPaymentChip(params.row.payment)
-        )
-      },
-    },
-    {
-      field: "actions",
-      headerName: '',
-      sortable: false,
-      flex: 0.10,
-      renderCell: (params) => {
-        return (
-          <ActionMenu
-            data={params.row}
-            onViewOrder={() => handleViewOrder(params.row._id)}
-            onUpdateOrder={() => handleUpdateOrder(params.row._id)}
-            onDeleteOrder={() => handleDeleteOrder(params.row._id)}
-          />
-        )
-      },
-    },
-  ];
-
-  const dataGridStyles = {
-    border: 'none',
-    '& .MuiDataGrid-columnHeaders': {
-      borderBottom: '1px solid rgba(224, 224, 224, 1)',
-    },
-    '& .MuiDataGrid-row': {
-      borderBottom: '1px solid rgba(224, 224, 224, 0.1)',
-      fontWeight: '550',
-    },
-  };
-
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
         <Header title="Projects" />
         <FlexBetween sx={{ gap: 3 }}>
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={handleCreateOrder}
-          >
-            All Projects {/* PROJECT COUNT */}
-          </Button>
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={handleCreateOrder}
-          >
-            New Project
-          </Button>
+          {generateButton("All Projects", handleAllProjects, 'outlined', 'grey.300', 'grey.600')}
+          {generateButton("New Project", handleCreateOrder, 'outlined', '#1677FF', 'white')}
         </FlexBetween>
       </FlexBetween>
 
@@ -232,43 +123,23 @@ const Orders = () => {
         {/* ROW 1 */}
         <ProjectBox
           title="Draft"
-          value={data ? data.activeTransactions : "Loading..."}
-          page="orders"
+          onSelect={handleKpiSelect}
         />
         <ProjectBox
           title="In Review"
-          value={data ? data.activeTransactions : "Loading..."}
+          onSelect={handleKpiSelect}
         />
         <ProjectBox
           title="Active"
-          value={data ? data.activeTransactions : "Loading..."}
+          onSelect={handleKpiSelect}
         />
         <ProjectBox
           title="Not Approved"
-          value={data ? data.activeTransactions : "Loading..."}
+          onSelect={handleKpiSelect}
         />
       </Box>
 
-      <DataGridPro
-        loading={isLoading || data.transactions.length === 0}
-        getRowId={(row) => row["_id"]}
-        rows={(data && data.transactions) || []}
-        columns={columns}
-        disableColumnResize
-        pagination
-        page={page}
-        pageSize={pageSize}
-        paginationMode="server"
-        sortingMode="server"
-        onPageChange={(newPage) => setPage(newPage)}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-        slots={{ Toolbar: DataGridCustomToolbar }}
-        slotProps={{
-          toolbar: { searchInput, setSearchInput, setSearch }
-        }}
-        sx={dataGridStyles}
-      />
+      {renderDataGrid()}
     </Box>
   );
 };

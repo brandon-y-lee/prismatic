@@ -8,21 +8,22 @@ import getCountryIso3 from "country-iso-2-to-3";
 
 export const getTransactions = async (req, res) => {
   try {
-    const { userId, page, pageSize, sort, search } = req.query;
+    const { userId, page, pageSize, sort, search, statusFilter } = req.query;
 
-    // formatted sort should look like { userId: -1 }
+    // Parse and format sorting
     const generateSort = () => {
       const sortParsed = JSON.parse(sort);
-      const sortFormatted = {
-        [sortParsed.field]: (sortParsed.sort = "asc" ? 1 : -1),
-      };
-
-      return sortFormatted;
+      return { [sortParsed.field]: (sortParsed.sort === "asc" ? 1 : -1) };
     };
-    const sortFormatted = Boolean(sort) ? generateSort() : {};
+    const sortFormatted = sort ? generateSort() : {};
 
-    const query = {
+    // Build query with status filter
+    let query = {
       $or: [{ buyerId: userId }, { sellerId: userId }],
+    };
+
+    if (statusFilter !== undefined) {
+      query.status = statusFilter;
     };
 
     const transactions = await Transaction.find(query)

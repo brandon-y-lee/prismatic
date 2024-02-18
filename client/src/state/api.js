@@ -35,10 +35,10 @@ export const api = createApi({
 
     /* TRANSACTION - CRUD */
     getTransactions: build.query({
-      query: ({ userId, page, pageSize, sort, search }) => ({
+      query: ({ userId, page, pageSize, sort, search, statusFilter }) => ({
         url: "client/transactions",
         method: "GET",
-        params: { userId, page, pageSize, sort, search },
+        params: { userId, page, pageSize, sort, search, statusFilter },
       }),
       providesTags: ['Transactions', 'Products'],
     }),

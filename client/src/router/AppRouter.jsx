@@ -10,6 +10,8 @@ import Login from "scenes/login";
 import Logout from "scenes/logout";
 import Error from "scenes/error";
 import Dashboard from "scenes/dashboard";
+import Home from "scenes/home";
+import Search from "scenes/search";
 import Orders from "scenes/orders";
 import ViewOrder from "scenes/orders/ViewOrder";
 import CreateOrder from "scenes/orders/CreateOrder";
@@ -38,6 +40,21 @@ function AppRouter() {
             <Route path="/dashboard" element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/home" element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            } />
+            <Route path="/search/loading" element={
+              <PrivateRoute>
+                <Search isLoading={true} />
+              </PrivateRoute>
+            } />
+            <Route path="/search/:id" element={
+              <PrivateRoute>
+                <Search />
               </PrivateRoute>
             } />
             <Route path="/funds" element={

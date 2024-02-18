@@ -74,7 +74,7 @@ export const FundsProvider = ({ children }) => {
       const transactionsResponse = await getTransactions({ authId: authId }).unwrap();
       let organizedTransactions = {};
   
-      transactionsResponse.transactions.forEach(txn => {
+      transactionsResponse.addedTransactions.forEach(txn => {
         if (!organizedTransactions[txn.account_id]) {
           organizedTransactions[txn.account_id] = [];
         }
