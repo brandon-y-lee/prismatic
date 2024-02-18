@@ -7,7 +7,7 @@ import { useLogoutMutation } from "state/api";
 import { removeToken, removeLoggedInUser, removeAccessToken, removeLocalRequisitionId } from "utils/token";
 
 import FlexBetween from "components/FlexBetween";
-import ChatBox from "components/ChatBox";
+import Chat from "components/Chat";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const theme = useTheme();
@@ -98,7 +98,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           </Menu>
         </FlexBetween>
       </Toolbar>
-      <ChatBox open={chatOpen} onClose={toggleChat} />
+      <Chat open={chatOpen} onClose={toggleChat} />
     </AppBar>
   );
 };

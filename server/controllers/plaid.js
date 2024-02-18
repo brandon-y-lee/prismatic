@@ -50,9 +50,9 @@ export const exchangePublicTokenForAccessToken = async (req, res) => {
     const tokenResponse = await client.itemPublicTokenExchange({ public_token });
     const accessToken = tokenResponse.data.access_token;
 
-    await UserAuth.updateOne({ _id: authId }, { accessToken: accessToken });
+    await UserAuth.updateOne({ _id: authId }, { publicToken: public_token, accessToken: accessToken });
 
-    res.status(200).json({ message: "Access Token exchanged and stored successfully" });
+    res.status(200).json({ message: "Tokens exchanged and stored successfully" });
   } catch (error) {
     console.error('Error exchanging public token:', error);
   }
@@ -113,36 +113,36 @@ export const getTransactions = async (req, res) => {
     return res.status(404).json({ message: 'Access Token not found.' });
   }
 
+  let cursor = '';
+
   const request = {
     access_token: accessToken,
-    start_date: '2023-01-01',
-    end_date: '2023-10-01'
+    cursor: cursor,
   };
 
+  let addedTransactions = [];
+  let modifiedTransactions = [];
+  let removedTransactions = [];
+  let hasMore = true;
+
   try {
-    const response = await client.transactionsGet(request);
-    console.log('response: ', response.data.transactions);
+    while (hasMore) {
+      const response = await client.transactionsSync(request);
+      console.log('response: ', response.data);
 
-    let transactions = response.data.transactions;
-    const total_transactions = response.data.total_transactions;
-
-    while (transactions.length < total_transactions) {
-      const paginatedRequest = {
-        access_token: accessToken,
-        start_date: '2023-01-01',
-        end_date: '2023-10-01',
-        options: {
-          offset: 0,
-        },
-      };
-      const paginatedResponse = await client.transactionsGet(paginatedRequest);
-      console.log('paginated response: ', paginatedResponse.data.transactions);
-      transactions = transactions.concat(
-        paginatedResponse.data.transactions,
-      );
+      const { added, modified, removed, next_cursor, has_more } = response.data;
+      addedTransactions = addedTransactions.concat(added);
+      modifiedTransactions = modifiedTransactions.concat(modified);
+      removedTransactions = removedTransactions.concat(removed.map((r) => r.transaction_id));
+      hasMore = has_more;
+      cursor = next_cursor;
     }
 
-    res.status(200).json({ transactions });
+    res.status(200).json({
+      addedTransactions,
+      modifiedTransactions,
+      removedTransactions,
+    });
   } catch (error) {
     console.error('Error getting transactions:', error);
     res.status(500).json({ message: error.message });

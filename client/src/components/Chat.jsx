@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle, TextField, InputAdornment, IconButt
 import { useInteractWithAssistantMutation } from 'state/api';
 import { AccountCircle, Send } from '@mui/icons-material';
 
-const ChatBox = ({ open, onClose }) => {
+const Chat = ({ open, onClose }) => {
   const [message, setMessage] = useState('');
   const [conversation, setConversation] = useState([]);
   const [interactWithAssistant, { isLoading }] = useInteractWithAssistantMutation();
@@ -108,4 +108,4 @@ const ChatBox = ({ open, onClose }) => {
   );
 };
 
-export default ChatBox;
+export default Chat;

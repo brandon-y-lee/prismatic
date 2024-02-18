@@ -5,6 +5,7 @@ const UserAuthSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  publicToken: { type: String },
   accessToken: { type: String },
 });
 
