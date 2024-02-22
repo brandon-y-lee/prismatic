@@ -19,20 +19,17 @@ import salesRoutes from "./routes/sales.js";
 
 // data imports
 import User from "./models/User.js";
+import Supplier from "./models/Supplier.js";
 import Product from "./models/Product.js";
 import ProductStat from "./models/ProductStat.js";
 import Transaction from "./models/Transaction.js";
 import OverallStat from "./models/OverallStat.js";
 import AffiliateStat from "./models/AffiliateStat.js";
 import {
-  dataUser,
-  dataProduct,
-  dataProductStat,
-  dataTransaction,
-  dataTransactions,
-  dataOverallStat,
-  dataAffiliateStat,
+  mockSupplierData,
+  mockContractorData
 } from "./data/index.js";
+import Contractor from "./models/Contractor.js";
 
 /* CONFIGURATION */
 dotenv.config();
@@ -75,5 +72,7 @@ mongoose
     // Transaction.insertMany(dataTransaction);
     // User.insertMany(dataUser);
     // Transaction.insertMany(dataTransactions);
+    // Supplier.insertMany(mockSupplierData);
+    // Contractor.insertMany(mockContractorData);
   })
   .catch((error) => console.log(`${error} did not connect`));
