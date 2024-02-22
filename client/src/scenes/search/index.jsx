@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Box, Typography, CircularProgress, Icon } from '@mui/material';
-import { Subject } from '@mui/icons-material';
+import { Box, Typography, CircularProgress, Icon, Stack, LinearProgress } from '@mui/material';
+import { FormatAlignLeftOutlined, Autorenew } from '@mui/icons-material';
 import { useInteractWithAssistantMutation } from 'state/api';
+import FlexBetween from 'components/FlexBetween';
 
 const Search = () => {
   const searchedRef = useRef(false);
@@ -89,36 +90,62 @@ const Search = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
+      <Box m="1.5rem 2.5rem">
+        <Box sx={{ display: 'flex', width: '60%'}}>
+          <Typography variant="h2" gutterBottom>
+            {searchQuery}
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'left', alignItems: 'center', gap: '0.25rem', my: '1rem' }}>
+          <Autorenew sx={{ animation: 'spin 2s linear infinite' }} />
+          <Typography variant="h4">Answer</Typography>
+        </Box>
+        <Stack sx={{ width: '60%' }} spacing={3}>
+          <LinearProgress color="secondary" />
+          <LinearProgress color="secondary" />
+          <Stack sx={{ width: '75%' }} spacing={3}>
+            <LinearProgress color="secondary" />
+            <LinearProgress color="secondary" />
+          </Stack>
+          <Stack sx={{ width: '50%' }}>
+            <LinearProgress color="secondary" />
+          </Stack>
+        </Stack>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ padding: '2rem' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-        <Typography variant="h3" gutterBottom>
+    <Box m="1.5rem 2.5rem">
+      <Box sx={{ display: 'flex', width: '60%'}}>
+        <Typography variant="h2" gutterBottom>
           {searchQuery}
         </Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', justifyContent: 'left', gap: '0.25rem' }}>
-        <Subject />
-        <Typography variant="h5" gutterBottom>
+      <Box sx={{ display: 'flex', justifyContent: 'left', alignItems: 'center', gap: '0.25rem', my: '1rem' }}>
+        <FormatAlignLeftOutlined />
+        <Typography variant="h4">
           Answer
         </Typography>
       </Box>
 
-      {conversation.map((msg, index) => {
-        if (msg.role === 'assistant') {
-          const messageContent = parseAssistantResponse(msg.content);
-          return (
-            <Typography key={index} variant="body1" sx={{ marginBottom: '1rem' }} dangerouslySetInnerHTML={{ __html: messageContent }} />
-          );
-        }
-        return null;
-      })}
+      <FlexBetween>
+        <Box sx={{ width: '60%' }}>
+          {conversation.map((msg, index) => {
+            if (msg.role === 'assistant') {
+              const messageContent = parseAssistantResponse(msg.content);
+              return (
+                <Typography key={index} variant="h5" sx={{ marginBottom: '1rem' }} dangerouslySetInnerHTML={{ __html: messageContent }} />
+              );
+            }
+            return null;
+          })}
+        </Box>
+        <Box sx={{ width: '40%' }}>
+
+        </Box>
+      </FlexBetween>
     </Box>
   );
 };
