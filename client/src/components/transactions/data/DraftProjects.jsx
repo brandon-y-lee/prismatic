@@ -18,15 +18,15 @@ const DraftProjects = ({ data }) => {
 
   const [deleteTransaction] = useDeleteTransactionMutation();
 
-  const handleViewOrder = (id) => {
-    navigate(`/orders/view/${id}`);
+  const handleViewProject = (id) => {
+    navigate(`/projects/view/${id}`);
   };
 
-  const handleUpdateOrder = (id) => {
-    navigate(`/orders/update/${id}`);
+  const handleUpdateProject = (id) => {
+    navigate(`/projects/update/${id}`);
   };
 
-  const handleDeleteOrder = async (id) => {
+  const handleDeleteProject = async (id) => {
     try {
       await deleteTransaction({ id }).unwrap();
     } catch (error) {
@@ -74,9 +74,9 @@ const DraftProjects = ({ data }) => {
         return (
           <ActionMenu
             data={params.row}
-            onViewOrder={() => handleViewOrder(params.row._id)}
-            onUpdateOrder={() => handleUpdateOrder(params.row._id)}
-            onDeleteOrder={() => handleDeleteOrder(params.row._id)}
+            onViewOrder={() => handleViewProject(params.row._id)}
+            onUpdateOrder={() => handleUpdateProject(params.row._id)}
+            onDeleteOrder={() => handleDeleteProject(params.row._id)}
           />
         )
       },

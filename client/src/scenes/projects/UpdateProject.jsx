@@ -4,7 +4,7 @@ import { useViewTransactionQuery, useUpdateTransactionMutation } from 'state/api
 import DraftForm from 'components/transactions/draft/DraftForm';
 import PageLoader from 'components/PageLoader';
 
-const UpdateOrder = () => {
+const UpdateProject = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { data: transactionData, isLoading: isLoadingTransaction } = useViewTransactionQuery(id);
@@ -75,4 +75,4 @@ const UpdateOrder = () => {
   );
 };
 
-export default UpdateOrder;
+export default UpdateProject;

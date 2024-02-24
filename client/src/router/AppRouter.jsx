@@ -12,12 +12,13 @@ import Error from "scenes/error";
 import Dashboard from "scenes/dashboard";
 import Home from "scenes/home";
 import Search from "scenes/search";
-import Orders from "scenes/orders";
-import ViewOrder from "scenes/orders/ViewOrder";
-import CreateOrder from "scenes/orders/CreateOrder";
-import UpdateOrder from "scenes/orders/UpdateOrder";
 import Funds from "scenes/funds";
 import Funding from "scenes/funding";
+import Projects from "scenes/projects";
+import CreateProject from "scenes/projects/CreateProject";
+import ViewProject from "scenes/projects/ViewProject";
+import UpdateProject from "scenes/projects/UpdateProject";
+import Create from "components/projects/create";
 
 function AppRouter() {
   const location = useLocation();
@@ -67,24 +68,24 @@ function AppRouter() {
                 <Funding />
               </PrivateRoute>
             } />
-            <Route path="/orders" element={
+            <Route path="/projects" element={
               <PrivateRoute>
-                <Orders />
+                <Projects />
               </PrivateRoute>
             } />
-            <Route path="/orders/create" element={
+            <Route path="/projects/create" element={
               <PrivateRoute>
-                <CreateOrder />
+                <Create />
               </PrivateRoute>
             } />
-            <Route path="/orders/view/:id" element={
+            <Route path="/projects/view/:id" element={
               <PrivateRoute>
-                <ViewOrder />
+                <ViewProject />
               </PrivateRoute>
             } />
-            <Route path="/orders/update/:id" element={
+            <Route path="/projects/update/:id" element={
               <PrivateRoute>
-                <UpdateOrder />
+                <UpdateProject />
               </PrivateRoute>
             } />
             <Route path="/logout" element={

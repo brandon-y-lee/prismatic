@@ -7,7 +7,7 @@ import PageLoader from 'components/PageLoader';
 
 import { useViewTransactionQuery } from 'state/api';
 
-const ViewOrder = () => {
+const ViewProject = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: transactionData, isLoading } = useViewTransactionQuery(id);
@@ -50,4 +50,4 @@ const ViewOrder = () => {
   );
 };
 
-export default ViewOrder;
+export default ViewProject;

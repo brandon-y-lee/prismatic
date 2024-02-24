@@ -14,7 +14,7 @@ import NotApprovedProjects from 'components/transactions/data/NotApprovedProject
 
 import { getLoggedInUser } from 'utils/token';
 
-const Orders = () => {
+const Projects = () => {
   const user = getLoggedInUser();
   const navigate = useNavigate();
 
@@ -40,8 +40,8 @@ const Orders = () => {
     console.log('selectedKpi: ', selectedKpi);
   };
 
-  const handleCreateOrder = () => {
-    navigate('/orders/create');
+  const handleCreateProject = () => {
+    navigate('/projects/create');
   };
 
   const handleAllProjects = () => {
@@ -106,7 +106,7 @@ const Orders = () => {
         <Header title="Projects" />
         <FlexBetween sx={{ gap: 3 }}>
           {generateButton("All Projects", handleAllProjects, 'outlined', 'grey.300', 'grey.600')}
-          {generateButton("New Project", handleCreateOrder, 'outlined', '#1677FF', 'white')}
+          {generateButton("New Project", handleCreateProject, 'outlined', '#1677FF', 'white')}
         </FlexBetween>
       </FlexBetween>
 
@@ -144,4 +144,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default Projects;

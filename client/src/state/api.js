@@ -9,7 +9,8 @@ export const api = createApi({
     "Transactions",
     "Dashboard",
     "Invoices",
-    "Funds"
+    "Funds",
+    "Projects"
   ],
   endpoints: (build) => ({
     login: build.mutation({
@@ -30,6 +31,28 @@ export const api = createApi({
         url: 'auth/register',
         method: 'POST',
         body: { name, email, password },
+      }),
+    }),
+
+    /* PROJECTS - CRUD */
+    createProject: build.mutation({
+      query: ({ title, summary }) => ({
+        url: "projects/create",
+        method: "POST",
+        body: { title, summary },
+      }),
+    }),
+    viewProject: build.query({
+      query: (id) => `projects/view/${id}`,
+      providesTags: ['Projects'],
+    }),
+
+    /* FILE UPLOAD */
+    uploadFile: build.mutation({
+      query: (formData) => ({
+        url: "projects/upload",
+        method: "POST",
+        body: formData,
       }),
     }),
 
@@ -259,6 +282,10 @@ export const {
   useGetUserQuery,
   useGetSupplierQuery,
 
+  useCreateProjectMutation,
+  useViewProjectQuery,
+  useUploadFileMutation,
+  
   useGetTransactionsQuery,
   useCreateTransactionMutation,
   useViewTransactionQuery,
