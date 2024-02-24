@@ -9,6 +9,7 @@ import NordigenClient from "nordigen-node";
 
 import authRoutes from "./routes/auth.js";
 import clientRoutes from "./routes/client.js";
+import projectRoutes from "./routes/projects.js";
 import fundRoutes from "./routes/funds.js";
 import nordigenRoutes from "./routes/nordigen.js";
 import plaidRoutes from "./routes/plaid.js";
@@ -45,6 +46,7 @@ app.use(cors());
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/client", clientRoutes);
+app.use("/projects", projectRoutes);
 app.use("/funds", fundRoutes);
 app.use("/nordigen", nordigenRoutes);
 app.use("/plaid", plaidRoutes);

@@ -4,7 +4,7 @@ import { useCreateTransactionMutation } from 'state/api';
 import DraftForm from 'components/transactions/draft/DraftForm';
 import { getLoggedInUser } from 'utils/token';
 
-const CreateOrder = () => {
+const CreateProject = () => {
   const navigate = useNavigate();
   const user = getLoggedInUser();
   const [createTransaction] = useCreateTransactionMutation();
@@ -50,4 +50,4 @@ const CreateOrder = () => {
   );
 };
 
-export default CreateOrder;
+export default CreateProject;

@@ -41,7 +41,7 @@ const navItems = [
     icon: <CreditCardOutlined />,
   },
   {
-    text: "Orders",
+    text: "Projects",
     icon: <ShoppingCartOutlined />,
   },
 ];

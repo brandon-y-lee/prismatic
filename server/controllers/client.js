@@ -2,9 +2,60 @@ import Product from "../models/Product.js";
 import ProductStat from "../models/ProductStat.js";
 import User from "../models/User.js";
 import UserAuth from "../models/UserAuth.js";
+import Contract from "../models/Contract.js";
 import Transaction from "../models/Transaction.js";
 import getCountryIso3 from "country-iso-2-to-3";
+import AWS from 'aws-sdk';
 
+// Configure the AWS environment
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
+const s3 = new AWS.S3();
+
+export const uploadFile = async (req, res) => {
+  try {
+    const { title, summary, status } = req.body;
+    console.log("Title: ", title);
+    console.log("Summary: ", summary);
+    console.log("Status: ", status);
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file provided' });
+    }
+
+    console.log("Uploaded File: ", req.file);
+
+    const params = {
+      Bucket: 'alethea-contracts',
+      Key: req.file.originalname,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+    };
+
+    s3.upload(params, async (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Error uploading file');
+      }
+
+      // Once the file is uploaded successfully, create the Contract object
+      const newContract = new Contract({
+        title,
+        summary,
+        pdf_url: data.Location, // Use the S3 object URL
+        status: status,
+      });
+
+      await newContract.save();
+      res.status(201).json(newContract);
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 export const getTransactions = async (req, res) => {
   try {
