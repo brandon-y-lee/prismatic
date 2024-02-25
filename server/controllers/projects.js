@@ -11,13 +11,51 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
+export const getProjects = async (req, res) => {
+  console.log("Fetching Projects for User: ", req.query);
+  try {
+    const { page, pageSize, sort, search, userId } = req.query;
+
+    const generateSort = () => {
+      const sortParsed = JSON.parse(sort);
+      const sortFormatted = {
+        [sortParsed.field]: (sortParsed.sort = "asc" ? 1 : -1),
+      };
+      
+      return sortFormatted;
+    }
+
+    const sortFormatted = Boolean(sort) ? generateSort() : {};
+
+    const projects = await Project.find({
+      owner: userId
+    })
+      .sort(sortFormatted)
+      .skip(page * pageSize)
+      .limit(pageSize)
+
+    if (!projects) {
+      return res.status(404).json({ message: 'User has no projects.' });
+    }
+    
+    res.status(200).json({ projects });
+  } catch(error){
+    return res.json({message: error.message});
+  }
+};
+
 export const createProject = async (req, res) => {
   try {
-    const { title, summary } = req.body;
-    console.log('Title: ', title);
-    console.log('Summary: ', summary);
+    const { owner, title, summary } = req.body;
+    console.log("User: ", owner);
+    console.log("Title: ", title);
+    console.log("Summary: ", summary);
 
-    const newProject = new Project({ title, summary });
+    const newProject = new Project({ 
+      owner: owner,
+      title: title,
+      summary: summary
+    });
 
     await newProject.save();
     res.status(201).json(newProject);

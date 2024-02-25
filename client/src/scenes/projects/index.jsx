@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetTransactionsQuery } from 'state/api';
+import { useGetProjectsQuery, useGetTransactionsQuery } from 'state/api';
 import { Box, Button, CircularProgress, useMediaQuery } from '@mui/material';
+import { DataGridPro } from '@mui/x-data-grid-pro';
 
 import Header from 'components/Header';
 import FlexBetween from 'components/FlexBetween';
-import ProjectBox from 'components/ProjectBox';
-import AllProjects from 'components/transactions/data/AllProjects';
-import DraftProjects from 'components/transactions/data/DraftProjects';
-import ActiveProjects from 'components/transactions/data/ActiveProjects';
-import InReviewProjects from 'components/transactions/data/InReviewProjects';
-import NotApprovedProjects from 'components/transactions/data/NotApprovedProjects';
+import ActionMenu from 'components/ActionMenu';
+import DataGridCustomToolbar from 'components/DataGridCustomToolbar';
 
 import { getLoggedInUser } from 'utils/token';
 
@@ -18,34 +15,25 @@ const Projects = () => {
   const user = getLoggedInUser();
   const navigate = useNavigate();
 
-  const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
 
-  const [selectedKpi, setSelectedKpi] = useState(null);
-
-  /* Potentially get rid of this and call it once in useEffect */
-  const { data, isLoading, isError } = useGetTransactionsQuery({
-    userId: user.authId,
+  const { data, isLoading, isError } = useGetProjectsQuery({
     page,
     pageSize,
     sort: JSON.stringify(sort),
     search,
-  });
-
-  const handleKpiSelect = (kpiType) => {
-    setSelectedKpi(kpiType.toLowerCase());
-    console.log('selectedKpi: ', selectedKpi);
-  };
+    userId: user.userId,
+  })
 
   const handleCreateProject = () => {
     navigate('/projects/create');
   };
 
   const handleAllProjects = () => {
-    setSelectedKpi(null);
+    console.log("All Projects Clicked.");
   };
 
   const generateButton = (label, onClick, variant, bcolor, color) => (
@@ -77,26 +65,65 @@ const Projects = () => {
     </Button>
   );
 
-  const renderDataGrid = () => {
-    switch (selectedKpi) {
-      case 'draft':
-        return <DraftProjects data={data} />;
-      case 'active':
-        return <ActiveProjects data={data} />;
-      case 'in review':
-        return <InReviewProjects data={data} />;
-      case 'not approved':
-        return <NotApprovedProjects data={data} />;
-      default:
-        return <AllProjects data={data} />;
+  const columns = [
+    {
+      field: "title",
+      flex: 1,
+    },
+    {
+      field: "summary",
+      flex: 2,
+    },
+    {
+      field: "status",
+      flex: 0.75,
+    },
+    {
+      field: "actions",
+      headerName: '',
+      sortable: false,
+      width: 50,
+      renderCell: (params) => {
+        return (
+          <ActionMenu
+            data={params.row}
+            onViewOrder={() => handleViewOrder(params.row._id)}
+            onUpdateOrder={() => handleUpdateOrder(params.row._id)}
+            onDeleteOrder={() => handleDeleteOrder(params.row._id)}
+          />
+        )
+      },
     }
+  ];
+
+  const dataGridStyles = {
+    border: 'none',
+    '& .MuiDataGrid-columnHeaders': {
+      borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    },
+    '& .MuiDataGrid-row': {
+      borderBottom: '1px solid rgba(224, 224, 224, 0.1)',
+      fontWeight: '550',
+    },
+  };
+
+  const handleViewOrder = (id) => {
+    navigate(`/projects/view/${id}`);
+  };
+
+  const handleUpdateOrder = (id) => {
+    navigate(`/projects/update/${id}`);
+  };
+
+  const handleDeleteOrder = async (id) => {
+
   };
 
   if (isLoading) {
     return <CircularProgress />;
   };
 
-  if (isError || !data) {
+  if (isError || !data || data.length === 0) {
     return <Box>Error loading transactions.</Box>;
   };
 
@@ -110,36 +137,24 @@ const Projects = () => {
         </FlexBetween>
       </FlexBetween>
 
-      <Box
-        my="20px"
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
-        gap="30px"
-        sx={{
-          "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" },
-        }}
-      >
-        {/* ROW 1 */}
-        <ProjectBox
-          title="Draft"
-          onSelect={handleKpiSelect}
-        />
-        <ProjectBox
-          title="In Review"
-          onSelect={handleKpiSelect}
-        />
-        <ProjectBox
-          title="Active"
-          onSelect={handleKpiSelect}
-        />
-        <ProjectBox
-          title="Not Approved"
-          onSelect={handleKpiSelect}
+      <Box my="1rem">
+        <DataGridPro
+          loading={!data}
+          getRowId={(row) => row["_id"]}
+          rows={data && data.projects}
+          columns={columns}
+          pagination
+          page={page}
+          pageSize={pageSize}
+          paginationMode="server"
+          sortingMode="server"
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+          slots={{ Toolbar: DataGridCustomToolbar }}
+          sx={dataGridStyles}
         />
       </Box>
-
-      {renderDataGrid()}
     </Box>
   );
 };

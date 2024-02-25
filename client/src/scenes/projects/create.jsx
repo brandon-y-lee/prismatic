@@ -3,19 +3,24 @@ import { Box, Typography, TextField, Button, useMediaQuery, useTheme, Backdrop, 
 import { Check, CheckCircleOutlined } from '@mui/icons-material';
 import { UploaderComponent } from '@syncfusion/ej2-react-inputs';
 import './create.css';
-import { useUploadFileMutation } from 'state/api';
+import { useUploadFileMutation, useCreateProjectMutation } from 'state/api';
 import { useNavigate } from 'react-router-dom';
 import FlexBetween from 'components/FlexBetween';
-import Dendrogram from './dendrogram';
+import Dendrogram from 'components/projects/dendrogram';
+import { getLoggedInUser } from 'utils/token';
 
 const Create = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
+  const user = getLoggedInUser();
+  console.log('User: ', user);
+
   const [projectTitle, setProjectTitle] = useState('');
   const [projectSummary, setProjectSummary] = useState('');
   const [files, setFiles] = useState([]);
-  const [uploadFile, { isLoading, data }] = useUploadFileMutation();
+  const [uploadFile] = useUploadFileMutation();
+  const [createProject, { isLoading, data }] = useCreateProjectMutation();
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const path = {
@@ -41,9 +46,22 @@ const Create = () => {
     e.preventDefault();
     console.log('Title:', projectTitle);
     console.log('Summary:', projectSummary);
-    console.log('Files:', files);
 
-    if (files.length > 0) {
+    let userId = user.userId;
+
+    try {
+      const response = await createProject({ 
+        owner: userId,
+        title: projectTitle,
+        summary: projectSummary
+      }).unwrap();
+      console.log('Project created successfully!', response);
+        setFormSubmitted(true);
+    } catch (err) {
+      console.error('Error uploading PDF:', err);
+    }
+
+    /* if (files.length > 0) {
       const formData = new FormData();
       formData.append('title', projectTitle);
       formData.append('summary', projectSummary);
@@ -57,7 +75,7 @@ const Create = () => {
       } catch (err) {
         console.error('Error uploading PDF:', err);
       }
-    }
+    } */
   };
 
   const handleSaveDraft = () => {

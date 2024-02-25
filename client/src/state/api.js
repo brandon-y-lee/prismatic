@@ -35,12 +35,21 @@ export const api = createApi({
     }),
 
     /* PROJECTS - CRUD */
+    getProjects: build.query({
+      query: ({ page, pageSize, sort, search, userId }) => ({
+        url: "projects/get",
+        method: "GET",
+        params: { page, pageSize, sort, search, userId },
+      }),
+      providesTags: ["Projects"],
+    }),
     createProject: build.mutation({
-      query: ({ title, summary }) => ({
+      query: ({ owner, title, summary }) => ({
         url: "projects/create",
         method: "POST",
-        body: { title, summary },
+        body: { owner, title, summary },
       }),
+      invalidatesTags: ['Projects'],
     }),
     viewProject: build.query({
       query: (id) => `projects/view/${id}`,
@@ -282,10 +291,11 @@ export const {
   useGetUserQuery,
   useGetSupplierQuery,
 
+  useGetProjectsQuery,
   useCreateProjectMutation,
   useViewProjectQuery,
   useUploadFileMutation,
-  
+
   useGetTransactionsQuery,
   useCreateTransactionMutation,
   useViewTransactionQuery,
