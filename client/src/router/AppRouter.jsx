@@ -15,10 +15,12 @@ import Search from "scenes/search";
 import Funds from "scenes/funds";
 import Funding from "scenes/funding";
 import Projects from "scenes/projects";
+import Create from "scenes/projects/create";
+import View from "scenes/projects/view";
 import CreateProject from "scenes/projects/CreateProject";
 import ViewProject from "scenes/projects/ViewProject";
 import UpdateProject from "scenes/projects/UpdateProject";
-import Create from "components/projects/create";
+
 
 function AppRouter() {
   const location = useLocation();
@@ -80,7 +82,7 @@ function AppRouter() {
             } />
             <Route path="/projects/view/:id" element={
               <PrivateRoute>
-                <ViewProject />
+                <View />
               </PrivateRoute>
             } />
             <Route path="/projects/update/:id" element={

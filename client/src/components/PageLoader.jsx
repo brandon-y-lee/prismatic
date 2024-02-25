@@ -1,11 +1,12 @@
 import React from "react";
 import { Spin } from "antd";
+import { Box } from "@mui/material";
 
 const PageLoader = () => {
   return (
-    <div className="center">
+    <Box display='flex' justifyContent='center'>
       <Spin size="large" />
-    </div>
+    </Box>
   );
 };
 export default PageLoader;

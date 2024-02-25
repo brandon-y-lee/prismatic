@@ -3,7 +3,7 @@ import {
   uploadFile,
 } from "../controllers/client.js";
 import multer from 'multer';
-import { createProject, viewProject } from "../controllers/projects.js";
+import { createProject, getProjects, viewProject } from "../controllers/projects.js";
 
 // Set up the multer s3 storage
 const upload = multer({ 
@@ -15,6 +15,7 @@ const upload = multer({
 
 const router = express.Router();
 
+router.get("/get", getProjects);
 router.post("/create", createProject);
 router.get("/view/:id", viewProject);
 

@@ -64,6 +64,10 @@ const ConstructionEstimateSchema = new mongoose.Schema({
 });
 
 const ProjectSchema = new mongoose.Schema({
+  owner: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,
