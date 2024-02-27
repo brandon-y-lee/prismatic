@@ -166,7 +166,6 @@ const Create = () => {
               sx={{ p: '2rem', border: '1px', borderRadius: '12px', boxShadow: theme.shadows[3] }}
             >
               <Typography>Upload Successful!</Typography>
-              <Dendrogram width={400} height={400} />
             </Box>
           </Slide>
         )}

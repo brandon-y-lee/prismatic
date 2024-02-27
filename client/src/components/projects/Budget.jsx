@@ -1,57 +1,61 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, useMediaQuery, useTheme, Backdrop, CircularProgress, Slide } from '@mui/material';
-import { Check, CheckCircleOutlined } from '@mui/icons-material';
-import { UploaderComponent } from '@syncfusion/ej2-react-inputs';
-import { useUploadFileMutation, useCreateProjectMutation } from 'state/api';
-import { useNavigate } from 'react-router-dom';
+import { Box, List, ListItem, ListItemIcon, ListItemText, IconButton, Paper, Typography, Tabs, Tab, useMediaQuery, useTheme, Button } from '@mui/material';
+import { EditOutlined, RadioButtonUncheckedOutlined, CheckCircleOutlined, Add } from '@mui/icons-material';
 import FlexBetween from 'components/FlexBetween';
-import Dendrogram from 'components/projects/dendrogram';
-import { getLoggedInUser } from 'utils/token';
+
 
 const Budget = () => {
   const theme = useTheme();
-  const navigate = useNavigate();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-  const user = getLoggedInUser();
-  console.log('User: ', user);
+  const [activeTab, setActiveTab] = useState(0);
 
-  const [projectTitle, setProjectTitle] = useState('');
-  const [projectSummary, setProjectSummary] = useState('');
-  const [files, setFiles] = useState([]);
-  const [uploadFile] = useUploadFileMutation();
-  const [createProject, { isLoading, data }] = useCreateProjectMutation();
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const handleCreate = () => {
+
+  }
 
   return (  
-    <Box m="1.5rem 2.5rem" sx={{ minHeight: 'calc(100vh - 3rem)' }}>
+    <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
       <Box
-        mt="20px"
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
         sx={{
-          "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" },
+          gap: '1.5rem',
+          "& > div": { 
+            gridColumn: "span 12",
+          },
         }}
       >
-        <Box
-          gridColumn="span 4"
-          sx={{ p: '2rem', border: '1px', borderRadius: '12px', boxShadow: theme.shadows[3] }}
+        <Paper
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            transition: 'box-shadow 0.3s',
+            boxShadow: 'none',
+            borderColor: 'grey.300',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderRadius: '16px',
+            padding: '1.5rem 2rem',
+            '&:hover': {
+              boxShadow: theme => theme.shadows[3],
+            },
+          }}
         >
-        
-        </Box>
+          <FlexBetween>
+            {/* Title "Tasks" */}
+            <Typography variant='h5' fontWeight={550} marginBottom={1}>
+              Budget
+            </Typography>
+            <Button
+              startIcon={<Add />}
+              color='info'
+              sx={{ fontWeight: 600 }}
+            >
+              Create Budget
+            </Button>
+          </FlexBetween>
 
-        <Box
-          gridColumn="span 4"
-          sx={{ p: '2rem', border: '1px', borderRadius: '12px', boxShadow: theme.shadows[3] }}
-        >
-          
-        </Box>
-
-        <Box
-          gridColumn="span 4"
-          sx={{ p: '2rem', border: '1px', borderRadius: '12px', boxShadow: theme.shadows[3] }}
-        >
-          
-        </Box>
+        </Paper>
       </Box>
     </Box>
   );

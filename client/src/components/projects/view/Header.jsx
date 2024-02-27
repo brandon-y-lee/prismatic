@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, IconButton, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined, PictureAsPdfOutlined } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FlexBetween from 'components/FlexBetween';
@@ -29,9 +29,9 @@ const Header = ({ project, status }) => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, gap: '1rem' }}>
       <FlexBetween gap="1rem">
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ color: 'info' }}>
-          
-        </Button>
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
         <Typography variant="h5" fontWeight={600}>{project}</Typography>
         {renderStatusChip(status)}
       </FlexBetween>
@@ -39,6 +39,7 @@ const Header = ({ project, status }) => {
       <FlexBetween gap="0.5rem">
         <Button
           startIcon={<EditOutlined />}
+          color='warning'
           sx={{ fontWeight: 600 }}
           onClick={handleEdit}
         >
@@ -47,6 +48,7 @@ const Header = ({ project, status }) => {
 
         <Button
           startIcon={<PictureAsPdfOutlined />}
+          color='info'
           sx={{ fontWeight: 600 }}
           onClick={handleDownloadPDF}
         >
@@ -54,6 +56,7 @@ const Header = ({ project, status }) => {
         </Button>
         <Button
           startIcon={<DeleteOutlineOutlined />}
+          color='error'
           sx={{ fontWeight: 600 }}
           onClick={handleDelete}
         >
