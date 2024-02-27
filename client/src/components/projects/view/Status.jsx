@@ -24,10 +24,13 @@ const OrderStat = ({ title, value }) => {
   );
 };
 
-const Status = ({ status }) => {
+const Status = ({ summary, status }) => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2, gap: '1.5rem' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 1, gap: '1.5rem' }}>
       <OrderStat title='Status' value={status} />
+      <Typography variant="h6" sx={{ color: 'black', fontWeight: '550' }}>
+        {summary}
+      </Typography>
       <Box sx={{ flexGrow: 1 }} />
     </Box>
   );

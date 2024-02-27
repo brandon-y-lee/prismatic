@@ -59,6 +59,7 @@ const Scope = () => {
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
         sx={{
+          gap: '1.5rem',
           "& > div": { 
             gridColumn: isNonMediumScreens ? "span 6" : "span 12",
           },
@@ -77,9 +78,6 @@ const Scope = () => {
             padding: '1.5rem 2rem',
             '&:hover': {
               boxShadow: theme => theme.shadows[3],
-            },
-            "& > div": { 
-              mr: isNonMediumScreens ? "0.5rem" : "0rem",
             },
           }}
         >
@@ -100,6 +98,7 @@ const Scope = () => {
                   fontSize: '14px',
                   '&.Mui-selected': {
                     color: 'black',
+                    fontWeight: '550'
                   },
                   '&:not(.Mui-selected)': {
                     color: 'grey',
@@ -130,7 +129,6 @@ const Scope = () => {
               </ListItem>
             ))}
           </List>
-
         </Paper>
 
         <Paper
@@ -146,9 +144,6 @@ const Scope = () => {
             padding: '1.5rem 2rem',
             '&:hover': {
               boxShadow: theme => theme.shadows[3],
-            },
-            "& > div": { 
-              ml: isNonMediumScreens ? "1rem" : "0rem",
             },
           }}
         >
@@ -170,9 +165,42 @@ const Scope = () => {
               <Bar dataKey="complete" fill="#8884d8" barSize={20} />
             </BarChart>
           </ResponsiveContainer>
-
         </Paper>
 
+        <Paper
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            transition: 'box-shadow 0.3s',
+            boxShadow: 'none',
+            borderColor: 'grey.300',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderRadius: '16px',
+            padding: '1.5rem 2rem',
+            '&:hover': {
+              boxShadow: theme => theme.shadows[3],
+            },
+          }}
+        >
+          {/* Title "Tasks" */}
+          <Typography variant='h5' fontWeight={550} marginBottom={1}>
+            Status Updates
+          </Typography>
+
+          {/* List of Tasks */}
+          <List>
+            {['Get started using My Tasks', 'Find the layout that\'s right for you'].map((text, index) => (
+              <ListItem key={text} secondaryAction={
+                <Typography variant="caption" color="text.secondary">
+                  May 30, 2023
+                </Typography>
+              }>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
       </Box>
     </Box>
   );

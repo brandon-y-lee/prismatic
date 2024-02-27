@@ -56,7 +56,7 @@ const View = () => {
       >
         <Box sx={{ padding: '1.5rem 2.5rem 0rem 2.5rem' }}>
           <Header project={projectData.title} status={projectData.status} />
-          <Status status={projectData.status} />
+          <Status summary={projectData.summary} status={projectData.status} />
         </Box>
 
         <Divider />
