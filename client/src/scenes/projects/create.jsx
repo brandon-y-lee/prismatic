@@ -6,7 +6,6 @@ import './create.css';
 import { useUploadFileMutation, useCreateProjectMutation } from 'state/api';
 import { useNavigate } from 'react-router-dom';
 import FlexBetween from 'components/FlexBetween';
-import Dendrogram from 'components/projects/dendrogram';
 import { getLoggedInUser } from 'utils/token';
 
 const Create = () => {

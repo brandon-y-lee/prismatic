@@ -162,7 +162,7 @@ const Scope = () => {
                 tick={(props) => <CustomizedAxisTick {...props} data={data} />}
                 width={80}
               />
-              <Bar dataKey="complete" fill="#8884d8" barSize={20} />
+              <Bar dataKey="complete" fill="#000" barSize={20} />
             </BarChart>
           </ResponsiveContainer>
         </Paper>
