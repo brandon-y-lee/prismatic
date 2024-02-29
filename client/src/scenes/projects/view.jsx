@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Paper, Divider, Tabs, Tab } from '@mui/material';
 import PageLoader from 'components/PageLoader';
 
@@ -12,30 +12,37 @@ import Budget from 'components/projects/Budget';
 const View = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: projectData, isLoading } = useViewProjectQuery(id);
   console.log("Project Data: ", projectData);
 
   const [tabValue, setTabValue] = useState(0);
-  const handleTabChange = (event, newValue) => setTabValue(newValue);
+
+  useEffect(() => {
+    const pathSegments = location.pathname.split('/');
+    const lastSegment = pathSegments[pathSegments.length - 1];
+
+    const tabIndexMap = {
+      '': 0, // index route for Scope
+      'budget': 1,
+      'team': 2,
+    };
+
+    setTabValue(tabIndexMap[lastSegment] ?? 0);
+  }, [location]);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+    const paths = ['', 'budget', 'team'];
+    navigate(`/projects/view/${id}/${paths[newValue]}`);
+  };
 
   if (isLoading) {
     return <PageLoader />;
-  }
+  };
 
   if (!projectData) {
     return <Box>Project not found.</Box>;
-  }
-
-  // Function to render the active tab content
-  const renderTab = () => {
-    switch (tabValue) {
-      case 0:
-        return <Scope projectData={projectData} />;
-      case 1:
-        return <Budget projectData={projectData} />;
-      default:
-        return null;
-    }
   };
 
   return (
@@ -55,8 +62,8 @@ const View = () => {
         }}
       >
         <Box sx={{ padding: '1.5rem 2.5rem 0rem 2.5rem' }}>
-          <Header project={projectData.title} status={projectData.status} />
-          <Status summary={projectData.summary} status={projectData.status} />
+          <Header project={projectData.title} summary={projectData.summary} status={projectData.status} />
+          <Status status={projectData.status} />
         </Box>
 
         <Divider />
@@ -99,7 +106,7 @@ const View = () => {
 
       {/* Render the active tab component */}
       <Box>
-        {renderTab()}
+        <Outlet />
       </Box>
     </Box>
   );

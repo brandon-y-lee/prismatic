@@ -7,8 +7,7 @@ import FlexBetween from 'components/FlexBetween';
 import { useDeleteTransactionMutation } from 'state/api';
 import { renderStatusChip } from 'utils/transaction';
 
-const Header = ({ project, status }) => {
-
+const Header = ({ project, summary, status }) => {
   const navigate = useNavigate();
   const [deleteTransaction] = useDeleteTransactionMutation();
 
@@ -32,7 +31,10 @@ const Header = ({ project, status }) => {
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" fontWeight={600}>{project}</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Typography variant="h5" fontWeight={600}>{project}</Typography>
+          <Typography variant="subtitle1">{summary}</Typography>
+        </Box>
         {renderStatusChip(status)}
       </FlexBetween>
 

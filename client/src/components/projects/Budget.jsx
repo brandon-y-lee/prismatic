@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Box, List, ListItem, ListItemIcon, ListItemText, IconButton, Paper, Typography, Tabs, Tab, useMediaQuery, useTheme, Button } from '@mui/material';
 import { EditOutlined, RadioButtonUncheckedOutlined, CheckCircleOutlined, Add } from '@mui/icons-material';
+import { DataGridPro } from '@mui/x-data-grid-pro';
+import { useDemoData } from '@mui/x-data-grid-generator';
 import FlexBetween from 'components/FlexBetween';
+import CreateBudget from './CreateBudget';
 
 
 const Budget = () => {
-  const theme = useTheme();
-  const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-  const [activeTab, setActiveTab] = useState(0);
+  const id = useParams();
+  const navigate = useNavigate();
 
-  const handleCreate = () => {
+  const handleCreateBudget = () => {
+    navigate(`/projects/view/${id.id}/budget/new`);
+  };
 
-  }
+  const { data } = useDemoData({
+    dataSet: 'Commodity',
+    rowLength: 100,
+    editable: true,
+  });
 
   return (  
     <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
@@ -36,6 +45,8 @@ const Budget = () => {
             borderStyle: 'solid',
             borderRadius: '16px',
             padding: '1.5rem 2rem',
+            mb: '1rem',
+            gap: '1rem',
             '&:hover': {
               boxShadow: theme => theme.shadows[3],
             },
@@ -50,10 +61,19 @@ const Budget = () => {
               startIcon={<Add />}
               color='info'
               sx={{ fontWeight: 600 }}
+              onClick={handleCreateBudget}
             >
               Create Budget
             </Button>
           </FlexBetween>
+
+          <DataGridPro
+            {...data}
+            loading={data.rows.length === 0}
+            rowHeight={38}
+            checkboxSelection
+            disableRowSelectionOnClick
+          />
 
         </Paper>
       </Box>

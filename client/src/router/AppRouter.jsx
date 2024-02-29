@@ -17,9 +17,10 @@ import Funding from "scenes/funding";
 import Projects from "scenes/projects";
 import Create from "scenes/projects/create";
 import View from "scenes/projects/view";
-import CreateProject from "scenes/projects/CreateProject";
-import ViewProject from "scenes/projects/ViewProject";
-import UpdateProject from "scenes/projects/UpdateProject";
+import CreateBudget from "components/projects/CreateBudget";
+import Scope from "components/projects/Scope";
+import Budget from "components/projects/Budget";
+import Team from "components/projects/team/Team";
 
 
 function AppRouter() {
@@ -80,16 +81,14 @@ function AppRouter() {
                 <Create />
               </PrivateRoute>
             } />
-            <Route path="/projects/view/:id" element={
-              <PrivateRoute>
-                <View />
-              </PrivateRoute>
-            } />
-            <Route path="/projects/update/:id" element={
-              <PrivateRoute>
-                <UpdateProject />
-              </PrivateRoute>
-            } />
+            <Route path="/projects/view/:id" element={<PrivateRoute><View /></PrivateRoute>}>
+              <Route index element={<Scope />} />
+              <Route path="budget" element={<Budget />} />
+              <Route path="budget/new" element={<CreateBudget />} />
+              <Route path="team" element={<Team />} />
+              <Route path="team/new" element={<Team />} />
+            </Route>
+
             <Route path="/logout" element={
               <PrivateRoute>
                 <Logout />
