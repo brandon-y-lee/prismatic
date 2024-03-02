@@ -16,6 +16,7 @@
     "@nivo/line": "^0.80.0",
     "@nivo/pie": "^0.80.0",
     "@reduxjs/toolkit": "^1.9.7",
+    "@syncfusion/ej2-react-gantt": "^24.2.8",
     "@syncfusion/ej2-react-inputs": "^24.2.7",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",

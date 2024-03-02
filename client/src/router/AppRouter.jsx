@@ -21,6 +21,7 @@ import CreateBudget from "components/projects/CreateBudget";
 import Scope from "components/projects/Scope";
 import Budget from "components/projects/Budget";
 import Team from "components/projects/team/Team";
+import Timeline from "components/projects/timeline/Timeline";
 
 
 function AppRouter() {
@@ -87,6 +88,7 @@ function AppRouter() {
               <Route path="budget/new" element={<CreateBudget />} />
               <Route path="team" element={<Team />} />
               <Route path="team/new" element={<Team />} />
+              <Route path="timeline" element={<Timeline />} />
             </Route>
 
             <Route path="/logout" element={

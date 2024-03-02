@@ -6,8 +6,6 @@ import PageLoader from 'components/PageLoader';
 import { useViewProjectQuery } from 'state/api';
 import Header from 'components/projects/view/Header';
 import Status from 'components/projects/view/Status';
-import Scope from 'components/projects/Scope';
-import Budget from 'components/projects/Budget';
 
 const View = () => {
   const { id } = useParams();
@@ -26,6 +24,7 @@ const View = () => {
       '': 0, // index route for Scope
       'budget': 1,
       'team': 2,
+      'timeline': 3,
     };
 
     setTabValue(tabIndexMap[lastSegment] ?? 0);
@@ -33,7 +32,7 @@ const View = () => {
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
-    const paths = ['', 'budget', 'team'];
+    const paths = ['', 'budget', 'team', 'timeline'];
     navigate(`/projects/view/${id}/${paths[newValue]}`);
   };
 
@@ -73,6 +72,7 @@ const View = () => {
             value={tabValue}
             onChange={handleTabChange}
             aria-label="project-tabs"
+            variant="fullWidth"
             sx={{
               '& .MuiTab-root': {
                 textTransform: 'none',
@@ -85,19 +85,25 @@ const View = () => {
                 '&.Mui-selected': {
                   backgroundColor: 'white',
                   color: 'black',
+                  fontWeight: '550'
                 },
                 '&:not(.Mui-selected)': {
                   backgroundColor: '#f5f5f5',
                 },
+                '&:hover': {
+                  backgroundColor: 'white',
+                  color: 'black',
+                  fontWeight: '550'
+                }
               }
             }}
           >
             <Tab label="Scope" />
             <Tab label="Budget" />
             <Tab label="Team" />
+            <Tab label="Timeline" />
             <Tab label="Materials" />
             <Tab label="Permits" />
-            <Tab label="Communication" />
             <Tab label="Modeling" />
             <Tab label="Estimates" />
           </Tabs>

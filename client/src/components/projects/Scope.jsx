@@ -43,10 +43,10 @@ const Scope = () => {
     
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={-120} y={0} dy={5} textAnchor="start" fill="#666" fontSize={14}>
+        <text x={-120} y={0} dy={5} textAnchor="start" fill="#03045E" fontSize={14}>
           {payload.value}
         </text>
-        <text x={0} y={0} dy={5} textAnchor="end" fill="#8884d8" fontSize={14}>
+        <text x={0} y={0} dy={5} textAnchor="end" fill="#03045E" fontSize={14} fontWeight={550}>
           {`${value}%`}
         </text>
       </g>
@@ -114,9 +114,9 @@ const Scope = () => {
 
           {/* List of Tasks */}
           <List>
-            {['Get started using My Tasks', 'Find the layout that\'s right for you'].map((text, index) => (
+            {['Get permit signed by city', 'Sign contract with general contractor'].map((text, index) => (
               <ListItem key={text} secondaryAction={
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="body2" color="text.secondary">
                   May 30, 2023
                 </Typography>
               }>
@@ -153,6 +153,12 @@ const Scope = () => {
           </Typography>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={data} layout='vertical' margin={{ left: 50 }}>
+              <defs>
+                <linearGradient id="gradientFill" x1="0" x2="1" y1="0.25" y2="1">
+                  <stop offset="0%" stopColor="#00B4D8" />
+                  <stop offset="100%" stopColor="#023E8A" />
+                </linearGradient>
+              </defs>
               <XAxis type="number" domain={[0, 100]} hide />
               <YAxis
                 dataKey="name"
@@ -162,7 +168,7 @@ const Scope = () => {
                 tick={(props) => <CustomizedAxisTick {...props} data={data} />}
                 width={80}
               />
-              <Bar dataKey="complete" fill="#000" barSize={20} />
+              <Bar dataKey="complete" fill="url(#gradientFill)" barSize={8} />
             </BarChart>
           </ResponsiveContainer>
         </Paper>
@@ -192,7 +198,7 @@ const Scope = () => {
           <List>
             {['Get started using My Tasks', 'Find the layout that\'s right for you'].map((text, index) => (
               <ListItem key={text} secondaryAction={
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="body2" color="text.secondary">
                   May 30, 2023
                 </Typography>
               }>
