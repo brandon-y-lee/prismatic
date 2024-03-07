@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetProjectsQuery, useGetTransactionsQuery } from 'state/api';
-import { Box, Button, CircularProgress, useMediaQuery } from '@mui/material';
+import { useDeleteProjectMutation, useGetProjectsQuery } from 'state/api';
+import { Box, Button, CircularProgress, Divider, useMediaQuery, useTheme } from '@mui/material';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 
 import Header from 'components/Header';
@@ -14,6 +14,8 @@ import { getLoggedInUser } from 'utils/token';
 const Projects = () => {
   const user = getLoggedInUser();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
@@ -28,12 +30,31 @@ const Projects = () => {
     userId: user.userId,
   })
 
+  const [deleteProject] = useDeleteProjectMutation();
+
   const handleCreateProject = () => {
     navigate('/projects/create');
   };
 
   const handleAllProjects = () => {
     console.log("All Projects Clicked.");
+  };
+
+  const handleViewProject = (id) => {
+    navigate(`/projects/view/${id}`);
+  };
+
+  const handleUpdateProject = (id) => {
+    navigate(`/projects/update/${id}`);
+  };
+
+  const handleDeleteProject = async (id) => {
+    try {
+      await deleteProject({ id }).unwrap();
+      console.log(`Project ${id} deleted successfully.`);
+    } catch (error) {
+      console.error('Error deleting the project: ', error.message);
+    }
   };
 
   const generateButton = (label, onClick, variant, bcolor, color) => (
@@ -68,14 +89,17 @@ const Projects = () => {
   const columns = [
     {
       field: "title",
+      headerName: "Title",
       flex: 1,
     },
     {
       field: "summary",
+      headerName: "Summary",
       flex: 2,
     },
     {
       field: "status",
+      headerName: "Status",
       flex: 0.75,
     },
     {
@@ -83,40 +107,25 @@ const Projects = () => {
       headerName: '',
       sortable: false,
       width: 50,
-      renderCell: (params) => {
-        return (
-          <ActionMenu
-            data={params.row}
-            onViewOrder={() => handleViewOrder(params.row._id)}
-            onUpdateOrder={() => handleUpdateOrder(params.row._id)}
-            onDeleteOrder={() => handleDeleteOrder(params.row._id)}
-          />
-        )
-      },
+      renderCell: (params) => (
+        <ActionMenu
+          data={params.row}
+          onView={() => handleViewProject(params.row._id)}
+          onUpdate={() => handleUpdateProject(params.row._id)}
+          onDelete={() => handleDeleteProject(params.row._id)}
+        />
+      )
     }
   ];
 
   const dataGridStyles = {
-    border: 'none',
     '& .MuiDataGrid-columnHeaders': {
-      borderBottom: '1px solid rgba(224, 224, 224, 1)',
+      backgroundColor: theme.palette.background.alt,
     },
     '& .MuiDataGrid-row': {
       borderBottom: '1px solid rgba(224, 224, 224, 0.1)',
       fontWeight: '550',
     },
-  };
-
-  const handleViewOrder = (id) => {
-    navigate(`/projects/view/${id}`);
-  };
-
-  const handleUpdateOrder = (id) => {
-    navigate(`/projects/update/${id}`);
-  };
-
-  const handleDeleteOrder = async (id) => {
-
   };
 
   if (isLoading) {
@@ -128,32 +137,48 @@ const Projects = () => {
   };
 
   return (
-    <Box m="1.5rem 2.5rem">
-      <FlexBetween>
-        <Header title="Projects" />
-        <FlexBetween sx={{ gap: 3 }}>
-          {generateButton("All Projects", handleAllProjects, 'outlined', 'grey.300', 'grey.600')}
-          {generateButton("New Project", handleCreateProject, 'outlined', '#1677FF', 'white')}
-        </FlexBetween>
-      </FlexBetween>
+    <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
+      <Box
+        display="grid"
+        gridTemplateColumns="repeat(12, 1fr)"
+        sx={{
+          "& > div": { 
+            gridColumn: isNonMediumScreens ? undefined : "span 12",
+          },
+        }}
+      >
+        <Box sx={{ gridColumn: "span 12", m: "1.5rem 2.5rem" }}>
+          <FlexBetween>
+            <Header title="Projects" />
+            <FlexBetween sx={{ gap: 3 }}>
+              {generateButton("All Projects", handleAllProjects, 'outlined', 'grey.300', 'grey.600')}
+              {generateButton("New Project", handleCreateProject, 'outlined', '#1677FF', 'white')}
+            </FlexBetween>
+          </FlexBetween>
+        </Box>
 
-      <Box my="1rem">
-        <DataGridPro
-          loading={!data}
-          getRowId={(row) => row["_id"]}
-          rows={data && data.projects}
-          columns={columns}
-          pagination
-          page={page}
-          pageSize={pageSize}
-          paginationMode="server"
-          sortingMode="server"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-          slots={{ Toolbar: DataGridCustomToolbar }}
-          sx={dataGridStyles}
-        />
+        <Box sx={{ gridColumn: "span 12" }}>
+          <Divider />
+        </Box>
+
+        <Box sx={{ gridColumn: "span 12", m: "1.5rem 2.5rem" }}>
+          <DataGridPro
+            loading={!data}
+            getRowId={(row) => row["_id"]}
+            rows={data && data.projects}
+            columns={columns}
+            pagination
+            page={page}
+            pageSize={pageSize}
+            paginationMode="server"
+            sortingMode="server"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+            slots={{ Toolbar: DataGridCustomToolbar }}
+            sx={dataGridStyles}
+          />
+        </Box>
       </Box>
     </Box>
   );

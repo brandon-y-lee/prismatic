@@ -55,7 +55,7 @@ const Create = () => {
         summary: projectSummary
       }).unwrap();
       console.log('Project created successfully!', response);
-        setFormSubmitted(true);
+      setFormSubmitted(true);
     } catch (err) {
       console.error('Error uploading PDF:', err);
     }

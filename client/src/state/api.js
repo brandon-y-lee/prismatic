@@ -34,6 +34,15 @@ export const api = createApi({
       }),
     }),
 
+    /* FILE UPLOAD */
+    uploadFile: build.mutation({
+      query: (formData) => ({
+        url: "projects/upload",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+
     /* PROJECTS - CRUD */
     getProjects: build.query({
       query: ({ page, pageSize, sort, search, userId }) => ({
@@ -55,14 +64,43 @@ export const api = createApi({
       query: (id) => `projects/view/${id}`,
       providesTags: ['Projects'],
     }),
-
-    /* FILE UPLOAD */
-    uploadFile: build.mutation({
-      query: (formData) => ({
-        url: "projects/upload",
-        method: "POST",
-        body: formData,
+    deleteProject: build.mutation({
+      query: ({ id }) => ({
+        url: `projects/delete/${id}`,
+        method: 'DELETE',
       }),
+      invalidatesTags: ['Projects'],
+    }),
+
+    /* CONTRACTORS - CRUD */
+    getContractors: build.query({
+      query: () => 'projects/get-contractors',
+      providesTags: ['Contractors'],
+    }),
+
+    /* CREWS - CRUD */
+    createCrew: build.mutation({
+      query: (crewData) => ({
+        url: 'projects/create-crew',
+        method: 'POST',
+        body: crewData,
+      }),
+      invalidatesTags: ['Projects', 'Crews'],
+    }),
+    getCrews: build.query({
+      query: ({ projectId }) => ({
+        url: 'projects/get-crews',
+        method: 'GET',
+        params: { projectId },
+      }),
+      providesTags: ['Crews'],
+    }),
+    deleteCrew: build.mutation({
+      query: ({ id }) => ({
+        url: `projects/delete-crew/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Crews'],
     }),
 
     /* TRANSACTION - CRUD */
@@ -291,10 +329,17 @@ export const {
   useGetUserQuery,
   useGetSupplierQuery,
 
+  useUploadFileMutation,
+
   useGetProjectsQuery,
   useCreateProjectMutation,
   useViewProjectQuery,
-  useUploadFileMutation,
+  useDeleteProjectMutation,
+
+  useGetContractorsQuery,
+  useCreateCrewMutation,
+  useGetCrewsQuery,
+  useDeleteCrewMutation,
 
   useGetTransactionsQuery,
   useCreateTransactionMutation,

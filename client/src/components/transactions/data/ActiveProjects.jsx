@@ -74,9 +74,9 @@ const ActiveProjects = ({ data }) => {
         return (
           <ActionMenu
             data={params.row}
-            onViewOrder={() => handleViewOrder(params.row._id)}
-            onUpdateOrder={() => handleUpdateOrder(params.row._id)}
-            onDeleteOrder={() => handleDeleteOrder(params.row._id)}
+            onView={() => handleViewOrder(params.row._id)}
+            onUpdate={() => handleUpdateOrder(params.row._id)}
+            onDelete={() => handleDeleteOrder(params.row._id)}
           />
         )
       },

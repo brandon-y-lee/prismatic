@@ -8,7 +8,8 @@ import Message from './Message';
 import CreateNewMessage from './CreateNewMessage';
 
 const Team = () => {
-  const id = useParams();
+  const { crewId } = useParams();
+  console.log('crewId: ', crewId);
   const navigate = useNavigate();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
 

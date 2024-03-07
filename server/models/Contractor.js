@@ -3,11 +3,10 @@ import mongoose from "mongoose";
 const ContractorSchema = new mongoose.Schema(
   {
     id: Number,
-    Company: String,
-    City: String,
-    State: String,
-    Type: String,
-    Description: String,
+    name: String,
+    email: String,
+    company: String,
+    role: String,
   },
   { timestamps: true }
 );

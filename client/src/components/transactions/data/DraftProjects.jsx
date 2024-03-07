@@ -74,9 +74,9 @@ const DraftProjects = ({ data }) => {
         return (
           <ActionMenu
             data={params.row}
-            onViewOrder={() => handleViewProject(params.row._id)}
-            onUpdateOrder={() => handleUpdateProject(params.row._id)}
-            onDeleteOrder={() => handleDeleteProject(params.row._id)}
+            onView={() => handleViewProject(params.row._id)}
+            onUpdate={() => handleUpdateProject(params.row._id)}
+            onDelete={() => handleDeleteProject(params.row._id)}
           />
         )
       },

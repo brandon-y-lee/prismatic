@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Drawer,
@@ -19,7 +19,6 @@ import {
   Search,
   ShoppingCartOutlined,
 } from "@mui/icons-material";
-import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
 
@@ -37,10 +36,6 @@ const navItems = [
     icon: <CreditCardOutlined />,
   },
   {
-    text: "Funding",
-    icon: <CreditCardOutlined />,
-  },
-  {
     text: "Projects",
     icon: <ShoppingCartOutlined />,
   },
@@ -55,12 +50,18 @@ const Sidebar = ({
 }) => {
   const { pathname } = useLocation();
   const [active, setActive] = useState("");
+  const [currentRoot, setCurrentRoot] = useState("");
   const navigate = useNavigate();
   const theme = useTheme();
 
   useEffect(() => {
-    setActive(pathname.substring(1));
-  }, [pathname]);
+    const pathSegments = pathname.split('/').filter(Boolean);
+    const rootPath = pathSegments[0];
+    if (rootPath !== currentRoot) {
+      setCurrentRoot(rootPath);
+      setActive(rootPath);
+    }
+  }, [pathname, currentRoot]);
 
   return (
     <Box component="nav">
