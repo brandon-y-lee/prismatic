@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Paper, Divider, Tabs, Tab } from '@mui/material';
 import PageLoader from 'components/PageLoader';
-
-import { useViewProjectQuery } from 'state/api';
 import Header from 'components/projects/view/Header';
 import Status from 'components/projects/view/Status';
+import { useViewProjectQuery } from 'state/api';
 
 const View = () => {
   const { id } = useParams();
+  console.log('id: ', id);
   const navigate = useNavigate();
   const location = useLocation();
   const { data: projectData, isLoading } = useViewProjectQuery(id);
@@ -18,21 +18,24 @@ const View = () => {
 
   useEffect(() => {
     const pathSegments = location.pathname.split('/');
-    const lastSegment = pathSegments[pathSegments.length - 1];
-
+    const viewIndex = pathSegments.findIndex(segment => segment === 'view');
+    const projectIdSegment = pathSegments[viewIndex + 1];
+    const subRouteSegment = pathSegments[viewIndex + 2];
+  
     const tabIndexMap = {
-      '': 0, // index route for Scope
+      '': 0, // Scope
       'budget': 1,
-      'team': 2,
-      'timeline': 3,
+      'crews': 2,
+      'team': 3,
+      'timeline': 4,
     };
-
-    setTabValue(tabIndexMap[lastSegment] ?? 0);
+  
+    setTabValue(tabIndexMap[subRouteSegment] ?? 0);
   }, [location]);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
-    const paths = ['', 'budget', 'team', 'timeline'];
+    const paths = ['', 'budget', 'crews', 'team', 'timeline'];
     navigate(`/projects/view/${id}/${paths[newValue]}`);
   };
 
@@ -45,7 +48,7 @@ const View = () => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" m="1.5rem 2.5rem 1.5rem 2.5rem" gap="1rem">
+    <Box display="flex" flexDirection="column" sx={{ m: "1.5rem 2.5rem", gap: "1rem" }}>
       <Paper
         sx={{
           transition: 'box-shadow 0.3s',
@@ -100,6 +103,7 @@ const View = () => {
           >
             <Tab label="Scope" />
             <Tab label="Budget" />
+            <Tab label="Crews" />
             <Tab label="Team" />
             <Tab label="Timeline" />
             <Tab label="Materials" />

@@ -1,5 +1,8 @@
+import mongoose from 'mongoose';
 import Project from "../models/Project.js";
 import Contract from "../models/Contract.js";
+import Crew from "../models/Crew.js";
+import Contractor from "../models/Contractor.js";
 
 import AWS from 'aws-sdk';
 
@@ -11,6 +14,7 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
+/* PROJECTS - CRUD */
 export const getProjects = async (req, res) => {
   console.log("Fetching Projects for User: ", req.query);
   try {
@@ -80,6 +84,23 @@ export const viewProject = async (req, res) => {
   }
 };
 
+export const deleteProject = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const project = await Project.findById(id);
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found.' });
+    }
+
+    await Project.deleteOne({ _id: id });
+    res.status(200).json({ message: `Project ${id} deleted successfully.` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  };
+};
+
 export const uploadFile = async (req, res) => {
   try {
     const { title, summary, status } = req.body;
@@ -111,7 +132,7 @@ export const uploadFile = async (req, res) => {
         title,
         summary,
         pdf_url: data.Location, // Use the S3 object URL
-        status: status,
+        status: status
       });
 
       await newContract.save();
@@ -120,4 +141,72 @@ export const uploadFile = async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
+};
+
+export const getContractors = async (req, res) => {
+  try {
+    const contractors = await Contractor.find({});
+
+    res.status(200).json(contractors);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+/* CREWS - CRUD */
+export const createCrew = async (req, res) => {
+  try {
+    const { name, projectId, memberIds, leadId, createdBy } = req.body;
+
+    const memberObjectIds = memberIds.map(id => mongoose.Types.ObjectId(id));
+    const leadObjectId = mongoose.Types.ObjectId(leadId);
+
+    const newCrew = new Crew({
+      name,
+      project_id: mongoose.Types.ObjectId(projectId),
+      members: memberObjectIds,
+      lead: leadObjectId,
+      created_by: createdBy
+    });
+
+    await newCrew.save();
+    res.status(201).json(newCrew);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getCrews = async (req, res) => {
+  try {
+    const { projectId } = req.query;
+    console.log('projectId: ', projectId);
+
+    const crews = await Crew.find({ project_id: mongoose.Types.ObjectId(projectId) }).populate('members lead');
+
+    if (!crews.length) {
+      return res.status(400).json({ message: 'No crews found for the given project.' });
+    }
+
+    res.status(200).json(crews);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const deleteCrew = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const crew = await Crew.findById(id);
+
+    if (!crew) {
+      return res.status(404).json({ message: 'Crew not found.' });
+    }
+
+    await Crew.deleteOne({ _id: id });
+    res.status(200).json({ message: `Crew ${id} deleted successfully.` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  };
 };

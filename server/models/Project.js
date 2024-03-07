@@ -90,6 +90,10 @@ const ProjectSchema = new mongoose.Schema({
     total: Number,
     items: [BudgetItemSchema]
   },
+  crews: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'Crew'
+  }],
   team: [TeamMemberSchema],
   materials: [MaterialSchema],
   permits: [PermitSchema],

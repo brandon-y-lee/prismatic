@@ -143,84 +143,76 @@ export const mockSupplierData = [
 
 
 export const mockContractorData = [
-  { 
+  {
     id: 1,
-    Company: "ElectroWorks",
-    City: "San Francisco",
-    State: "CA",
-    Type: "Electrician",
-    Description: "Specializing in residential electrical work."
+    name: "John Doe",
+    email: "johndoe@example.com",
+    company: "John's Electrical",
+    role: "Electrician"
   },
-  { 
+  {
     id: 2,
-    Company: "PipeMasters",
-    City: "Los Angeles",
-    State: "CA",
-    Type: "Plumbing",
-    Description: "Expert plumbing services for home and business."
+    name: "Jane Smith",
+    email: "janesmith@example.com",
+    company: "Smith Plumbing",
+    role: "Plumber"
   },
-  { 
+  {
     id: 3,
-    Company: "DesignBuild",
-    City: "New York",
-    State: "NY",
-    Type: "Architect",
-    Description: "Architectural design and consulting."
+    name: "Dave Wilson",
+    email: "davewilson@example.com",
+    company: "Wilson Constructions",
+    role: "Foreman"
   },
-  { 
+  {
     id: 4,
-    Company: "StrongFoundation",
-    City: "Chicago",
-    State: "IL",
-    Type: "General Contractor",
-    Description: "Full-service general contractor for all project sizes."
+    name: "Emily Roberts",
+    email: "emilyroberts@example.com",
+    company: "Elegant Spaces",
+    role: "Architect"
   },
-  { 
+  {
     id: 5,
-    Company: "BrightLights",
-    City: "Houston",
-    State: "TX",
-    Type: "Electrician",
-    Description: "Commercial and industrial electrical services."
+    name: "Michael Johnson",
+    email: "michaeljohnson@example.com",
+    company: "MJ Painting",
+    role: "Painter"
   },
-  { 
+  {
     id: 6,
-    Company: "FlowPros",
-    City: "Philadelphia",
-    State: "PA", 
-    Type: "Plumbing", 
-    Description: "Plumbing maintenance and emergency repair." 
+    name: "Sara Parker",
+    email: "saraparker@example.com",
+    company: "Parker Interiors",
+    role: "Interior Designer"
   },
-  { 
+  {
     id: 7,
-    Company: "SkyHigh", 
-    City: "Denver", 
-    State: "CO", 
-    Type: "Roofing", 
-    Description: "Roof installation and repair services." 
+    name: "Alex Green",
+    email: "alexgreen@example.com",
+    company: "Green's Landscaping",
+    role: "Landscaper"
   },
-  { 
+  {
     id: 8,
-    Company: "CoolAir", 
-    City: "Phoenix", 
-    State: "AZ", 
-    Type: "HVAC", 
-    Description: "Heating, ventilation, and air conditioning services." 
+    name: "Linda Brown",
+    email: "lindabrown@example.com",
+    company: "Brown & Co Masonry",
+    role: "Mason"
   },
-  { 
+  {
     id: 9,
-    Company: "EcoBuild", 
-    City: "Seattle", 
-    State: "WA", 
-    Type: "General Contractor", 
-    Description: "Eco-friendly construction and remodeling." 
+    name: "Chris White",
+    email: "chriswhite@example.com",
+    company: "White Carpentry",
+    role: "Carpenter"
   },
-  { 
+  {
     id: 10,
-    Company: "GroundUp", 
-    City: "Boston", 
-    State: "MA", 
-    Type: "General Contractor", 
-    Description: "Innovative building solutions from the ground up." 
-  },
+    name: "Olivia Black",
+    email: "oliviablack@example.com",
+    company: "Black Roofing",
+    role: "Roofer"
+  }
 ];
+
+

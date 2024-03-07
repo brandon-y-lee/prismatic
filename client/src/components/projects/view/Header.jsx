@@ -1,15 +1,16 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined, PictureAsPdfOutlined } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FlexBetween from 'components/FlexBetween';
-import { useDeleteTransactionMutation } from 'state/api';
+import { useDeleteProjectMutation } from 'state/api';
 import { renderStatusChip } from 'utils/transaction';
 
 const Header = ({ project, summary, status }) => {
   const navigate = useNavigate();
-  const [deleteTransaction] = useDeleteTransactionMutation();
+  const { id } = useParams();
+  const [deleteProject] = useDeleteProjectMutation();
 
   const handleEdit = () => {
     navigate(`/orders/update/${project}`);
@@ -20,15 +21,19 @@ const Header = ({ project, summary, status }) => {
   };
 
   const handleDelete = async () => {
-    const response = await deleteTransaction({ id: project });
-    if (response)
-      navigate(`/orders`);
+    try {
+      await deleteProject({ id }).unwrap();
+      console.log(`Project ${id} deleted successfully.`);
+      navigate(`/projects`);
+    } catch (error) {
+      console.error('Error deleting the project: ', error.message);
+    }
   };
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, gap: '1rem' }}>
       <FlexBetween gap="1rem">
-        <IconButton onClick={() => navigate(-1)}>
+        <IconButton onClick={() => navigate('/projects')}>
           <ArrowBackIcon />
         </IconButton>
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>

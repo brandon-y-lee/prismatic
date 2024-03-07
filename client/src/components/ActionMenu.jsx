@@ -6,7 +6,7 @@ import {
   IconButton
 } from '@mui/material';
 
-const ActionMenu = ({ data, onViewOrder, onUpdateOrder, onDeleteOrder }) => {
+const ActionMenu = ({ data, onView, onUpdate, onDelete }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -20,17 +20,17 @@ const ActionMenu = ({ data, onViewOrder, onUpdateOrder, onDeleteOrder }) => {
 
   const handleView = () => {
     handleClose();
-    onViewOrder(data._id);
+    onView(data._id);
   };
 
   const handleUpdate = () => {
     handleClose();
-    onUpdateOrder(data._id);
+    onUpdate(data._id);
   };
 
   const handleDelete = () => {
     handleClose();
-    onDeleteOrder(data._id);
+    onDelete(data._id);
   }
   
   return (
