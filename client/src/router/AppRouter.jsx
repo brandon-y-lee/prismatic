@@ -21,7 +21,7 @@ import CreateBudget from "components/projects/CreateBudget";
 import Scope from "components/projects/Scope";
 import Budget from "components/projects/Budget";
 import Crews from "components/projects/crews";
-import Team from "components/projects/team/Team";
+import Crew from "components/projects/crew";
 import Timeline from "components/projects/timeline/Timeline";
 
 
@@ -88,9 +88,9 @@ function AppRouter() {
               <Route path="budget" element={<Budget />} />
               <Route path="budget/new" element={<CreateBudget />} />
               <Route path="crews" element={<Crews />} />
-              <Route path="crews/:crewId" element={<Team />} />
-              <Route path="team" element={<Team />} />
-              <Route path="team/new" element={<Team />} />
+              <Route path="crews/:crewId" element={<Crew />} />
+              <Route path="team" element={<Crew />} />
+              <Route path="team/new" element={<Crew />} />
               <Route path="timeline" element={<Timeline />} />
             </Route>
 

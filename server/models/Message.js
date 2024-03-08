@@ -2,31 +2,30 @@ import mongoose from "mongoose";
 
 const MessageSchema = new mongoose.Schema(
   {
-    author: {
+    project_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+      required: true,
+    },
+    crew_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Crew',
+      required: true,
+    },
+    sender: {
       type: String,
       required: true,
     },
-    title: {
+    recipients: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Contractor',
+      required: true,
+    }],
+    subject: {
       type: String,
       required: true,
     },
-    subtitle: {
-      type: String,
-      required: true,
-    },
-    message: {
-      type: String,
-      required: true,
-    },
-    recipients: {
-      type: String,
-      required: true,
-    },
-    team: {
-      type: String,
-      required: true,
-    },
-    crew: {
+    content: {
       type: String,
       required: true,
     },

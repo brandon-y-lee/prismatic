@@ -7,14 +7,12 @@ import Status from 'components/projects/view/Status';
 import { useViewProjectQuery } from 'state/api';
 
 const View = () => {
-  const { id } = useParams();
-  console.log('id: ', id);
-  const navigate = useNavigate();
   const location = useLocation();
-  const { data: projectData, isLoading } = useViewProjectQuery(id);
-  console.log("Project Data: ", projectData);
-
   const [tabValue, setTabValue] = useState(0);
+  const navigate = useNavigate();
+
+  const { id } = useParams();
+  const { data: projectData, isLoading } = useViewProjectQuery(id);
 
   useEffect(() => {
     const pathSegments = location.pathname.split('/');

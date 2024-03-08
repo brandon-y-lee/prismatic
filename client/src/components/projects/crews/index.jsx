@@ -11,12 +11,11 @@
   const Crews = () => {
     const navigate = useNavigate();
     const theme = useTheme();
-    const { id: projectId } = useParams();
+    const { id } = useParams();
     const [openAddCrewDialog, setOpenAddCrewDialog] = useState(false);
     const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
 
-    const { data: crews, isLoading: isCrewsLoading, error } = useGetCrewsQuery({ projectId: projectId });
-    console.log('crews: ', crews);
+    const { data: crews, isLoading: isCrewsLoading, error } = useGetCrewsQuery({ projectId: id });
     const [deleteCrew] = useDeleteCrewMutation();
 
     const handleAddCrew = () => {
@@ -28,13 +27,13 @@
     };
 
     const handleViewCrew = (crewId) => {
-      navigate(`/projects/view/${projectId}/crews/${crewId}`);
+      navigate(`/projects/view/${id}/crews/${crewId}`);
     };
 
     const handleDeleteCrew = async (id) => {
       try {
         await deleteCrew({ id }).unwrap();
-        console.log(`Crew ${projectId} deleted successfully.`);
+        console.log(`Crew ${id} deleted successfully.`);
       } catch (error) {
         console.log('Error during delete.', error);
       }

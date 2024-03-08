@@ -22,15 +22,13 @@ import { useParams } from 'react-router-dom';
 
 
 const AddCrew = ({ open, onClose }) => {
+  const user = getLoggedInUser();
+  const { id } = useParams();
   const [crewName, setCrewName] = useState('');
   const [crewMembers, setCrewMembers] = useState(new Set());
   const [crewLead, setCrewLead] = useState(null);
-
-  const { data: contractors, isLoading: isContractorsLoading } = useGetContractorsQuery(undefined, { skip: !open });
   const [createCrew, { isLoading: isCreatingCrew }] = useCreateCrewMutation();
-
-  const user = getLoggedInUser();
-  const url = useParams();
+  const { data: contractors, isLoading: isContractorsLoading } = useGetContractorsQuery(undefined, { skip: !open });
 
   const handleCrewNameChange = (event) => {
     setCrewName(event.target.value);
@@ -55,7 +53,7 @@ const AddCrew = ({ open, onClose }) => {
   const handleSubmit = async () => {
     const crewData = {
       name: crewName,
-      projectId: url.id,
+      projectId: id,
       memberIds: Array.from(crewMembers),
       leadId: crewLead,
       createdBy: user.userId,
@@ -74,7 +72,7 @@ const AddCrew = ({ open, onClose }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle sx={{ fontWeight: '550' }}>Select Crew Members and Crew Lead</DialogTitle>
       <DialogContent>
         <Box

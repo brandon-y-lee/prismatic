@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import Project from "../models/Project.js";
 import Contract from "../models/Contract.js";
-import Crew from "../models/Crew.js";
 import Contractor from "../models/Contractor.js";
+import Crew from "../models/Crew.js";
+import Message from '../models/Message.js';
 
 import AWS from 'aws-sdk';
 
@@ -14,7 +15,7 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-/* PROJECTS - CRUD */
+/* Projects */
 export const getProjects = async (req, res) => {
   console.log("Fetching Projects for User: ", req.query);
   try {
@@ -154,7 +155,24 @@ export const getContractors = async (req, res) => {
 };
 
 
-/* CREWS - CRUD */
+/* Crews */
+export const getCrews = async (req, res) => {
+  try {
+    const { projectId } = req.query;
+    console.log('projectId: ', projectId);
+
+    const crews = await Crew.find({ project_id: mongoose.Types.ObjectId(projectId) }).populate('members lead');
+
+    if (!crews.length) {
+      return res.status(400).json({ message: 'No crews found for the given project.' });
+    }
+
+    res.status(200).json(crews);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 export const createCrew = async (req, res) => {
   try {
     const { name, projectId, memberIds, leadId, createdBy } = req.body;
@@ -177,18 +195,17 @@ export const createCrew = async (req, res) => {
   }
 };
 
-export const getCrews = async (req, res) => {
+export const getCrew = async (req, res) => {
   try {
-    const { projectId } = req.query;
-    console.log('projectId: ', projectId);
+    const { id } = req.params;
 
-    const crews = await Crew.find({ project_id: mongoose.Types.ObjectId(projectId) }).populate('members lead');
+    const crew = await Crew.findById(id).populate('members lead');
 
-    if (!crews.length) {
-      return res.status(400).json({ message: 'No crews found for the given project.' });
+    if (!crew) {
+      return res.status(404).json({ message: 'Crew not found.' });
     }
 
-    res.status(200).json(crews);
+    res.status(201).json(crew);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -206,6 +223,85 @@ export const deleteCrew = async (req, res) => {
 
     await Crew.deleteOne({ _id: id });
     res.status(200).json({ message: `Crew ${id} deleted successfully.` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  };
+};
+
+
+/* Messages */
+export const getMessages = async (req, res) => {
+  try {
+    const { projectId, crewId } = req.query;
+    console.log('Fetching messages for projectId: ', projectId, ' and crewId: ', crewId);
+
+    let query = { project_id: mongoose.Types.ObjectId(projectId) };
+    if (crewId) {
+      query.crew_id = mongoose.Types.ObjectId(crewId);
+    }
+
+    const messages = await Message.find(query).populate('crew_id recipients');
+
+    if (!messages.length) {
+      return res.status(400).json({ message: 'No messages found.' });
+    }
+
+    res.status(200).json(messages);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const createMessage = async (req, res) => {
+  try {
+    const { projectId, crewId, senderId, recipients, subject, content } = req.body;
+
+    const recipientObjectIds = recipients.map(id => mongoose.Types.ObjectId(id));
+
+    const newMessage = new Message({
+      project_id: mongoose.Types.ObjectId(projectId),
+      crew_id: mongoose.Types.ObjectId(crewId),
+      sender: senderId,
+      recipients: recipientObjectIds,
+      subject: subject,
+      content: content,
+    });
+
+    await newMessage.save();
+    res.status(201).json(newMessage);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const message = await Message.findById(id);
+
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found.' });
+    }
+
+    res.status(201).json(message);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const deleteMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const message = await Message.findById(id);
+
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found.' });
+    }
+
+    await Message.deleteOne({ _id: id });
+    res.status(200).json({ message: `Message ${id} deleted successfully.` });
   } catch (error) {
     res.status(500).json({ message: error.message });
   };

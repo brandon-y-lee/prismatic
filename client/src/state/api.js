@@ -79,14 +79,6 @@ export const api = createApi({
     }),
 
     /* CREWS - CRUD */
-    createCrew: build.mutation({
-      query: (crewData) => ({
-        url: 'projects/create-crew',
-        method: 'POST',
-        body: crewData,
-      }),
-      invalidatesTags: ['Projects', 'Crews'],
-    }),
     getCrews: build.query({
       query: ({ projectId }) => ({
         url: 'projects/get-crews',
@@ -95,12 +87,53 @@ export const api = createApi({
       }),
       providesTags: ['Crews'],
     }),
+    createCrew: build.mutation({
+      query: (crewData) => ({
+        url: 'projects/create-crew',
+        method: 'POST',
+        body: crewData,
+      }),
+      invalidatesTags: ['Projects', 'Crews'],
+    }),
+    getCrew: build.query({
+      query: (id) => `projects/get-crew/${id}`,
+      providesTags: ['Crews'],
+    }),
     deleteCrew: build.mutation({
       query: ({ id }) => ({
         url: `projects/delete-crew/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Crews'],
+    }),
+
+    /* MESSAGES - CRUD */
+    getMessages: build.query({
+      query: ({ projectId, crewId }) => ({
+        url: 'projects/get-messages',
+        method: 'GET',
+        params: { projectId, crewId },
+      }),
+      providesTags: ['Messages'],
+    }),
+    createMessage: build.mutation({
+      query: (messageData) => ({
+        url: 'projects/create-message',
+        method: 'POST',
+        body: messageData
+      }),
+      invalidatesTags: ['Projects', 'Messages'],
+    }),
+    getMessage: build.query({
+      query: (id) => `projects/get-message/${id}`,
+      providesTags: ['Messages'],
+    }),
+    deleteMessage: build.mutation({
+      query: ({ id }) => ({
+        url: `projects/delete-message/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Messages'],
     }),
 
     /* TRANSACTION - CRUD */
@@ -337,9 +370,15 @@ export const {
   useDeleteProjectMutation,
 
   useGetContractorsQuery,
-  useCreateCrewMutation,
   useGetCrewsQuery,
+  useCreateCrewMutation,
+  useGetCrewQuery,
   useDeleteCrewMutation,
+
+  useGetMessagesQuery,
+  useCreateMessageMutation,
+  useGetMessageQuery,
+  useDeleteMessageMutation,
 
   useGetTransactionsQuery,
   useCreateTransactionMutation,

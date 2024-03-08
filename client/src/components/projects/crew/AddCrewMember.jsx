@@ -9,10 +9,9 @@ import {
   Tabs, 
   Tab
 } from "@mui/material";
-import GeneralTab from './GeneralTab';
-import MemberTab from './MemberTab';
+import { GeneralTab, MemberTab } from './Tabs';
 
-const AddTeamMember = ({ open, onClose, teamMembers }) => {
+const AddCrewMember = ({ open, onClose, crewMembers }) => {
   const [activeTab, setActiveTab] = useState(1);
   const [email, setEmail] = useState('');
 
@@ -57,8 +56,8 @@ const AddTeamMember = ({ open, onClose, teamMembers }) => {
             <Tab label="Members" />
           </Tabs>
         </Box>
-        {activeTab === 0 && <GeneralTab teamMembers={teamMembers} />}
-        {activeTab === 1 && <MemberTab onClose={onClose} teamMembers={teamMembers} />}
+        {activeTab === 0 && <GeneralTab crewMembers={crewMembers} />}
+        {activeTab === 1 && <MemberTab onClose={onClose} crewMembers={crewMembers} />}
       </DialogContent>
     </Dialog>
   );
@@ -70,4 +69,4 @@ function stringAvatar(name) {
   };
 }
 
-export default AddTeamMember;
+export default AddCrewMember;
