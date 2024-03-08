@@ -1,37 +1,33 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Avatar, Box, Paper, Typography, Button, Stack, useMediaQuery, Grid, IconButton, Divider } from '@mui/material';
+import { Avatar, Box, Paper, Typography, Button, Stack, useMediaQuery, Grid, IconButton, Divider, CircularProgress } from '@mui/material';
 import { Add, MoreHorizOutlined, CreateOutlined, Circle, GroupOutlined } from '@mui/icons-material';
 import FlexBetween from 'components/FlexBetween';
-import AddTeamMember from './AddTeamMember';
+import AddCrewMember from './AddCrewMember';
 import Message from './Message';
 import CreateNewMessage from './CreateNewMessage';
+import { useGetCrewQuery, useGetMessagesQuery } from 'state/api';
 
-const Team = () => {
-  const { crewId } = useParams();
-  console.log('crewId: ', crewId);
-  const navigate = useNavigate();
+const Crew = () => {
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
+  const navigate = useNavigate();
 
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openMessageDialog, setOpenMessageDialog] = useState(false);
 
-  const handleAddTeamMember = () => {
+  const { id, crewId } = useParams();
+  const { data: crew, isLoading: isCrewLoading } = useGetCrewQuery(crewId);
+  const { data: messages, isLoading: isMessagesLoading } = useGetMessagesQuery({ projectId: id, crewId });
+
+  const handleAddCrewMember = () => {
     setOpenAddDialog(true);
   };
 
   const handleCreateNewMessage = () => {
     setOpenMessageDialog(true);
   }
-  
-  const teamMembers = [
-    { name: 'Brandon Lee', color: 'blue', role: 'Contractor' },
-    { name: 'Michael Smith', color: 'amber', role: 'Engineer' },
-    { name: 'Killian Joseph M...', color: 'teal', role: 'Architect' },
-    { name: 'Chester Zelaya', color: 'red', role: 'Planner' },
-  ];
 
-  const messages = [
+  const mockMessages = [
     {
       team: "Marketing",
       title: "Re: Update on our latest campaign",
@@ -54,6 +50,9 @@ const Team = () => {
       body: "Team,\n\nThe sprint planning meeting highlighted the following priorities for the next two weeks:\n- Finalize the API endpoints\n- Update the authentication flow\n- Resolve bugs reported in the ticketing system"
     }
   ];
+
+  if (isCrewLoading) return <CircularProgress />;
+  if (!crew) return <Box>Crew not found.</Box>;
 
   return (  
     <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
@@ -89,20 +88,20 @@ const Team = () => {
           <FlexBetween>
             {/* Title "Tasks" */}
             <Typography variant='h5' fontWeight={550}>
-              Team ({teamMembers.length})
+              {crew.name} ({crew.members.length})
             </Typography>
             <Button
               startIcon={<Add />}
               color='info'
               sx={{ fontWeight: 600 }}
-              onClick={handleAddTeamMember}
+              onClick={handleAddCrewMember}
             >
-              Add Team Member
+              Add Crew Member
             </Button>
           </FlexBetween>
 
           <Grid container spacing={2} sx={{ width: '100%', mb: 1 }}>
-            {teamMembers.map((member, index) => (
+            {crew.members.map((member, index) => (
               <Grid item xs={12} sm={4} key={index}>
                 <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
                   <Avatar sx={{ bgcolor: member.color, margin: 1 }}>
@@ -127,14 +126,18 @@ const Team = () => {
                 </Avatar>
                 <Box display="flex" flexDirection="column" sx={{ justifyContent: 'center' }}>
                   <Typography noWrap sx={{ fontWeight: 550 }}>
-                    Manage Team
+                    Manage Crew
                   </Typography>
                 </Box>
               </Box>
             </Grid>
           </Grid>
 
-          <AddTeamMember open={openAddDialog} onClose={() => setOpenAddDialog(false)} teamMembers={teamMembers} />
+          <AddCrewMember 
+            open={openAddDialog}
+            onClose={() => setOpenAddDialog(false)}
+            crewMembers={crew.members}
+          />
         </Paper>
 
         <Paper
@@ -218,23 +221,26 @@ const Team = () => {
             </Button>
           </FlexBetween>
 
-          <CreateNewMessage open={openMessageDialog} onClose={() => setOpenMessageDialog(false)} teamMembers={teamMembers} />
+          <CreateNewMessage
+            open={openMessageDialog}
+            onClose={() => setOpenMessageDialog(false)}
+            crewName={crew && crew.name}
+            crewMembers={crew && crew.members}
+          />
         </Paper>
 
-        {messages.map((message, index) => (
-          <Message
-            key={index}
-            author={message.author}
-            team={message.team}
-            title={message.title}
-            subtitle={`Created by ${message.author} on ${message.date}`}
-            messageBody={message.body}
-            onReply={() => {/* function to handle reply */}}
-          />
-        ))}
+        {
+          isMessagesLoading ? <CircularProgress /> : messages && messages.map((message, index) => (
+            <Message
+              key={index}
+              message={message}
+              onReply={() => {/* function to handle reply */}}
+            />
+          ))
+        }
       </Box>
     </Box>
   );
 }
 
-export default Team;
+export default Crew;

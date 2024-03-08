@@ -2,7 +2,9 @@ import React from 'react';
 import { Box, Paper, Typography, Avatar, IconButton, TextField } from '@mui/material';
 import { GroupAddOutlined, GroupOutlined, MoreVert } from '@mui/icons-material';
 
-const Message = ({ team, author, title, subtitle, messageBody, onReply }) => {
+const Message = ({ message, onReply }) => {
+
+  const mockSenderName = "Brandon Lee";
 
   function stringToColor(string) {
     let hash = 0;
@@ -55,7 +57,7 @@ const Message = ({ team, author, title, subtitle, messageBody, onReply }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GroupOutlined />
-            <Typography fontWeight={550}>{team}</Typography>
+            <Typography fontWeight={550}>{message.crew_id.name}</Typography>
           </Box>
           <IconButton aria-label="more">
             <MoreVert />
@@ -65,23 +67,23 @@ const Message = ({ team, author, title, subtitle, messageBody, onReply }) => {
         {/* Title Section */}
         <Box sx={{ py: 1 }}>
           <Typography variant='h4' fontWeight={550} gutterBottom>
-            {title}
+            {message.subject}
           </Typography>
           <Typography variant='subtitle1'>
-            {subtitle}
+            Created by {mockSenderName} on {message.initialDate}
           </Typography>
         </Box>
 
         {/* Body Section */}
         <Box sx={{ pl: 1, py: 1.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Avatar {...stringAvatar(author)} />
+            <Avatar {...stringAvatar(mockSenderName)} />
             <Typography variant='h6' fontWeight={550}>
-              {author}
+              {mockSenderName}
             </Typography>
           </Box>
           <Typography variant='body1' gutterBottom sx={{ pl: '3.25rem', pb: '1rem' }}>
-            {messageBody}
+            {message.content}
           </Typography>
         </Box>
       </Box>
@@ -100,7 +102,7 @@ const Message = ({ team, author, title, subtitle, messageBody, onReply }) => {
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
           <Typography variant='body1' sx={{ color: 'grey' }}>Collaborators</Typography>
-          <Avatar {...stringAvatar(author)} />
+          <Avatar {...stringAvatar(mockSenderName)} />
           <IconButton aria-label="add collaborators" size="small">
             <GroupAddOutlined />
           </IconButton>

@@ -3,7 +3,7 @@ import {
   uploadFile,
 } from "../controllers/client.js";
 import multer from 'multer';
-import { createCrew, createProject, deleteCrew, deleteProject, getContractors, getCrews, getProjects, viewProject } from "../controllers/projects.js";
+import { createCrew, createMessage, createProject, deleteCrew, deleteMessage, deleteProject, getContractors, getCrew, getCrews, getMessage, getMessages, getProjects, viewProject } from "../controllers/projects.js";
 
 // Set up the multer s3 storage
 const upload = multer({ 
@@ -22,8 +22,14 @@ router.post("/upload", upload.single('file'), uploadFile);
 router.delete("/delete/:id", deleteProject);
 
 router.get('/get-contractors', getContractors);
-router.post("/create-crew", createCrew);
 router.get("/get-crews", getCrews);
+router.post("/create-crew", createCrew);
+router.get("/get-crew/:id", getCrew);
 router.delete("/delete-crew/:id", deleteCrew);
+
+router.get("/get-messages", getMessages);
+router.post("/create-message", createMessage);
+router.get("/get-message/:id", getMessage);
+router.delete("/delete-message/:id", deleteMessage);
 
 export default router;

@@ -9,16 +9,62 @@ import {
   ListItemAvatar,
   Avatar,
   IconButton,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
   Typography
 } from "@mui/material";
 import { MoreVertOutlined } from '@mui/icons-material';
 import FlexBetween from 'components/FlexBetween';
 
-const MemberTab = ({ onClose, teamMembers }) => {
+export const GeneralTab = () => {
+  const [teamName, setTeamName] = useState('');
+  const [description, setDescription] = useState('');
+
+  const handleTeamNameChange = (event) => {
+    setTeamName(event.target.value);
+  };
+
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value);
+  };
+
+  return (
+    <Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', my: 2, mx: 1 }}>
+        <Typography variant='h6'>Project</Typography>
+        <Typography variant='h6' sx={{ fontWeight: 550 }}>Test</Typography>
+      </Box>
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', my: 3, mx: 1 }}>
+        <Typography variant='body1'>Team name</Typography>
+        <TextField
+          variant="outlined"
+          size="small"
+          margin="dense"
+          id="team"
+          fullWidth
+          value={teamName}
+          onChange={handleTeamNameChange}
+        />
+      </Box>
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', my: 2, mx: 1 }}>
+        <Typography variant='body1'>Description</Typography>
+        <TextField
+          variant="outlined"
+          size="small"
+          margin="dense"
+          id="team"
+          rows={4}
+          multiline
+          fullWidth
+          value={description}
+          onChange={handleDescriptionChange}
+        />
+      </Box>
+    </Box>
+  );
+};
+
+export const MemberTab = ({ onClose, crewMembers }) => {
   const [email, setEmail] = useState('');
 
   const handleEmailChange = (event) => {
@@ -57,7 +103,7 @@ const MemberTab = ({ onClose, teamMembers }) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', my: 2, mx: 1 }}>
         <Typography variant='h6' fontWeight='550'>Team Members</Typography>
         <List dense>
-          {teamMembers.map((member, index) => (
+          {crewMembers.map((member, index) => (
             <ListItem key={index} secondaryAction={
               <IconButton edge="end">
                 <MoreVertOutlined />
@@ -83,6 +129,3 @@ function stringAvatar(name) {
     children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
   };
 }
-
-export default MemberTab;
-

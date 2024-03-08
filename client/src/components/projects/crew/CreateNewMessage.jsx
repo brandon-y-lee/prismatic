@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog, 
   DialogContent, 
@@ -11,16 +11,26 @@ import {
   Typography,
   Autocomplete,
   TextField,
-  Stack,
   Chip,
 } from "@mui/material";
-import { Close, PersonAddAlt1Outlined } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
+import { useParams } from 'react-router-dom';
+import { getLoggedInUser } from 'utils/token';
+import { useCreateMessageMutation } from 'state/api';
 
-const CreateNewMessage = ({ open, onClose, isMinimized, teamMembers }) => {
+const CreateNewMessage = ({ open, onClose, crewName, crewMembers }) => {
   const [subject, setSubject] = useState('');
   const [recipients, setRecipients] = useState([]);
   const [message, setMessage] = useState('');
+  const { id, crewId } = useParams();
+  const user = getLoggedInUser();
 
+  const [createMessage] = useCreateMessageMutation();
+
+  useEffect(() => {
+    console.log('recipients on change: ', recipients);
+  }, [recipients]);
+  
   const handleSubjectChange = (event) => {
     setSubject(event.target.value);
   };
@@ -29,13 +39,23 @@ const CreateNewMessage = ({ open, onClose, isMinimized, teamMembers }) => {
     setMessage(event.target.value);
   };
 
-  const handleAddRecipient = () => {
+  const handleSubmit = async () => {
+    const messageData = {
+      projectId: id,
+      crewId: crewId,
+      senderId: user.userId,
+      recipients: recipients,
+      subject: subject,
+      content: message
+    };
 
-  };
-
-  const handleSubmit = () => {
-    console.log({ subject, recipients, message });
-    onClose();
+    try {
+      await createMessage(messageData).unwrap();
+    } catch (error) {
+      console.error('Failed to create message: ', error);
+    } finally {
+      onClose();
+    }
   };
 
   return (
@@ -67,15 +87,16 @@ const CreateNewMessage = ({ open, onClose, isMinimized, teamMembers }) => {
             To
           </Typography>
           <Autocomplete
-            variant='standard'
             multiple
+            autoHighlight
+            variant='standard'
             id="recipients"
-            options={teamMembers.map((option) => option.name)}
+            options={crewMembers || []}
+            getOptionLabel={(option) => option ? option.name : ''}
             filterSelectedOptions
-            freeSolo
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
-                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                <Chip variant="outlined" label={option.name} {...getTagProps({ index })} />
               ))
             }
             renderInput={(params) => (
@@ -85,9 +106,9 @@ const CreateNewMessage = ({ open, onClose, isMinimized, teamMembers }) => {
                 placeholder="Type the name of a team, a project, or people"
               />
             )}
-            value={recipients}
+            value={recipients.map(id => crewMembers.find(member => member._id === id)).filter(Boolean)}
             onChange={(event, newValue) => {
-              setRecipients(newValue);
+              setRecipients(newValue.map(item => item._id));
             }}
             sx={{ width: '100%', backgroundColor: 'transparent' }}
           />
