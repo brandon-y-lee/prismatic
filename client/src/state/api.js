@@ -116,9 +116,25 @@ export const api = createApi({
       }),
       providesTags: ['Messages'],
     }),
+    getMessageThread: build.query({
+      query: ({ threadId }) => ({
+        url: 'projects/get-message-thread',
+        method: 'GET',
+        params: { threadId },
+      }),
+      providesTags: ['Messages'],
+    }),
     createMessage: build.mutation({
       query: (messageData) => ({
         url: 'projects/create-message',
+        method: 'POST',
+        body: messageData
+      }),
+      invalidatesTags: ['Projects', 'Messages'],
+    }),
+    replyMessage: build.mutation({
+      query: (messageData) => ({
+        url: 'projects/reply-message',
         method: 'POST',
         body: messageData
       }),
@@ -376,7 +392,9 @@ export const {
   useDeleteCrewMutation,
 
   useGetMessagesQuery,
+  useGetMessageThreadQuery,
   useCreateMessageMutation,
+  useReplyMessageMutation,
   useGetMessageQuery,
   useDeleteMessageMutation,
 

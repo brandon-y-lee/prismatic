@@ -10,7 +10,7 @@ const MessageSchema = new mongoose.Schema(
     crew_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Crew',
-      required: true,
+      required: false,
     },
     sender: {
       type: String,
@@ -23,13 +23,22 @@ const MessageSchema = new mongoose.Schema(
     }],
     subject: {
       type: String,
-      required: true,
+      required: false,
     },
     content: {
       type: String,
       required: true,
     },
-    initialDate: {
+    thread_id: {
+      type: String,
+      required: false,
+    },
+    parent_message_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Message',
+      required: false,
+    },
+    message_date: {
       type: Date,
       default: Date.now,
     },

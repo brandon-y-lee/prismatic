@@ -6,6 +6,7 @@ import Crew from "../models/Crew.js";
 import Message from '../models/Message.js';
 
 import AWS from 'aws-sdk';
+import { v4 as uuidv4 } from 'uuid';
 
 // Configure the AWS environment
 AWS.config.update({
@@ -235,12 +236,49 @@ export const getMessages = async (req, res) => {
     const { projectId, crewId } = req.query;
     console.log('Fetching messages for projectId: ', projectId, ' and crewId: ', crewId);
 
-    let query = { project_id: mongoose.Types.ObjectId(projectId) };
+    let matchStage = {
+      $match: {
+        project_id: mongoose.Types.ObjectId(projectId),
+      },
+    };
+
     if (crewId) {
-      query.crew_id = mongoose.Types.ObjectId(crewId);
+      matchStage.$match.crew_id = mongoose.Types.ObjectId(crewId);
     }
 
-    const messages = await Message.find(query).populate('crew_id recipients');
+    const aggregationPipeline = [
+      matchStage,
+      {
+        $sort: { message_date: -1 }, 
+      },
+      {
+        $group: {
+          _id: "$thread_id",
+          latestMessage: { $first: "$$ROOT" }
+        },
+      },
+      {
+        $replaceRoot: { newRoot: "$latestMessage" },
+      },
+      {
+        $lookup: {
+          from: 'crews',
+          localField: 'crew_id',
+          foreignField: '_id',
+          as: 'crew_id',
+        },
+      },
+      {
+        $lookup: {
+          from: 'contractors',
+          localField: 'recipients',
+          foreignField: '_id',
+          as: 'recipients',
+        },
+      }
+    ];
+
+    const messages = await Message.aggregate(aggregationPipeline);
 
     if (!messages.length) {
       return res.status(400).json({ message: 'No messages found.' });
@@ -252,25 +290,72 @@ export const getMessages = async (req, res) => {
   }
 };
 
+export const getMessageThread = async (req, res) => {
+  try {
+    const { threadId } = req.query;
+
+    if (!threadId) {
+      return res.status(400).json({ message: 'Thread ID is required.' });
+    }
+
+    const messages = await Message.find({ thread_id: threadId }).sort({ createdAt: 1 });
+
+    if (!messages) {
+      return res.status(404).json({ message: 'No messages found for the given thread.' });
+    }
+
+    res.status(200).json(messages);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  };
+};
+
 export const createMessage = async (req, res) => {
   try {
     const { projectId, crewId, senderId, recipients, subject, content } = req.body;
 
-    const recipientObjectIds = recipients.map(id => mongoose.Types.ObjectId(id));
+    const threadId = uuidv4();
 
     const newMessage = new Message({
       project_id: mongoose.Types.ObjectId(projectId),
       crew_id: mongoose.Types.ObjectId(crewId),
       sender: senderId,
-      recipients: recipientObjectIds,
+      recipients: recipients.map(id => mongoose.Types.ObjectId(id)),
       subject: subject,
       content: content,
+      thread_id: threadId
     });
 
     await newMessage.save();
     res.status(201).json(newMessage);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const replyMessage = async (req, res) => {
+  try {
+    const { projectId, crewId, senderId, recipients, subject, content, threadId, parentMessageId } = req.body;
+
+    if (!projectId || !crewId || !senderId || !content || !threadId) {
+      return res.status(400).json({ message: "Required fields are missing" });
+    }
+
+    const reply = new Message({
+      project_id: projectId,
+      crew_id: crewId,
+      sender: senderId,
+      recipients: recipients.map(id => mongoose.Types.ObjectId(id)),
+      subject: subject,
+      content: content,
+      thread_id: threadId,
+      parent_message_id: parentMessageId,
+    });
+
+    await reply.save();
+    res.status(201).json(reply);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -18,6 +18,7 @@ const Crew = () => {
   const { id, crewId } = useParams();
   const { data: crew, isLoading: isCrewLoading } = useGetCrewQuery(crewId);
   const { data: messages, isLoading: isMessagesLoading } = useGetMessagesQuery({ projectId: id, crewId });
+  console.log('messages at crew: ', messages);
 
   const handleAddCrewMember = () => {
     setOpenAddDialog(true);
@@ -229,15 +230,13 @@ const Crew = () => {
           />
         </Paper>
 
-        {
-          isMessagesLoading ? <CircularProgress /> : messages && messages.map((message, index) => (
-            <Message
-              key={index}
-              message={message}
-              onReply={() => {/* function to handle reply */}}
-            />
-          ))
-        }
+        {isMessagesLoading ? <CircularProgress /> : messages && messages.map((message, index) => (
+          <Message
+            key={index}
+            message={message}
+            onReply={() => {/* function to handle reply */}}
+          />
+        ))}
       </Box>
     </Box>
   );

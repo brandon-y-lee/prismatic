@@ -1,36 +1,50 @@
-import React from 'react';
-import { Box, Paper, Typography, Avatar, IconButton, TextField } from '@mui/material';
-import { GroupAddOutlined, GroupOutlined, MoreVert } from '@mui/icons-material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box, Paper, Typography, Avatar, IconButton, TextField, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { GroupAddOutlined, GroupOutlined, Close, UnfoldMore } from '@mui/icons-material';
+import Thread from './Thread';
+import { useReplyMessageMutation } from 'state/api';
+import { stringAvatar, formatDate } from 'utils/project';
 
 const Message = ({ message, onReply }) => {
-
   const mockSenderName = "Brandon Lee";
+  const recipientNames = message?.recipients.map(recipient => recipient.name);
+  const collaborators = [mockSenderName, ...recipientNames];
 
-  function stringToColor(string) {
-    let hash = 0;
-    let i;
-  
-    /* eslint-disable no-bitwise */
-    for (i = 0; i < string.length; i += 1) {
-      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  const messageEndRef = useRef(null);
+
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  
-    let color = '#';
-  
-    for (i = 0; i < 3; i += 1) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += `00${value.toString(16)}`.slice(-2);
+  }, [message.content]);
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
+
+  const [replyContent, setReplyContent] = useState()
+  const [replyMessage, { isLoading: isReplyLoading }] = useReplyMessageMutation();
+
+  const handleReplySubmit = async () => {
+    if (!replyContent.trim()) return;
+
+    try {
+      await replyMessage({
+        projectId: message.project_id,
+        crewId: message.crew_id,
+        senderId: mockSenderName,
+        recipients: message.recipients.map(recipient => recipient._id),
+        subject: message.subject,
+        content: replyContent,
+        threadId: message.thread_id,
+        parentMessageId: message._id
+      }).unwrap();
+
+      console.log('Reply created successfully.');
+      setReplyContent('');
+    } catch (error) {
+      console.error('Failed to send reply:', error);
     }
-    /* eslint-enable no-bitwise */
-  
-    return color;
-  };
-  
-  function stringAvatar(name) {
-    return {
-      sx: { bgcolor: stringToColor(name) },
-      children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
-    };
   };
 
   return (
@@ -59,8 +73,8 @@ const Message = ({ message, onReply }) => {
             <GroupOutlined />
             <Typography fontWeight={550}>{message.crew_id.name}</Typography>
           </Box>
-          <IconButton aria-label="more">
-            <MoreVert />
+          <IconButton aria-label="more" onClick={handleOpenDialog}>
+            <UnfoldMore />
           </IconButton>
         </Box>
           
@@ -70,12 +84,12 @@ const Message = ({ message, onReply }) => {
             {message.subject}
           </Typography>
           <Typography variant='subtitle1'>
-            Created by {mockSenderName} on {message.initialDate}
+            Created by {mockSenderName} on {formatDate(message.message_date)}
           </Typography>
         </Box>
 
         {/* Body Section */}
-        <Box sx={{ pl: 1, py: 1.5 }}>
+        <Box sx={{ pl: 1, py: 1.5, maxHeight: '150px', overflowY: 'auto' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Avatar {...stringAvatar(mockSenderName)} />
             <Typography variant='h6' fontWeight={550}>
@@ -85,11 +99,12 @@ const Message = ({ message, onReply }) => {
           <Typography variant='body1' gutterBottom sx={{ pl: '3.25rem', pb: '1rem' }}>
             {message.content}
           </Typography>
+          <div ref={messageEndRef} />
         </Box>
       </Box>
 
       {/* Bottom Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', mt: 1, gap: 1 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ alignItems: 'center' }}>
           <TextField
             fullWidth
@@ -97,17 +112,29 @@ const Message = ({ message, onReply }) => {
             variant="outlined"
             size="small"
             multiline
-            rows={3}
+            rows={4}
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleReplySubmit();
+              }
+            }}
           />
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
           <Typography variant='body1' sx={{ color: 'grey' }}>Collaborators</Typography>
-          <Avatar {...stringAvatar(mockSenderName)} />
+          {collaborators.map((name, index) => (
+            <Avatar key={index} {...stringAvatar(name)} sx={{ width: 24, height: 24, fontSize: '0.75rem', ...stringAvatar(name).sx }} />
+          ))}
           <IconButton aria-label="add collaborators" size="small">
             <GroupAddOutlined />
           </IconButton>
         </Box>
       </Box>
+
+      <Thread threadId={message.thread_id} open={openDialog} onClose={handleCloseDialog} />
     </Paper>
   );
 };
