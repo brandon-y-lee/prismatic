@@ -31,7 +31,7 @@ const Message = ({ message, onReply }) => {
     try {
       await replyMessage({
         projectId: message.project_id,
-        crewId: message.crew_id,
+        crewId: message.crew_id._id,
         senderId: mockSenderName,
         recipients: message.recipients.map(recipient => recipient._id),
         subject: message.subject,
@@ -84,7 +84,9 @@ const Message = ({ message, onReply }) => {
             {message.subject}
           </Typography>
           <Typography variant='subtitle1'>
-            Created by {mockSenderName} on {formatDate(message.message_date)}
+            {message.parent_message_id 
+              ? `Latest reply by ${mockSenderName} on ${formatDate(message.message_date)}` 
+              : `Created by ${mockSenderName} on ${formatDate(message.message_date)}`}
           </Typography>
         </Box>
 

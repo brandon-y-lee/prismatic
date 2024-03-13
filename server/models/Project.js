@@ -1,114 +1,65 @@
 import mongoose from "mongoose";
 import { ProjectStatus } from "../configs/ProjectStatus.js";
+import { 
+  PropertyIdentificationSchema,
+  ZoningAndLandUseSchema,
+  RegulatoryComplianceAndEligibilitySchema,
+  EnvironmentalAndGeologicalSchema,
+  DevelopmentConstraintsSchema,
+  BuildingAndConstructionSchema,
+  IncentivesAndOpportunitiesSchema,
+  CommunityAndPlanningSchema,
+  ValuationAndTaxationSchema,
+  AdditionalInformationSchema
+} from "../configs/ProjectSchema.js";
 
-/* Define nested schemas for detailed project components */
-const ObjectiveSchema = new mongoose.Schema({
-  description: String,
-  isCompleted: { type: Boolean, default: false }
+const ZoningSchema = new mongoose.Schema({
+  propertyIdentification: PropertyIdentificationSchema,
+  zoningAndLandUse: ZoningAndLandUseSchema,
+  regulatoryComplianceAndEligibility: RegulatoryComplianceAndEligibilitySchema,
+  environmentalAndGeological: EnvironmentalAndGeologicalSchema,
+  developmentConstraints: DevelopmentConstraintsSchema,
+  buildingAndConstruction: BuildingAndConstructionSchema,
+  incentivesAndOpportunities: IncentivesAndOpportunitiesSchema,
+  communityAndPlanning: CommunityAndPlanningSchema,
+  valuationAndTaxation: ValuationAndTaxationSchema,
+  additionalInformation: AdditionalInformationSchema,
 });
 
-const BudgetItemSchema = new mongoose.Schema({
-  category: String,
-  estimatedCost: Number,
-  actualCost: Number
-});
-
-const TeamMemberSchema = new mongoose.Schema({
-  name: String,
-  role: String,
-  contactInformation: String
-});
-
-const MaterialSchema = new mongoose.Schema({
-  name: String,
-  quantity: Number,
-  unit: String,
-  estimatedDeliveryDate: Date,
-  actualDeliveryDate: Date
-});
-
-const PermitSchema = new mongoose.Schema({
-  type: String,
-  status: { type: String, enum: ['Pending', 'Approved', 'Denied'], default: 'Pending' },
-  issueDate: Date,
-  expiryDate: Date
-});
-
-const CommunicationPlanSchema = new mongoose.Schema({
-  stakeholder: String,
-  method: String,
-  frequency: String
-});
-
-const EngineeringAssessmentSchema = new mongoose.Schema({
-  systemType: String,
-  condition: String,
-  recommendations: String
-});
-
-const VisualizationSchema = new mongoose.Schema({
-  type: String,
-  description: String,
-  dateCreated: Date
-});
-
-/* Change material to ObjectId instead of String */
-const MaterialTakeoffSchema = new mongoose.Schema({
-  materialId: String,
-  quantityRequired: Number
-});
-
-const ConstructionEstimateSchema = new mongoose.Schema({
-  category: String,
-  estimatedCost: Number
-});
-
-const ProjectSchema = new mongoose.Schema({
-  owner: {
-    type: String,
-    required: true,
+const ProjectSchema = new mongoose.Schema(
+  {
+    owner: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    summary: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: Object.values(ProjectStatus),
+      default: ProjectStatus[0]
+    },
+    initialDate: {
+      type: Date,
+      default: Date.now
+    },
+    crews: [{
+      type: mongoose.Types.ObjectId,
+      ref: 'Crew'
+    }],
+    contracts: [{
+      type: mongoose.Types.ObjectId,
+      ref: 'Contract'
+    }],
+    zoning: ZoningSchema,
   },
-  title: {
-    type: String,
-    required: true,
-  },
-  summary: {
-    type: String,
-    required: true,
-  },
-  status: {
-    type: Number,
-    enum: Object.values(ProjectStatus),
-    default: ProjectStatus.ACTIVE
-  },
-  initialDate: {
-    type: Date,
-    default: Date.now
-  },
-  objectives: [ObjectiveSchema],
-  budget: {
-    total: Number,
-    items: [BudgetItemSchema]
-  },
-  crews: [{
-    type: mongoose.Types.ObjectId,
-    ref: 'Crew'
-  }],
-  team: [TeamMemberSchema],
-  materials: [MaterialSchema],
-  permits: [PermitSchema],
-  communicationPlan: [CommunicationPlanSchema],
-  engineeringAssessments: [EngineeringAssessmentSchema],
-  visualizations: [VisualizationSchema],
-  materialTakeoffs: [MaterialTakeoffSchema],
-  constructionEstimates: [ConstructionEstimateSchema],
-  contracts: [{
-    type: mongoose.Types.ObjectId,
-    ref: 'Contract'
-  }],
-  completionDate: Date
-},
-{ timestamps: true }
+  { timestamps: true }
 );
 
 const Project = mongoose.model("Project", ProjectSchema);

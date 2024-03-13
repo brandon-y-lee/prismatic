@@ -44,20 +44,21 @@
         field: 'name',
         headerName: 'Crew Name',
         flex: 1,
-        minWidth: 150 },
+        minWidth: 100,
+      },
       { 
         field: 'lead',
         headerName: 'Crew Lead',
         flex: 1, 
-        minWidth: 200,
-        renderCell: (params) => params.value.name,
+        minWidth: 150,
+        renderCell: (params) => params.value.name
       },
       { 
         field: 'size',
         headerName: 'Size',
         flex: 0.5,
         minWidth: 100,
-        valueGetter: (params) => params.row.members.length,
+        valueGetter: (params) => params.row.members.length
       },
       {
         field: "actions",
@@ -76,12 +77,11 @@
     ];
 
     return (  
-      <Box sx={{ minHeight: 'calc(100vh - 8rem)' }}>
+      <Box sx={{ mb: '2.5rem' }}>
         <Box
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
           sx={{
-            mb: '1.5rem',
             gap: '1.5rem',
             "& > div": { 
               gridColumn: isNonMediumScreens ? undefined : "span 12",
@@ -134,7 +134,10 @@
                 hideFooterPagination
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: theme.palette.background.alt,
+                    backgroundColor: '#f6f6f6',
+                  },
+                  '& .MuiDataGrid-row': {
+                    fontWeight: '550',
                   },
                 }}
               />

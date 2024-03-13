@@ -28,42 +28,17 @@ const Crew = () => {
     setOpenMessageDialog(true);
   }
 
-  const mockMessages = [
-    {
-      team: "Marketing",
-      title: "Re: Update on our latest campaign",
-      author: "Blake Pham",
-      date: "7 January, 2021",
-      body: "Hey Daniela,\n\nAny update on our latest campaign? See tasks below:\n- Diversity blog post\n- Rewrite blog post"
-    },
-    {
-      team: "Product Design",
-      title: "Feedback on the new design mockups",
-      author: "Avery Stewart",
-      date: "12 March, 2021",
-      body: "Hello Team,\n\nI've attached the new design mockups for the homepage redesign. Please review them and provide your feedback by EOD."
-    },
-    {
-      team: "Engineering",
-      title: "Sprint Planning Meeting Notes",
-      author: "Jordan Lee",
-      date: "22 March, 2021",
-      body: "Team,\n\nThe sprint planning meeting highlighted the following priorities for the next two weeks:\n- Finalize the API endpoints\n- Update the authentication flow\n- Resolve bugs reported in the ticketing system"
-    }
-  ];
-
   if (isCrewLoading) return <CircularProgress />;
   if (!crew) return <Box>Crew not found.</Box>;
 
   return (  
-    <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
+    <Box sx={{ mb: '2.5rem' }}>
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
         sx={{
           gap: '1.5rem',
-          mb: '1.5rem',
-          "& > div": { 
+          "& > div": {
             gridColumn: isNonMediumScreens ? undefined : "span 12",
           },
         }}

@@ -9,7 +9,8 @@ const Thread = ({ threadId, open, onClose }) => {
   const scrollRef = useRef(null);
 
   const { data: messages, isLoading: isMessagesLoading } = useGetMessageThreadQuery({ threadId }, { skip: !threadId || !open });
-
+  console.log('messages on thread open: ', messages);
+  
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -58,9 +59,9 @@ const Thread = ({ threadId, open, onClose }) => {
           <CircularProgress />
         ) : (
           messages?.map((message, index) => (
-            <Box key={index} sx={{ px: 1, py: 1.5 }}>
+            <Box key={index} sx={{ px: 1, py: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Avatar {...stringAvatar(message.sender)} />
+                <Avatar {...stringAvatar(message.sender)} sx={{ width: 24, height: 24, fontSize: '0.75rem', ...stringAvatar(message.sender).sx }} />
                 <Typography variant='h6' fontWeight={550}>
                   {message.sender}
                 </Typography>
@@ -68,7 +69,7 @@ const Thread = ({ threadId, open, onClose }) => {
                   {formatDate(message.message_date)}
                 </Typography>
               </Box>
-              <Typography variant='body1' gutterBottom sx={{ pl: '3.25rem' }}>
+              <Typography variant='body1' gutterBottom sx={{ pl: '2.25rem' }}>
                 {message.content}
               </Typography>
               {/* Add styling or additional elements as necessary */}

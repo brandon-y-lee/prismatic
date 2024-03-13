@@ -14,15 +14,14 @@ export const paymentMap = {
   2: 'Paid'
 };
 
-export const renderStatusChip = (statusEnum) => {
-  const status = mapStatus(statusEnum);
+export const renderStatusChip = (status) => {
   const backgroundColor = status === 'Draft' ? 'turquoise' :
-  status === 'Pending' ? 'orange' :
-  status === 'Processed' ? 'blue' :
-  ['En Route', 'Received'].includes(status) ? 'green' : undefined;
+  status === 'Action Required' ? 'red' :
+  status === 'Active' ? 'blue' :
+  status === 'Inactive' ? 'grey' : undefined;
 
   return (
-    <Chip label={status} sx={{ backgroundColor, color: 'white' }} />
+    <Chip label={status} sx={{ backgroundColor, color: 'white', fontWeight: 550 }} />
   );
 };
 

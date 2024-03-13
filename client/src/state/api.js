@@ -13,6 +13,8 @@ export const api = createApi({
     "Projects"
   ],
   endpoints: (build) => ({
+
+    /* Authentication */
     login: build.mutation({
       query: ({ email, password }) => ({
         url: 'auth/login',
@@ -34,7 +36,7 @@ export const api = createApi({
       }),
     }),
 
-    /* FILE UPLOAD */
+    /* File Upload */
     uploadFile: build.mutation({
       query: (formData) => ({
         url: "projects/upload",
@@ -43,12 +45,21 @@ export const api = createApi({
       }),
     }),
 
-    /* PROJECTS - CRUD */
+    /* Scrape */
+    scrapeZimas: build.mutation({
+      query: ({ houseNumber, streetName }) => ({
+        url: 'projects/scrape-zimas',
+        method: 'POST',
+        body: { houseNumber, streetName },
+      }),
+    }),
+
+    /* Projects */
     getProjects: build.query({
-      query: ({ page, pageSize, sort, search, userId }) => ({
+      query: ({ userId }) => ({
         url: "projects/get",
         method: "GET",
-        params: { page, pageSize, sort, search, userId },
+        params: { userId },
       }),
       providesTags: ["Projects"],
     }),
@@ -64,6 +75,14 @@ export const api = createApi({
       query: (id) => `projects/view/${id}`,
       providesTags: ['Projects'],
     }),
+    updateProject: build.mutation({
+      query: ({ projectId, data }) => ({
+        url: 'projects/update',
+        method: 'POST',
+        body: { projectId, data }
+      }),
+      invalidatesTags: ['Projects'],
+    }),
     deleteProject: build.mutation({
       query: ({ id }) => ({
         url: `projects/delete/${id}`,
@@ -72,13 +91,13 @@ export const api = createApi({
       invalidatesTags: ['Projects'],
     }),
 
-    /* CONTRACTORS - CRUD */
+    /* Contractors */
     getContractors: build.query({
       query: () => 'projects/get-contractors',
       providesTags: ['Contractors'],
     }),
 
-    /* CREWS - CRUD */
+    /* Crews */
     getCrews: build.query({
       query: ({ projectId }) => ({
         url: 'projects/get-crews',
@@ -107,7 +126,7 @@ export const api = createApi({
       invalidatesTags: ['Crews'],
     }),
 
-    /* MESSAGES - CRUD */
+    /* Messages */
     getMessages: build.query({
       query: ({ projectId, crewId }) => ({
         url: 'projects/get-messages',
@@ -152,7 +171,7 @@ export const api = createApi({
       invalidatesTags: ['Messages'],
     }),
 
-    /* TRANSACTION - CRUD */
+    /* Transactions */
     getTransactions: build.query({
       query: ({ userId, page, pageSize, sort, search, statusFilter }) => ({
         url: "client/transactions",
@@ -190,7 +209,7 @@ export const api = createApi({
     }),
 
 
-    /* INVOICE - CRUD */
+    /* Invoices */
     createInvoice: build.mutation({
       query: ({ userId, clientId, invoiceDate, invoiceTotal }) => ({
         url: "funds/invoice",
@@ -219,7 +238,7 @@ export const api = createApi({
       invalidatesTags: ['Invoices', 'Funds'],
     }),
 
-    /* FUND - CRUD */
+    /* Funds */
     getFunds: build.mutation({
       query: ({ accountIds }) => ({
         url: 'funds/get-funds',
@@ -271,7 +290,8 @@ export const api = createApi({
       }),
       invalidatesTags: ['Funds', 'Accounts'],
     }),
-    /* NORDIGEN - GET */
+
+    /* Nordigen */
     generateToken: build.query({
       query: () => ({
         url: 'nordigen/token',
@@ -309,7 +329,7 @@ export const api = createApi({
       }),
     }),
 
-    /* PLAID */
+    /* Plaid */
     getLinkToken: build.mutation({
       query: ({ authId }) => ({
         url: 'plaid/get-link-token',
@@ -339,7 +359,7 @@ export const api = createApi({
       }),
     }),
 
-    /* OPENAI ASSISTANT */
+    /* OpenAI Assistant */
     interactWithAssistant: build.mutation({
       query: ({ userMessage }) => ({
         url: 'assistant/message',
@@ -348,7 +368,7 @@ export const api = createApi({
       }),
     }),
   
-    /* DASHBOARD - GET */
+    /* Dashboard */
     getDashboard: build.query({
       query: ({ userId }) => ({
         url: "general/dashboard",
@@ -378,11 +398,13 @@ export const {
   useGetUserQuery,
   useGetSupplierQuery,
 
+  useScrapeZimasMutation,
   useUploadFileMutation,
 
   useGetProjectsQuery,
   useCreateProjectMutation,
   useViewProjectQuery,
+  useUpdateProjectMutation,
   useDeleteProjectMutation,
 
   useGetContractorsQuery,

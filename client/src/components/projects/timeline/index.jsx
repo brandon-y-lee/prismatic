@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { GanttComponent, Inject, Edit, Resize, Sort, Selection, ColumnMenu, ColumnsDirective, ColumnDirective, AddDialogFieldsDirective, AddDialogFieldDirective, EditDialogFieldsDirective, EditDialogFieldDirective, Toolbar } from '@syncfusion/ej2-react-gantt';
 import { Box, Button } from '@mui/material';
-import './Timeline.css';
+import './index.css';
 
 const projectResources = [
   { resourceId: 1, resourceName: 'Chester' },
@@ -88,7 +88,7 @@ const Timeline = () => {
   };
 
   return (
-    <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
+    <Box sx={{ mb: '2.5rem' }}>
       <Box sx={{ m: 0.5 }}>
         <Button variant='text' color='info' onClick={zoomIn}>Zoom In</Button>
         <Button variant='text' color='info' onClick={zoomOut}>Zoom Out</Button>

@@ -51,12 +51,14 @@ const AddCrew = ({ open, onClose }) => {
   };
 
   const handleSubmit = async () => {
+    let userId = user.userId;
+
     const crewData = {
       name: crewName,
       projectId: id,
       memberIds: Array.from(crewMembers),
       leadId: crewLead,
-      createdBy: user.userId,
+      createdBy: userId,
     };
 
     try {
