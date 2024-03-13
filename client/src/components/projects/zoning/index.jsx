@@ -8,6 +8,26 @@ const Zoning = () => {
   const { projectData, isLoading } = useProjectData();
   console.log('Project data at zoning: ', projectData);
 
+  const schemaOrder = [
+    'propertyIdentification',
+    'zoningAndLandUse',
+    'regulatoryComplianceAndEligibility',
+    'environmentalAndGeological',
+    'developmentConstraints',
+    'buildingAndConstruction',
+    'incentivesAndOpportunities',
+    'communityAndPlanning',
+    'valuationAndTaxation',
+    'additionalInformation'
+  ];
+
+  const orderedZoning = schemaOrder
+    .filter(schemaName => projectData.zoning && projectData.zoning[schemaName])
+    .map(schemaName => ({
+      name: schemaName,
+      data: projectData.zoning[schemaName]
+    }));
+
   const renderList = (data) => {
     return Object.entries(data)
       .filter(([key]) => key !== '_id')
@@ -27,11 +47,10 @@ const Zoning = () => {
   };
 
   const renderSchemas = () => {
-    return Object.entries(projectData?.zoning || {})
-      .map(([schemaName, schemaData]) => {
-        const schemaTitle = invertKey(schemaName);
-        return renderSchema(schemaTitle, schemaData);
-      });
+    return orderedZoning.map(({ name, data }) => {
+      const schemaTitle = invertKey(name, true);
+      return renderSchema(schemaTitle, data);
+    });
   };
 
   const renderSchema = (title, data) => {
