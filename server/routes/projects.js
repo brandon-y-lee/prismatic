@@ -21,7 +21,7 @@ router.get('/view/:id', viewProject);
 router.post('/update', updateProject);
 router.delete('/delete/:id', deleteProject);
 
-router.post('/scrape-zimas', scrapeZimas);
+router.post('/scrape', scrapeZimas);
 router.post('/upload', upload.single('file'), uploadFile);
 
 router.get('/get-contractors', getContractors);

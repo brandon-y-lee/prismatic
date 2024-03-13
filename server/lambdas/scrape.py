@@ -1,14 +1,19 @@
+from flask import Flask, request, jsonify
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup
-import sys
 import time
-import json
 
-def scrape_zimas(house_number, street_name):
+app = Flask(__name__)
+
+@app.route('/scrape', methods=['POST'])
+def scrape():
+  data = request.json
+  house_number = data['house_number']
+  street_name = data['street_name']
+
   chrome_options = Options()
   chrome_options.add_argument("--headless")
   chrome_options.add_argument("--disable-gpu")
@@ -78,13 +83,12 @@ def scrape_zimas(house_number, street_name):
 
         if key and value:
           scraped_data[key] = value
-
-  print(json.dumps(scraped_data))
   
   driver.quit()
 
+  return jsonify(scraped_data), 200
+
+
 
 if __name__ == "__main__":
-  house_number = sys.argv[1]
-  street_name = sys.argv[2]
-  scrape_zimas(house_number, street_name)
+  app.run(host='0.0.0.0', port=5000, debug=True)

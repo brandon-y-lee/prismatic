@@ -48,7 +48,7 @@ export const api = createApi({
     /* Scrape */
     scrapeZimas: build.mutation({
       query: ({ houseNumber, streetName }) => ({
-        url: 'projects/scrape-zimas',
+        url: 'projects/scrape',
         method: 'POST',
         body: { houseNumber, streetName },
       }),

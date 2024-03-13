@@ -179,12 +179,24 @@ const keyMap = {
   }
 };
 
-export const invertKey = (inputKey) => {
-  const [section, key] = inputKey.split('.');
-  
-  if (keyMap[section] && keyMap[section][key]) {
-    return keyMap[section][key];
-  }
+const toTitleCase = (text) => {
+  const result = text.replace(/([A-Z])/g, " $1");
+  const title = result.charAt(0).toUpperCase() + result.slice(1);
+  return title.trim().replace(/ +/g, ' ');
+};
 
+export const invertKey = (inputKey, isSchema = false) => {
+  if (isSchema) {
+    // Convert schema names directly to a title format
+    return toTitleCase(inputKey);
+  } else {
+    for (const section in keyMap) {
+      for (const key in keyMap[section]) {
+        if (key === inputKey) {
+          return keyMap[section][key];
+        }
+      }
+    }
+  }
   return `Key not found: ${inputKey}`;
 };
