@@ -17,18 +17,7 @@ const Projects = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
 
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
-  const [sort, setSort] = useState({});
-  const [search, setSearch] = useState("");
-
-  const { data, isLoading, isError } = useGetProjectsQuery({
-    page,
-    pageSize,
-    sort: JSON.stringify(sort),
-    search,
-    userId: user.userId,
-  })
+  const { data, isLoading, isError } = useGetProjectsQuery({ userId: user.userId });
 
   const [deleteProject] = useDeleteProjectMutation();
 
@@ -118,26 +107,12 @@ const Projects = () => {
     }
   ];
 
-  const dataGridStyles = {
-    '& .MuiDataGrid-columnHeaders': {
-      backgroundColor: theme.palette.background.alt,
-    },
-    '& .MuiDataGrid-row': {
-      borderBottom: '1px solid rgba(224, 224, 224, 0.1)',
-      fontWeight: '550',
-    },
-  };
-
   if (isLoading) {
     return <CircularProgress />;
   };
 
-  if (isError || !data || data.length === 0) {
-    return <Box>Error loading transactions.</Box>;
-  };
-
   return (
-    <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
+    <Box sx={{ mb: '2.5rem' }}>
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
@@ -161,22 +136,25 @@ const Projects = () => {
           <Divider />
         </Box>
 
-        <Box sx={{ gridColumn: "span 12", m: "1.5rem 2.5rem" }}>
+        <Box sx={{ gridColumn: "span 12", height: '60vh', m: "1.5rem 2.5rem" }}>
           <DataGridPro
             loading={!data}
-            getRowId={(row) => row["_id"]}
+            getRowId={(row) => row['_id']}
             rows={data && data.projects}
             columns={columns}
-            pagination
-            page={page}
-            pageSize={pageSize}
-            paginationMode="server"
-            sortingMode="server"
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
-            slots={{ Toolbar: DataGridCustomToolbar }}
-            sx={dataGridStyles}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            disableSelectionOnClick
+            hideFooter
+            hideFooterPagination
+            sx={{
+              '& .MuiDataGrid-columnHeaders': {
+                backgroundColor: '#f6f6f6',
+              },
+              '& .MuiDataGrid-row': {
+                fontWeight: '550',
+              },
+            }}
           />
         </Box>
       </Box>

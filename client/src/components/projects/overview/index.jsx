@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { Box, List, ListItem, ListItemIcon, ListItemText, IconButton, Paper, Typography, Tabs, Tab, useMediaQuery, useTheme } from '@mui/material';
-import { ResponsiveBar } from '@nivo/bar';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-
-const Scope = () => {
+const Overview = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const [activeTab, setActiveTab] = useState(0);
@@ -54,14 +52,14 @@ const Scope = () => {
   };
 
   return (  
-    <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
+    <Box sx={{ mb: '2.5rem' }}>
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
         sx={{
           gap: '1.5rem',
           "& > div": { 
-            gridColumn: isNonMediumScreens ? "span 6" : "span 12",
+            gridColumn: isNonMediumScreens ? undefined : "span 12",
           },
         }}
       >
@@ -69,6 +67,7 @@ const Scope = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
+            gridColumn: 'span 6',
             transition: 'box-shadow 0.3s',
             boxShadow: 'none',
             borderColor: 'grey.300',
@@ -135,6 +134,7 @@ const Scope = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
+            gridColumn: 'span 6',
             transition: 'box-shadow 0.3s',
             boxShadow: 'none',
             borderColor: 'grey.300',
@@ -177,6 +177,7 @@ const Scope = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
+            gridColumn: 'span 6',
             transition: 'box-shadow 0.3s',
             boxShadow: 'none',
             borderColor: 'grey.300',
@@ -212,4 +213,4 @@ const Scope = () => {
   );
 }
 
-export default Scope;
+export default Overview;

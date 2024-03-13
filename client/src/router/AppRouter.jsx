@@ -14,15 +14,17 @@ import Home from "scenes/home";
 import Search from "scenes/search";
 import Funds from "scenes/funds";
 import Funding from "scenes/funding";
+
 import Projects from "scenes/projects";
 import Create from "scenes/projects/create";
 import View from "scenes/projects/view";
-import CreateBudget from "components/projects/CreateBudget";
-import Scope from "components/projects/Scope";
-import Budget from "components/projects/Budget";
+import Overview from "components/projects/overview";
+import Zoning from "components/projects/zoning";
+import Budget from "components/projects/budget";
+import CreateBudget from "components/projects/budget/CreateBudget";
 import Crews from "components/projects/crews";
 import Crew from "components/projects/crew";
-import Timeline from "components/projects/timeline/Timeline";
+import Timeline from "components/projects/timeline";
 
 
 function AppRouter() {
@@ -84,7 +86,8 @@ function AppRouter() {
               </PrivateRoute>
             } />
             <Route path="/projects/view/:id" element={<PrivateRoute><View /></PrivateRoute>}>
-              <Route index element={<Scope />} />
+              <Route index element={<Overview />} />
+              <Route path="zoning" element={<Zoning />} />
               <Route path="budget" element={<Budget />} />
               <Route path="budget/new" element={<CreateBudget />} />
               <Route path="crews" element={<Crews />} />

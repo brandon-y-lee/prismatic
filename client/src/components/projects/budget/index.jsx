@@ -7,7 +7,6 @@ import { useDemoData } from '@mui/x-data-grid-generator';
 import FlexBetween from 'components/FlexBetween';
 import CreateBudget from './CreateBudget';
 
-
 const Budget = () => {
   const id = useParams();
   const navigate = useNavigate();
@@ -18,12 +17,12 @@ const Budget = () => {
 
   const { data } = useDemoData({
     dataSet: 'Commodity',
-    rowLength: 100,
+    rowLength: 10,
     editable: true,
   });
 
   return (  
-    <Box sx={{ minHeight: 'calc(100vh - 3rem)' }}>
+    <Box sx={{ mb: '2.5rem' }}>
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"

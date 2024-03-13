@@ -2,11 +2,21 @@ import mongoose from "mongoose";
 
 const ContractorSchema = new mongoose.Schema(
   {
-    id: Number,
-    name: String,
-    email: String,
-    company: String,
-    role: String,
+    id: {
+      type: Number,
+    },
+    name: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    company: {
+      type: String,
+    },
+    role: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

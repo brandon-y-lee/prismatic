@@ -1,6 +1,6 @@
 export const ProjectStatus = {
-  DRAFT: 0,
-  ACTIVE: 1,
-  INACTIVE: 2,
-  COMPLETED: 3
+  0: 'Draft',
+  1: 'Action Required',
+  2: 'Active',
+  3: 'Inactive'
 };

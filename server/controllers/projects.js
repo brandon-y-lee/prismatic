@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
+import { spawn } from 'child_process';
 import Project from "../models/Project.js";
 import Contract from "../models/Contract.js";
 import Contractor from "../models/Contractor.js";
 import Crew from "../models/Crew.js";
 import Message from '../models/Message.js';
+import Thread from '../models/Thread.js';
 
 import AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,25 +22,9 @@ const s3 = new AWS.S3();
 export const getProjects = async (req, res) => {
   console.log("Fetching Projects for User: ", req.query);
   try {
-    const { page, pageSize, sort, search, userId } = req.query;
+    const { userId } = req.query;
 
-    const generateSort = () => {
-      const sortParsed = JSON.parse(sort);
-      const sortFormatted = {
-        [sortParsed.field]: (sortParsed.sort = "asc" ? 1 : -1),
-      };
-      
-      return sortFormatted;
-    }
-
-    const sortFormatted = Boolean(sort) ? generateSort() : {};
-
-    const projects = await Project.find({
-      owner: userId
-    })
-      .sort(sortFormatted)
-      .skip(page * pageSize)
-      .limit(pageSize)
+    const projects = await Project.find({ owner: userId })
 
     if (!projects) {
       return res.status(404).json({ message: 'User has no projects.' });
@@ -86,6 +72,35 @@ export const viewProject = async (req, res) => {
   }
 };
 
+export const updateProject = async (req, res) => {
+  try {
+    const { projectId, data } = req.body;
+
+    const updateObject = {
+      'zoning.propertyIdentification': data.propertyIdentification,
+      'zoning.zoningAndLandUse': data.zoningAndLandUse,
+      'zoning.regulatoryComplianceAndEligibility': data.regulatoryComplianceAndEligibility,
+      'zoning.environmentalAndGeological': data.environmentalAndGeological,
+      'zoning.developmentConstraints': data.developmentConstraints,
+      'zoning.buildingAndConstruction': data.buildingAndConstruction,
+      'zoning.incentivesAndOpportunities': data.incentivesAndOpportunities,
+      'zoning.communityAndPlanning': data.communityAndPlanning,
+      'zoning.valuationAndTaxation': data.valuationAndTaxation,
+      'zoning.additionalInformation': data.additionalInformation,
+    };
+
+    const updatedProject = await Project.findByIdAndUpdate(projectId, { $set: updateObject }, { new: true });
+
+    if (!updatedProject) {
+      return res.status(404).json({ message: 'Project not found.' });
+    }
+
+    res.status(200).json(updatedProject);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 export const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
@@ -101,6 +116,40 @@ export const deleteProject = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   };
+};
+
+export const scrapeZimas = async (req, res) => {
+  try {
+    const { houseNumber, streetName } = req.body;
+    console.log('Scraping Zimas for houseNumber: ', houseNumber, ' and streetName: ', streetName);
+
+    const pythonProcess = spawn('python', ['lambdas/scrape.py', houseNumber, streetName]);
+
+    let dataString = '';
+
+    pythonProcess.stdout.on('data', (data) => {
+      dataString += data.toString();
+    });
+
+    pythonProcess.on('close', (code) => {
+      if (code === 0) {
+        try {
+          const data = JSON.parse(dataString);
+          res.status(200).json(data);
+        } catch (parseError) {
+          res.status(500).send('Failed to parse script output.');
+        }
+      } else {
+        res.status(500).send('An error occurred while executing the Python script.');
+      }
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export const uploadFile = async (req, res) => {
@@ -269,6 +318,12 @@ export const getMessages = async (req, res) => {
         },
       },
       {
+        $unwind: {
+          path: '$crew_id',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $lookup: {
           from: 'contractors',
           localField: 'recipients',
@@ -298,9 +353,11 @@ export const getMessageThread = async (req, res) => {
       return res.status(400).json({ message: 'Thread ID is required.' });
     }
 
-    const messages = await Message.find({ thread_id: threadId }).sort({ createdAt: 1 });
+    const messages = await Message.find({ thread_id: threadId })
+      .populate('crew_id recipients')
+      .sort({ createdAt: 1 });
 
-    if (!messages) {
+    if (!messages.length) {
       return res.status(404).json({ message: 'No messages found for the given thread.' });
     }
 
