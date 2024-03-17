@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Paper, Divider, Tabs, Tab } from '@mui/material';
-import PageLoader from 'components/PageLoader';
-import Header from 'components/projects/view/Header';
-import Status from 'components/projects/view/Status';
 import { useViewProjectQuery } from 'state/api';
 import { ProjectProvider } from 'context/ProjectContext';
+import PageLoader from 'components/PageLoader';
+import Header from 'components/projects/view/Header';
+import Status from 'components/projects/view/Update';
+import Assistant from 'components/Assistant';
 
 const View = () => {
   const location = useLocation();
-  const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
   const { id } = useParams();
+  const [tabValue, setTabValue] = useState(0);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const { data: projectData, isLoading } = useViewProjectQuery(id);
 
+  const handlePaperClick = () => {
+    setIsAssistantOpen(true);
+  };
+  
   useEffect(() => {
     const pathSegments = location.pathname.split('/');
     const viewIndex = pathSegments.findIndex(segment => segment === 'view');
@@ -24,8 +30,8 @@ const View = () => {
       'zoning': 1,
       'budget': 2,
       'crews': 3,
-      'team': 4,
-      'timeline': 5,
+      'timeline': 4,
+      'planning': 5
     };
   
     setTabValue(tabIndexMap[subRouteSegment] ?? 0);
@@ -33,7 +39,7 @@ const View = () => {
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
-    const paths = ['', 'zoning', 'budget', 'crews', 'team', 'timeline'];
+    const paths = ['', 'zoning', 'budget', 'crews', 'timeline', 'planning'];
     navigate(`/projects/view/${id}/${paths[newValue]}`);
   };
 
@@ -49,6 +55,7 @@ const View = () => {
     <ProjectProvider projectData={projectData} isLoading={isLoading}>
       <Box display="flex" flexDirection="column" sx={{ m: "1.5rem 2.5rem", gap: "1rem" }}>
         <Paper
+          onClick={handlePaperClick}
           sx={{
             transition: 'box-shadow 0.3s',
             boxShadow: 'none',
@@ -62,19 +69,19 @@ const View = () => {
             },
           }}
         >
-          <Box sx={{ padding: '1.5rem 2.5rem 0rem 2.5rem' }}>
+          <Box sx={{ p: '1.5rem 2.5rem' }}>
             <Header project={projectData} />
-            <Status status={projectData.status} />
           </Box>
 
           <Divider />
 
-          <Box sx={{ padding: '1.5rem 2.5rem 1.5rem 2.5rem' }}>
+          <Box sx={{ p: '1.5rem 2.5rem' }}>
             <Tabs
               value={tabValue}
               onChange={handleTabChange}
               aria-label="project-tabs"
               variant="fullWidth"
+              TabIndicatorProps={{ sx: { display: 'none' } }}
               sx={{
                 '& .MuiTab-root': {
                   textTransform: 'none',
@@ -96,7 +103,15 @@ const View = () => {
                     backgroundColor: 'white',
                     color: 'black',
                     fontWeight: '550'
-                  }
+                  },
+                  '&:first-of-type': {
+                    borderTopLeftRadius: '14px',
+                    borderBottomLeftRadius: '14px'
+                  },
+                  '&:last-of-type': {
+                    borderTopRightRadius: '14px',
+                    borderBottomRightRadius: '14px'
+                  },
                 }
               }}
             >
@@ -104,14 +119,14 @@ const View = () => {
               <Tab label="Zoning" />
               <Tab label="Budget" />
               <Tab label="Crews" />
-              <Tab label="Team" />
               <Tab label="Timeline" />
-              <Tab label="Materials" />
-              <Tab label="Permits" />
-              <Tab label="Estimates" />
+              <Tab label="Planning" />
+              <Tab label="Compliance" />
             </Tabs>
           </Box>
         </Paper>
+
+        <Assistant open={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />
 
         {/* Render the active tab component */}
         <Outlet />

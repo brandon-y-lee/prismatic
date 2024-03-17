@@ -13,7 +13,7 @@ export const register = async (req, res) => {
 
     const savedUser = await newUser.save();
 
-    const newUserAuth = new UserAuth({ email, password, user: savedUser });
+    const newUserAuth = new UserAuth({ email, password, user: savedUser._id });
 
     const savedUserAuth = await newUserAuth.save();
     res.status(201).json({ savedUser, savedUserAuth });
@@ -22,12 +22,12 @@ export const register = async (req, res) => {
   }
 };
 
-// LOGIN
+/* Login */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const userAuth = await UserAuth.findOne({ email: email });
+    const userAuth = await UserAuth.findOne({ email: email }).populate('user');
     if (!userAuth || !userAuth.user ) return res.status(400).json({ msg: "UserAuth or User does not exist." });
 
     console.log('Password: ', password);
@@ -38,9 +38,10 @@ export const login = async (req, res) => {
 
     console.log('authId: ', userAuth._id);
     console.log('userId: ', userAuth.user._id);
+    console.log('name: ', userAuth.user.name);
 
     const token = jwt.sign({ id: userAuth._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.status(200).json({ token, user: { authId: userAuth._id, userId: userAuth.user._id }});
+    res.status(200).json({ token, user: { authId: userAuth._id, userId: userAuth.user._id, name: userAuth.user.name }});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

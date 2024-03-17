@@ -28,7 +28,6 @@ const Form = () => {
     if (isLogin) {
       try {
         const response = await login({ email: values.email, password: values.password }).unwrap();
-
         if (response && response.token) {
           setToken(response.token);
           setLoggedInUser(response.user);

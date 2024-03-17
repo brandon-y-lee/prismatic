@@ -1,3 +1,6 @@
+import React from 'react';
+import { Chip } from '@mui/material';
+
 export function stringAvatar(name) {
   let hash = 0;
   let i;
@@ -24,6 +27,32 @@ export function formatDate(dateString) {
   return new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeStyle: 'short' }).format(date);
 };
 
+export const renderStatusChip = (status, onClick) => {
+  const backgroundColor = status === 'Draft' ? 'lightgrey' :
+  status === 'Action Required' ? 'darkorange' :
+  status === 'Active' ? 'blue' :
+  status === 'Inactive' ? 'grey' : undefined;
+
+  return (
+    <Chip
+      label={status}
+      sx={{ backgroundColor, color: 'white', fontWeight: 550 }}
+      onClick={onClick}
+    />
+  );
+};
+
+export const renderNetworkChip = (contractors, onClick) => {
+  return (
+    <Chip
+      label={`(${contractors}) Invite Collaborators`}
+      sx={{ backgroundColor: 'green', color: 'white', fontWeight: 550 }}
+      onClick={onClick}
+    />
+  );
+};
+
+
 export const transformData = (data) => {
   const normalizeKey = (key) => key.toLowerCase().replace(/[^a-z0-9]+/g, '');
 
@@ -41,7 +70,7 @@ export const transformData = (data) => {
   return {
     propertyIdentification: {
       siteAddress: getValue(normalizeKey('Site Address')),
-      assessorParcelNumber: getValue(normalizeKey('Assessor Parcel No. (APN)')),
+      assessorParcelNumber: parseInt(getValue(normalizeKey('Assessor Parcel No. (APN)'))),
       zipCode: getValue(normalizeKey('ZIP Code'))
     },
     zoningAndLandUse: {

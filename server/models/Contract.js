@@ -20,7 +20,7 @@ const ContractSchema = new mongoose.Schema(
       enum: Object.values(ContractStatus),
       default: ContractStatus.DRAFT
     },
-    initialDate: {
+    initial_date: {
       type: Date,
       default: Date.now
     },

@@ -61,9 +61,9 @@ const Thread = ({ threadId, open, onClose }) => {
           messages?.map((message, index) => (
             <Box key={index} sx={{ px: 1, py: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Avatar {...stringAvatar(message.sender)} sx={{ width: 24, height: 24, fontSize: '0.75rem', ...stringAvatar(message.sender).sx }} />
+                <Avatar {...stringAvatar(message.sender.name)} sx={{ width: 24, height: 24, fontSize: '0.75rem', ...stringAvatar(message.sender.name).sx }} />
                 <Typography variant='h6' fontWeight={550}>
-                  {message.sender}
+                  {message.sender.name}
                 </Typography>
                 <Typography variant='caption' sx={{ color: 'text.secondary' }}>
                   {formatDate(message.message_date)}

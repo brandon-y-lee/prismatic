@@ -15,8 +15,8 @@ export const paymentMap = {
 };
 
 export const renderStatusChip = (status) => {
-  const backgroundColor = status === 'Draft' ? 'turquoise' :
-  status === 'Action Required' ? 'red' :
+  const backgroundColor = status === 'Draft' ? 'lightgrey' :
+  status === 'Action Required' ? 'darkorange' :
   status === 'Active' ? 'blue' :
   status === 'Inactive' ? 'grey' : undefined;
 

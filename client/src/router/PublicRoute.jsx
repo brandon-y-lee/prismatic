@@ -12,9 +12,8 @@ const PublicRoute = ({ children }) => {
 
   return (
     <motion.div
-      initial={{ x: 200 }}
-      animate={{ x: 0 }}
-      exit={{ scale: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 100 }}
     >
       {children}
     </motion.div>

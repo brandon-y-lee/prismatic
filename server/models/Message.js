@@ -13,7 +13,8 @@ const MessageSchema = new mongoose.Schema(
       required: false,
     },
     sender: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
     recipients: [{

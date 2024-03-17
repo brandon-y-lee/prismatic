@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
-import { spawn } from 'child_process';
+import axios from 'axios';
 import Project from "../models/Project.js";
 import Contract from "../models/Contract.js";
 import Contractor from "../models/Contractor.js";
 import Crew from "../models/Crew.js";
 import Message from '../models/Message.js';
+import Document from '../models/Document.js';
 import Thread from '../models/Thread.js';
 
 import AWS from 'aws-sdk';
@@ -87,6 +88,8 @@ export const updateProject = async (req, res) => {
       'zoning.communityAndPlanning': data.communityAndPlanning,
       'zoning.valuationAndTaxation': data.valuationAndTaxation,
       'zoning.additionalInformation': data.additionalInformation,
+      'status': 'Draft',
+      'location': data.propertyIdentification.siteAddress
     };
 
     const updatedProject = await Project.findByIdAndUpdate(projectId, { $set: updateObject }, { new: true });
@@ -123,47 +126,29 @@ export const scrapeZimas = async (req, res) => {
     const { houseNumber, streetName } = req.body;
     console.log('Scraping Zimas for houseNumber: ', houseNumber, ' and streetName: ', streetName);
 
-    const pythonProcess = spawn('python', ['lambdas/scrape.py', houseNumber, streetName]);
-
-    let dataString = '';
-
-    pythonProcess.stdout.on('data', (data) => {
-      dataString += data.toString();
+    const response = await axios.post('https://ancient-bayou-14978-d11f155dd40a.herokuapp.com/scrape', {
+      house_number: houseNumber,
+      street_name: streetName
     });
 
-    pythonProcess.on('close', (code) => {
-      if (code === 0) {
-        try {
-          const data = JSON.parse(dataString);
-          res.status(200).json(data);
-        } catch (parseError) {
-          res.status(500).send('Failed to parse script output.');
-        }
-      } else {
-        res.status(500).send('An error occurred while executing the Python script.');
-      }
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
-    });
+    res.status(200).json(response.data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const uploadFile = async (req, res) => {
+export const uploadDocument = async (req, res) => {
   try {
-    const { title, summary, status } = req.body;
+    const { projectId, title, summary } = req.body;
+    console.log("Project ID: ", projectId);
     console.log("Title: ", title);
     console.log("Summary: ", summary);
-    console.log("Status: ", status);
 
     if (!req.file) {
       return res.status(400).json({ message: 'No file provided' });
     }
 
-    console.log("Uploaded File: ", req.file);
+    console.log("Document: ", req.file);
 
     const params = {
       Bucket: 'alethea-contracts',
@@ -179,15 +164,15 @@ export const uploadFile = async (req, res) => {
       }
 
       // Once the file is uploaded successfully, create the Contract object
-      const newContract = new Contract({
-        title,
-        summary,
+      const newDocument = new Document({
+        project_id: projectId,
+        title: title,
+        summary: summary,
         pdf_url: data.Location, // Use the S3 object URL
-        status: status
       });
 
-      await newContract.save();
-      res.status(201).json(newContract);
+      await newDocument.save();
+      res.status(201).json(newDocument);
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -325,12 +310,26 @@ export const getMessages = async (req, res) => {
       },
       {
         $lookup: {
+          from: 'users',
+          localField: 'sender',
+          foreignField: '_id',
+          as: 'sender',
+        },
+      },
+      {
+        $unwind: {
+          path: '$sender',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
           from: 'contractors',
           localField: 'recipients',
           foreignField: '_id',
           as: 'recipients',
         },
-      }
+      },
     ];
 
     const messages = await Message.aggregate(aggregationPipeline);
@@ -354,7 +353,7 @@ export const getMessageThread = async (req, res) => {
     }
 
     const messages = await Message.find({ thread_id: threadId })
-      .populate('crew_id recipients')
+      .populate('crew_id recipients sender')
       .sort({ createdAt: 1 });
 
     if (!messages.length) {
@@ -376,7 +375,7 @@ export const createMessage = async (req, res) => {
     const newMessage = new Message({
       project_id: mongoose.Types.ObjectId(projectId),
       crew_id: mongoose.Types.ObjectId(crewId),
-      sender: senderId,
+      sender: mongoose.Types.ObjectId(senderId),
       recipients: recipients.map(id => mongoose.Types.ObjectId(id)),
       subject: subject,
       content: content,

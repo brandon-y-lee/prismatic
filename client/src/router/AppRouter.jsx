@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
+import AnimateRoute from "./AnimateRoute";
 import PageLoader from "components/PageLoader";
 
 import Layout from "scenes/layout";
@@ -25,6 +26,7 @@ import CreateBudget from "components/projects/budget/CreateBudget";
 import Crews from "components/projects/crews";
 import Crew from "components/projects/crew";
 import Timeline from "components/projects/timeline";
+import Planning from "components/projects/planning";
 
 
 function AppRouter() {
@@ -32,7 +34,6 @@ function AppRouter() {
 
   return (
     <Suspense fallback={<PageLoader />}>
-      <AnimatePresence mode="wait" initial={false}>
         <Routes location={location} key={location.pathname}>
           <Route path="/login" element={
             <PublicRoute>
@@ -86,15 +87,14 @@ function AppRouter() {
               </PrivateRoute>
             } />
             <Route path="/projects/view/:id" element={<PrivateRoute><View /></PrivateRoute>}>
-              <Route index element={<Overview />} />
-              <Route path="zoning" element={<Zoning />} />
-              <Route path="budget" element={<Budget />} />
-              <Route path="budget/new" element={<CreateBudget />} />
-              <Route path="crews" element={<Crews />} />
-              <Route path="crews/:crewId" element={<Crew />} />
-              <Route path="team" element={<Crew />} />
-              <Route path="team/new" element={<Crew />} />
+              <Route index element={<AnimateRoute><Overview /></AnimateRoute>} />
+              <Route path="zoning" element={<AnimateRoute><Zoning /></AnimateRoute>} />
+              <Route path="budget" element={<AnimateRoute><Budget /></AnimateRoute>} />
+              <Route path="budget/new" element={<AnimateRoute><CreateBudget /></AnimateRoute>} />
+              <Route path="crews" element={<AnimateRoute><Crews /></AnimateRoute>} />
+              <Route path="crews/:crewId" element={<AnimateRoute><Crew /></AnimateRoute>} />
               <Route path="timeline" element={<Timeline />} />
+              <Route path="planning" element={<Planning />} />
             </Route>
 
             <Route path="/logout" element={
@@ -105,7 +105,6 @@ function AppRouter() {
             <Route path="*" element={<Error />} />
           </Route>
         </Routes>
-      </AnimatePresence>
     </Suspense>
   );
 }

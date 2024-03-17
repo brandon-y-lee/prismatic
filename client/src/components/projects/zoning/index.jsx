@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Masonry } from '@mui/lab';
-import { Box, List, ListItem, ListItemText, Paper, Typography, useMediaQuery } from '@mui/material';
+import { Box, List, ListItem, ListItemText, Paper, Typography, TextField, Button } from '@mui/material';
 import { useProjectData } from 'context/ProjectContext';
 import { invertKey } from 'utils/project';
+import Map from './Map';
 
 const Zoning = () => {
   const { projectData, isLoading } = useProjectData();
@@ -46,13 +47,6 @@ const Zoning = () => {
       });
   };
 
-  const renderSchemas = () => {
-    return orderedZoning.map(({ name, data }) => {
-      const schemaTitle = invertKey(name, true);
-      return renderSchema(schemaTitle, data);
-    });
-  };
-
   const renderSchema = (title, data) => {
     return (
       <Paper
@@ -81,9 +75,10 @@ const Zoning = () => {
   };
 
   return (  
-    <Box sx={{ mb: '2.5rem' }}>
-      <Masonry columns={2} spacing={2}>
-        {renderSchemas()}
+    <Box sx={{ width: '100%', mb: '2.5rem' }}>
+      <Map />
+      <Masonry columns={2} spacing={2} sx={{ mx: '0px' }}>
+        {orderedZoning.map(({ name, data }) => renderSchema(invertKey(name, true), data))}
       </Masonry>
     </Box>
   );

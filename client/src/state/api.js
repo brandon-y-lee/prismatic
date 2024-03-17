@@ -36,10 +36,10 @@ export const api = createApi({
       }),
     }),
 
-    /* File Upload */
-    uploadFile: build.mutation({
+    /* Document Upload */
+    uploadDocument: build.mutation({
       query: (formData) => ({
-        url: "projects/upload",
+        url: "projects/upload-document",
         method: "POST",
         body: formData,
       }),
@@ -48,7 +48,7 @@ export const api = createApi({
     /* Scrape */
     scrapeZimas: build.mutation({
       query: ({ houseNumber, streetName }) => ({
-        url: 'projects/scrape',
+        url: 'projects/scrape-zimas',
         method: 'POST',
         body: { houseNumber, streetName },
       }),
@@ -399,7 +399,7 @@ export const {
   useGetSupplierQuery,
 
   useScrapeZimasMutation,
-  useUploadFileMutation,
+  useUploadDocumentMutation,
 
   useGetProjectsQuery,
   useCreateProjectMutation,
