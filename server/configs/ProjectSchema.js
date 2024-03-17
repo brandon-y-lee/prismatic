@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 export const PropertyIdentificationSchema = new mongoose.Schema({
   siteAddress: { type: String },
-  assessorParcelNo: { type: String },
+  assessorParcelNumber: { type: Number },
   zipCode: { type: String }
 });
 
@@ -54,7 +54,6 @@ export const BuildingAndConstructionSchema = new mongoose.Schema({
 export const IncentivesAndOpportunitiesSchema = new mongoose.Schema({
   reducedParkingAreasAB2097: { type: Boolean, default: false },
   urbanAgricultureIncentiveZone: { type: Boolean, default: false },
-  transitOrientedCommunitiesTier: { type: Number }
 });
 
 export const CommunityAndPlanningSchema = new mongoose.Schema({

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, TextField, Button, useMediaQuery, useTheme, Backdrop, CircularProgress, Slide, Paper } from '@mui/material';
-import { Check, CheckCircleOutlined } from '@mui/icons-material';
+import { Box, Typography, TextField, Button, useMediaQuery, Backdrop, CircularProgress, Slide, Paper } from '@mui/material';
 import { UploaderComponent } from '@syncfusion/ej2-react-inputs';
-import { useUploadFileMutation, useCreateProjectMutation, useScrapeZimasMutation, useUpdateProjectMutation } from 'state/api';
+import { useCreateProjectMutation, useScrapeZimasMutation, useUpdateProjectMutation } from 'state/api';
 import { getLoggedInUser } from 'utils/token';
 import { transformData } from 'utils/project';
 import FlexBetween from 'components/FlexBetween';
@@ -22,7 +21,6 @@ const Create = () => {
   const [streetName, setStreetName] = useState('');
 
   const [files, setFiles] = useState([]);
-  const [uploadFile] = useUploadFileMutation();
 
   const [createProject, { isLoading: isProjectLoading, data: projectData }] = useCreateProjectMutation();
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -240,7 +238,7 @@ const Create = () => {
               }}
             >
               <Typography variant='h3' fontWeight={550} sx={{ mb: '0.5rem' }}>Next Steps</Typography>
-              <Typography variant='h5' sx={{ mb: '2rem' }}>Configure your project with specifics</Typography>
+              <Typography variant='h5' sx={{ mb: '2rem' }}>Configure your project by location</Typography>
               <Box
                 component='form'
                 noValidate

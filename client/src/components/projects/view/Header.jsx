@@ -1,16 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined, PictureAsPdfOutlined } from '@mui/icons-material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import FlexBetween from 'components/FlexBetween';
 import { useDeleteProjectMutation } from 'state/api';
-import { renderStatusChip } from 'utils/transaction';
+import { renderNetworkChip, renderStatusChip } from 'utils/project';
+import FlexBetween from 'components/FlexBetween';
+import Update from './Update';
+import Invite from './Invite';
 
 const Header = ({ project }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [deleteProject] = useDeleteProjectMutation();
+  const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+  const [openInviteDialog, setOpenInviteDialog] = useState(false);
+
+  const handleUpdateProject = () => {
+    setOpenUpdateDialog(true);
+  };
+
+  const handleCloseUpdateDialog = () => {
+    setOpenUpdateDialog(false);
+  };
+
+  const handleInviteNetwork = () => {
+    setOpenInviteDialog(true);
+  };
+
+  const handleCloseInviteDialog = () => {
+    setOpenInviteDialog(false);
+  };
 
   const handleEdit = () => {
     
@@ -35,15 +54,14 @@ const Header = ({ project }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, gap: '1rem' }}>
-      <FlexBetween gap="1rem">
-        <IconButton onClick={() => navigate('/projects')}>
-          <ArrowBackIcon sx={{ fontSize: 'medium' }} />
-        </IconButton>
-        <Typography variant="h5" fontWeight={600}>{project.title}</Typography>
-        {renderStatusChip(project.status)}
-      </FlexBetween>
-
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
+      <FlexBetween sx={{ gap: '1rem' }}>
+        <Typography variant="h5" fontWeight={550}>{project.title}</Typography>
+        {project.status === 'Action Required' ?
+          renderStatusChip(project.status, handleUpdateProject) :
+          renderStatusChip(project.status)}
+        {renderNetworkChip(project.contractors.length, handleInviteNetwork)}
+        </FlexBetween>
       <FlexBetween gap="0.5rem">
         <Button
           startIcon={<EditOutlined />}
@@ -71,6 +89,14 @@ const Header = ({ project }) => {
           Delete
         </Button>
       </FlexBetween>
+      <Update
+        open={openUpdateDialog}
+        handleClose={handleCloseUpdateDialog}
+      />
+      <Invite
+        open={openInviteDialog}
+        handleClose={handleCloseInviteDialog}
+      />
     </Box>
   );
 };

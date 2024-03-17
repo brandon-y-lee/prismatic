@@ -4,11 +4,12 @@ import { GroupAddOutlined, GroupOutlined, Close, UnfoldMore } from '@mui/icons-m
 import Thread from './Thread';
 import { useReplyMessageMutation } from 'state/api';
 import { stringAvatar, formatDate } from 'utils/project';
+import { getLoggedInUser } from 'utils/token';
 
 const Message = ({ message, onReply }) => {
-  const mockSenderName = "Brandon Lee";
+  const user = getLoggedInUser();
   const recipientNames = message?.recipients.map(recipient => recipient.name);
-  const collaborators = [mockSenderName, ...recipientNames];
+  const collaborators = [user.name, ...recipientNames];
 
   const messageEndRef = useRef(null);
 
@@ -32,7 +33,7 @@ const Message = ({ message, onReply }) => {
       await replyMessage({
         projectId: message.project_id,
         crewId: message.crew_id._id,
-        senderId: mockSenderName,
+        senderId: user.userId,
         recipients: message.recipients.map(recipient => recipient._id),
         subject: message.subject,
         content: replyContent,
@@ -85,17 +86,17 @@ const Message = ({ message, onReply }) => {
           </Typography>
           <Typography variant='subtitle1'>
             {message.parent_message_id 
-              ? `Latest reply by ${mockSenderName} on ${formatDate(message.message_date)}` 
-              : `Created by ${mockSenderName} on ${formatDate(message.message_date)}`}
+              ? `Latest reply by ${message.sender.name} on ${formatDate(message.message_date)}` 
+              : `Created by ${message.sender.name} on ${formatDate(message.message_date)}`}
           </Typography>
         </Box>
 
         {/* Body Section */}
         <Box sx={{ pl: 1, py: 1.5, maxHeight: '150px', overflowY: 'auto' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Avatar {...stringAvatar(mockSenderName)} />
+            <Avatar {...stringAvatar(message.sender.name)} />
             <Typography variant='h6' fontWeight={550}>
-              {mockSenderName}
+              {message.sender.name}
             </Typography>
           </Box>
           <Typography variant='body1' gutterBottom sx={{ pl: '3.25rem', pb: '1rem' }}>

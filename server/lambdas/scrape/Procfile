@@ -1,1 +1,1 @@
-web: python lambdas/scrape.py
+web: python scrape.py

@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TextField, InputAdornment, IconButton, CircularProgress, Avatar, Typography } from '@mui/material';
+import { TextField, InputAdornment, IconButton, CircularProgress, Avatar, Typography, Dialog, DialogContent } from '@mui/material';
 import { useInteractWithAssistantMutation } from 'state/api';
 import { AccountCircle, Send } from '@mui/icons-material';
 
-const Assistant = () => {
+const Assistant = ({ open, onClose }) => {
+  const messagesEndRef = useRef(null);
   const [message, setMessage] = useState('');
   const [conversation, setConversation] = useState([]);
   const [interactWithAssistant, { isLoading }] = useInteractWithAssistantMutation();
-  const messagesEndRef = useRef(null);
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -47,11 +48,8 @@ const Assistant = () => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle variant='h4' sx={{ fontWeight: '500' }}>
-        FinanceGPT
-      </DialogTitle>
-      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', maxHeight: '80vh' }}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='md'>
+      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', minHeight: '60vh', maxHeight: '60vh' }}>
         {conversation.length > 0 ? (
           <div style={{ overflowY: 'auto', flexGrow: 1 }}>
             {conversation.map((msg, index) => (
@@ -60,8 +58,8 @@ const Assistant = () => {
                   <Avatar sx={{ width: 24, height: 24, marginRight: '8px' }}>
                     <AccountCircle fontSize='small' />
                   </Avatar>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                    {msg.role === 'user' ? 'You' : ''}
+                  <Typography variant="subtitle2" sx={{ fontWeight: '550' }}>
+                    {msg.role === 'user' ? 'You' : 'Aleth'}
                   </Typography>
                 </div>
                 <Typography variant="body1" sx={{ mx: '32px', mb: '20px' }}>
@@ -78,7 +76,7 @@ const Assistant = () => {
         )}
 
         <TextField
-          label='Message FinanceGPT...'
+          label='Ask Alethea Anything'
           multiline
           minRows={1}
           maxRows={8}
@@ -97,7 +95,7 @@ const Assistant = () => {
                   disabled={isLoading || !message.trim()}
                   sx={{ bgcolor: 'primary.main', '&:hover': { bgcolor: 'primary.dark' }, borderRadius: '12px' }}
                 >
-                  {isLoading ? <CircularProgress size={24} /> : <Send sx={{ color: 'common.white' }} />}
+                  {isLoading ? <CircularProgress size={24} /> : <Send sx={{ color: 'green' }} />}
                 </IconButton>
               </InputAdornment>
             ),

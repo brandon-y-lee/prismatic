@@ -1,17 +1,9 @@
 import express from "express";
-import {
-  uploadFile,
-} from "../controllers/client.js";
 import multer from 'multer';
-import { createCrew, createMessage, createProject, deleteCrew, deleteMessage, deleteProject, getContractors, getCrew, getCrews, getMessage, getMessageThread, getMessages, getProjects, replyMessage, scrapeZimas, updateProject, viewProject } from "../controllers/projects.js";
+import { createCrew, createMessage, createProject, deleteCrew, deleteMessage, deleteProject, getContractors, getCrew, getCrews, getMessage, getMessageThread, getMessages, getProjects, replyMessage, scrapeZimas, updateProject, uploadDocument, viewProject } from "../controllers/projects.js";
 
 // Set up the multer s3 storage
-const upload = multer({ 
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
-});
+const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
@@ -21,8 +13,8 @@ router.get('/view/:id', viewProject);
 router.post('/update', updateProject);
 router.delete('/delete/:id', deleteProject);
 
-router.post('/scrape', scrapeZimas);
-router.post('/upload', upload.single('file'), uploadFile);
+router.post('/scrape-zimas', scrapeZimas);
+router.post('/upload-document', upload.single('file'), uploadDocument);
 
 router.get('/get-contractors', getContractors);
 router.get('/get-crews', getCrews);

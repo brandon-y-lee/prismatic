@@ -40,15 +40,29 @@ const ProjectSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    location: {
+      type: String,
+      default: null,
+    },
     status: {
       type: String,
       enum: Object.values(ProjectStatus),
-      default: ProjectStatus[0]
+      default: ProjectStatus[1]
     },
-    initialDate: {
+    initial_date: {
       type: Date,
       default: Date.now
     },
+    documents: [{
+      type: mongoose.Types.ObjectId,
+      ref: 'Document',
+      default: []
+    }],
+    contractors: [{
+      type: mongoose.Types.ObjectId,
+      ref: 'Contractor',
+      default: []
+    }],
     crews: [{
       type: mongoose.Types.ObjectId,
       ref: 'Crew'
