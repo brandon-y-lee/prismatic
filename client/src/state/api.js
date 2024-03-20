@@ -408,8 +408,12 @@ export const {
 
   useScrapeZimasMutation,
   useUploadDocumentMutation,
+<<<<<<< HEAD
   useParseParcelsMutation,
   
+=======
+
+>>>>>>> 5db4542fcca7ad039096ff9b8a3e8a803bfbeff1
   useGetProjectsQuery,
   useCreateProjectMutation,
   useViewProjectQuery,

@@ -4,7 +4,10 @@ import { Box, Paper, Typography, Button, Stack, useMediaQuery, Grid, IconButton,
 import { Add, MoreHorizOutlined, CreateOutlined, Circle, GroupOutlined } from '@mui/icons-material';
 import FlexBetween from 'components/FlexBetween';
 import UploadDocument from './UploadDocument';
+<<<<<<< HEAD
 import { useParseParcelsMutation } from 'state/api';
+=======
+>>>>>>> 5db4542fcca7ad039096ff9b8a3e8a803bfbeff1
 
 const Planning = () => {
   const navigate = useNavigate();
@@ -13,12 +16,15 @@ const Planning = () => {
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const [openUploadDocument, setOpenUploadDocument] = useState(false);
 
+<<<<<<< HEAD
   const [parseParcels] = useParseParcelsMutation();
 
   const handleParseParcels = async () => {
     parseParcels().unwrap();
   };
 
+=======
+>>>>>>> 5db4542fcca7ad039096ff9b8a3e8a803bfbeff1
   const handleUploadDocument = () => {
     setOpenUploadDocument(true);
   };
