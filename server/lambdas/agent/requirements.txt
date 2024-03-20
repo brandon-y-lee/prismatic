@@ -1,0 +1,13 @@
+pandas==2.1.4
+Flask==3.0.1
+openai==1.5.0
+PyPDF2==3.0.1
+requests==2.31.0
+scipy==1.11.4
+tenacity==8.2.2
+IPython==8.20.0
+tqdm==4.65.0
+termcolor==2.4.0
+pymongo==4.6.1
+boto3==1.34.64
+tiktoken==0.3.3

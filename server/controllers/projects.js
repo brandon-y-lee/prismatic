@@ -189,7 +189,6 @@ export const getContractors = async (req, res) => {
   }
 };
 
-
 /* Crews */
 export const getCrews = async (req, res) => {
   try {

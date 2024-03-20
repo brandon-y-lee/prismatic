@@ -54,6 +54,14 @@ export const api = createApi({
       }),
     }),
 
+    /* Parcels */
+    parseParcels: build.mutation({
+      query: () => ({
+        url: 'parcels/parse-parcels',
+        method: 'POST',
+      })
+    }),
+
     /* Projects */
     getProjects: build.query({
       query: ({ userId }) => ({
@@ -400,7 +408,8 @@ export const {
 
   useScrapeZimasMutation,
   useUploadDocumentMutation,
-
+  useParseParcelsMutation,
+  
   useGetProjectsQuery,
   useCreateProjectMutation,
   useViewProjectQuery,
