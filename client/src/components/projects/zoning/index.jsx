@@ -4,6 +4,7 @@ import { Box, List, ListItem, ListItemText, Paper, Typography, TextField, Button
 import { useProjectData } from 'context/ProjectContext';
 import { invertKey } from 'utils/project';
 import Map from './Map';
+import MapBox from './MapBox';
 
 const Zoning = () => {
   const { projectData, isLoading } = useProjectData();
@@ -76,7 +77,7 @@ const Zoning = () => {
 
   return (  
     <Box sx={{ width: '100%', mb: '2.5rem' }}>
-      <Map />
+      <MapBox />
       <Masonry columns={2} spacing={2} sx={{ mx: '0px' }}>
         {orderedZoning.map(({ name, data }) => renderSchema(invertKey(name, true), data))}
       </Masonry>

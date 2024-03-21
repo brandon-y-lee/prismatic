@@ -55,6 +55,9 @@ export const api = createApi({
     }),
 
     /* Parcels */
+    getParcel: build.query({
+      query: (mapblklot) => `parcels/get-parcel/${mapblklot}`,
+    }),
     parseParcels: build.mutation({
       query: () => ({
         url: 'parcels/parse-parcels',
@@ -408,12 +411,10 @@ export const {
 
   useScrapeZimasMutation,
   useUploadDocumentMutation,
-<<<<<<< HEAD
+
+  useGetParcelQuery,
   useParseParcelsMutation,
   
-=======
-
->>>>>>> 5db4542fcca7ad039096ff9b8a3e8a803bfbeff1
   useGetProjectsQuery,
   useCreateProjectMutation,
   useViewProjectQuery,

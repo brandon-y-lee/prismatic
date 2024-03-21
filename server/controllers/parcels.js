@@ -1,7 +1,27 @@
 import fs from 'fs';
 import Papa from 'papaparse';
 import { parse as originalParse } from 'wellknown';
+import { BigQuery } from 'google-cloud/bigquery';
 import Parcel from '../models/Parcel.js';
+
+const bigQuery = new BigQuery();
+export const getParcel = async (req, res) => {
+  const mapblklot = req.params.mapblklot;
+  const query = `SELECT * FROM your_dataset.your_table WHERE mapblklot = @mapblklot`;
+
+  const options = {
+    query: query,
+    params: { mapblklot: mapblklot },
+  };
+
+  try {
+    const [rows] = await bigQuery.query(options);
+    res.json(rows);
+  } catch (error) {
+    console.error(`Failed to query BigQuery: ${error}`);
+    res.status(500).json({ error: 'Failed to fetch parcel data' });
+  }
+};
 
 const fsp = fs.promises;
 const BATCH_SIZE = 500;
@@ -75,3 +95,4 @@ function createParcel(data) {
 async function saveBatch(batch) {
   return Parcel.insertMany(batch);
 }
+

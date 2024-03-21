@@ -42,6 +42,8 @@ app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
 app.use("/sales", salesRoutes);
 app.use('/parcels', parcelRoutes);
+app.use('/data', express.static('./data'));
+
 
 /* MONGOOSE SETUP */
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
