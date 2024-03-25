@@ -20,6 +20,7 @@
     "@reduxjs/toolkit": "^1.9.7",
     "@syncfusion/ej2-react-gantt": "^24.2.8",
     "@syncfusion/ej2-react-inputs": "^24.2.7",
+    "@szhsin/react-accordion": "^1.2.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

@@ -4,27 +4,76 @@ const ParcelSchema = new mongoose.Schema(
   {
     mapblklot: {
       type: String,
-      required: true,
     },
     blklot: {
       type: String,
-      required: true,
     },
-    location: {
-      type: { 
-        type: String,
-        enum: ['MultiPolygon'],
-        required: true
-      },
-      coordinates: { 
-        type: [[[[Number]]]],
-        required: true
-      }
+    block_num: {
+      type: String,
+    },
+    lot_num: {
+      type: String,
+    },
+    from_address_num: {
+      type: Number,
+    },
+    to_address_num: {
+      type: Number,
+    },
+    street_name: {
+      type: String,
+    },
+    street_type: {
+      type: String,
+    },
+    in_asr_secured_roll: {
+      type: Boolean,
+    },
+    pw_recorded_map: {
+      type: Boolean,
+    },
+    zoning_code: {
+      type: String,
+    },
+    zoning_district: {
+      type: String,
+    },
+    date_rec_add: {
+      type: String,
+    },
+    date_rec_drop: {
+      type: String,
+    },
+    date_map_add: {
+      type: String,
+    },
+    date_map_drop: {
+      type: String,
+    },
+    active: {
+      type: Boolean
+    },
+    centroid: {
+      type: String,
+    },
+    centroid_latitude: {
+      type: Number,
+    },
+    centroid_longitude: {
+      type: Number,
+    },
+    supervisor_district: {
+      type: Number,
+    },
+    supervisor_name: {
+      type: String,
+    },
+    analysis_neighborhood: {
+      type: String,
     }
   },
   { timestamps: true }
 );
 
-ParcelSchema.index({ location: '2dsphere' });
 const Parcel = mongoose.model("Parcel", ParcelSchema);
 export default Parcel;

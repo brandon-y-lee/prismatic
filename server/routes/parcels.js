@@ -1,9 +1,9 @@
 import express from "express";
-import { getParcel, parseParcels } from "../controllers/parcels.js";
+import { getParcel, getZoningSims, parseParcels } from "../controllers/parcels.js";
 
 const router = express.Router();
 
-router.get('/get-parcel/:mapblklot', getParcel);
+router.get('/get-parcel', getParcel);
+router.get('/get-zoning-sims', getZoningSims);
 router.post('/parse-parcels', parseParcels);
-
 export default router;

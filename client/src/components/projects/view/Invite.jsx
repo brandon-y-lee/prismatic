@@ -49,6 +49,7 @@ const Invite = ({ open, handleClose }) => {
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '1rem', p: '1rem' }}>
           <Button
             variant='contained'
+            color='info'
             onClick={handleClose}
           >
             Cancel

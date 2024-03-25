@@ -55,7 +55,6 @@ const View = () => {
     <ProjectProvider projectData={projectData} isLoading={isLoading}>
       <Box display="flex" flexDirection="column" sx={{ m: "1.5rem 2.5rem", gap: "1rem" }}>
         <Paper
-          onClick={handlePaperClick}
           sx={{
             transition: 'box-shadow 0.3s',
             boxShadow: 'none',

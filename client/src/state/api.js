@@ -56,7 +56,11 @@ export const api = createApi({
 
     /* Parcels */
     getParcel: build.query({
-      query: (mapblklot) => `parcels/get-parcel/${mapblklot}`,
+      query: ({ mapblklot }) => ({
+        url: 'parcels/get-parcel',
+        method: 'GET',
+        params: { mapblklot },
+      }),
     }),
     parseParcels: build.mutation({
       query: () => ({

@@ -5,7 +5,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
-import NordigenClient from "nordigen-node";
 
 import authRoutes from "./routes/auth.js";
 import clientRoutes from "./routes/client.js";

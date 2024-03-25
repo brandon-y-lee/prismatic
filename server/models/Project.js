@@ -40,7 +40,7 @@ const ProjectSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    location: {
+    parcel: {
       type: String,
       default: null,
     },
