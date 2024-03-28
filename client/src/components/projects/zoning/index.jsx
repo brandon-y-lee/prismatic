@@ -10,12 +10,12 @@ import { useGetParcelQuery } from 'state/api';
 const Zoning = () => {
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");  
   const { projectData } = useProjectData();
-  console.log('Project Data at Zoning: ', projectData);
 
   const [parcelNumber, setParcelNumber] = useState('');
-  const { data: parcelData, isLoading: isParcelLoading } = useGetParcelQuery({ mapblklot: parcelNumber }, { skip: !parcelNumber });
+  const { data: parcelData, isLoading: isParcelLoading } = useGetParcelQuery({ blklot: parcelNumber }, { skip: !parcelNumber });
 
   const handleSearch = (query) => {
+    console.log('query at zoning: ', query);
     setParcelNumber(query);
   };
 
@@ -34,25 +34,22 @@ const Zoning = () => {
         <Box
           sx={{
             display: 'flex',
-            gridColumn: 'span 7',
-            transition: 'box-shadow 0.3s',
+            flexDirection: 'column',
+            gridColumn: 'span 8',
             boxShadow: 'none',
             borderColor: 'grey.400',
             borderWidth: '1px',
             borderStyle: 'solid',
-            '&:hover': {
-              boxShadow: theme => theme.shadows[2],
-            },
           }}
         >
-          <MapBox parcelData={parcelData} />
+          <MapBox parcelData={parcelData} onSearch={handleSearch} />
         </Box>
         <Box
           sx={{
             height: '70vh',
             display: 'flex',
             flexDirection: 'column',
-            gridColumn: 'span 5',
+            gridColumn: 'span 4',
             boxShadow: 'none',
             gap: '1rem'
           }}

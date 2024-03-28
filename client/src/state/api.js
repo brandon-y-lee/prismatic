@@ -56,10 +56,10 @@ export const api = createApi({
 
     /* Parcels */
     getParcel: build.query({
-      query: ({ mapblklot }) => ({
+      query: ({ blklot }) => ({
         url: 'parcels/get-parcel',
         method: 'GET',
-        params: { mapblklot },
+        params: { blklot },
       }),
     }),
     parseParcels: build.mutation({
@@ -67,6 +67,12 @@ export const api = createApi({
         url: 'parcels/parse-parcels',
         method: 'POST',
       })
+    }),
+    parseLandUse: build.mutation({
+      query: () => ({
+        url: 'parcels/parse-land-use',
+        method: 'POST',
+      }),
     }),
 
     /* Projects */
@@ -418,7 +424,8 @@ export const {
 
   useGetParcelQuery,
   useParseParcelsMutation,
-  
+  useParseLandUseMutation,
+
   useGetProjectsQuery,
   useCreateProjectMutation,
   useViewProjectQuery,

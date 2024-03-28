@@ -9,23 +9,21 @@ const bigQuery = new BigQuery();
 const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#33FFF3', '#F3FF33', '#FF3357'];
 
 export const getParcel = async (req, res) => {
-  const { mapblklot } = req.query;
+  const { blklot } = req.query;
 
-  const query = `SELECT * FROM \`norse-fiber-418004.map.parcels\` WHERE mapblklot = @mapblklot`;
-
-  const options = {
-    query: query,
-    params: { mapblklot },
-  };
-  
   try {
-    const [rows] = await bigQuery.query(options);
-    res.json(rows);
+    const parcels = await Parcel.find({ blklot: blklot });
+    
+    if (!parcels) {
+      return res.status(404).json({ message: 'No parcels found.' });
+    }
+
+    res.status(200).json(parcels);
   } catch (error) {
-    console.error(`Failed to query BigQuery: ${error}`);
-    res.status(500).json({ error: 'Failed to fetch parcel data' });
+    return res.json({message: error.message});
   }
 };
+
 
 export const getZoningSims = async (req, res) => {
   const query = `SELECT DISTINCT zoning_sim FROM \`norse-fiber-418004.map.zoning-districts\` ORDER BY zoning_sim`;
@@ -123,4 +121,57 @@ function createParcel(data) {
 
 async function saveBatch(batch) {
   return Parcel.insertMany(batch);
+}
+
+
+export const parseLandUse = async (req, res) => {
+  try {
+    const csvData = await fsp.readFile('./data/cleaned_land_use.csv', 'utf8');
+    let updateOperations = [];
+
+    Papa.parse(csvData, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true,
+      step: (row) => {
+        const updateOperation = prepareUpdateOperation(row.data);
+        if (updateOperation) updateOperations.push(updateOperation);
+      },
+      complete: () => executeBatchUpdates(updateOperations, res),
+      error: (error) => {
+        console.error('Parsing error:', error);
+        res.status(400).json({ message: error.message });
+      }
+    });
+  } catch (error) {
+    console.error('Error reading the CSV file:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+function prepareUpdateOperation(data) {
+  if (!data.blklot) {
+    console.log(`Skipping row with no blklot: ${JSON.stringify(data)}`);
+    return null;
+  }
+  const updateObject = {...data};
+  delete updateObject.blklot;
+
+  return {
+    filter: { blklot: data.blklot },
+    update: { $set: updateObject }
+  };
+}
+
+async function executeBatchUpdates(updateOperations, res) {
+  try {
+    for (let i = 0; i < updateOperations.length; i += BATCH_SIZE) {
+      const batch = updateOperations.slice(i, i + BATCH_SIZE).map(op => Parcel.updateOne(op.filter, op.update));
+      await Promise.all(batch);
+    }
+    res.status(200).json({ message: `${updateOperations.length} parcels updated successfully.` });
+  } catch (error) {
+    console.error('Batch processing error:', error);
+    res.status(400).json({ message: error.message });
+  }
 }

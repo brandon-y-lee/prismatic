@@ -12,7 +12,6 @@ const Search = ({ onSearch }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     onSearch(parcelNumber);
-    setParcelNumber('');
   };
 
   return (

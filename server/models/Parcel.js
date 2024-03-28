@@ -70,6 +70,57 @@ const ParcelSchema = new mongoose.Schema(
     },
     analysis_neighborhood: {
       type: String,
+    },
+    bldgsqft: {
+      type: Number,
+    },
+    landuse: {
+      type: String,
+    },
+    landval: {
+      type: Number,
+    },
+    med: {
+      type: Number,
+    },
+    mips: {
+      type: Number,
+    },
+    mixed_use: {
+      type: String,
+    },
+    pdr: {
+      type: Number,
+    },
+    restype: {
+      type: String,
+    },
+    resunits: {
+      type: Number,
+    },
+    retail: {
+      type: Number,
+    },
+    st_area_sh: {
+      type: Number,
+    },
+    st_length: {
+      type: Number,
+    },
+    strucval: {
+      type: Number,
+    },
+    total_uses: {
+      type: Number,
+    },
+    usetype: {
+      type: String,
+    },
+    visitor: {
+      type: Number,
+    },
+    yrbuilt: {
+      type: Number,
     }
   },
   { timestamps: true }
