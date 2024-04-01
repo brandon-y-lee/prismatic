@@ -53,7 +53,7 @@ const ParcelSchema = new mongoose.Schema(
     active: {
       type: Boolean
     },
-    centroid: {
+    shape: {
       type: String,
     },
     centroid_latitude: {
@@ -72,6 +72,9 @@ const ParcelSchema = new mongoose.Schema(
       type: String,
     },
     bldgsqft: {
+      type: Number,
+    },
+    cie: {
       type: Number,
     },
     landuse: {
@@ -108,9 +111,6 @@ const ParcelSchema = new mongoose.Schema(
       type: Number,
     },
     strucval: {
-      type: Number,
-    },
-    total_uses: {
       type: Number,
     },
     usetype: {

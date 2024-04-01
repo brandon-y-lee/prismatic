@@ -13,7 +13,7 @@ const Planning = () => {
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const [openUploadDocument, setOpenUploadDocument] = useState(false);
 
-  const [parseParcels] = useParseLandUseMutation();
+  const [parseParcels] = useParseParcelsMutation();
 
   const handleParseParcels = async () => {
     parseParcels().unwrap();

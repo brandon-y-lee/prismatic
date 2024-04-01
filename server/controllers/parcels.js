@@ -6,8 +6,6 @@ import Parcel from '../models/Parcel.js';
 
 const bigQuery = new BigQuery();
 
-const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#33FFF3', '#F3FF33', '#FF3357'];
-
 export const getParcel = async (req, res) => {
   const { blklot } = req.query;
 
@@ -24,44 +22,25 @@ export const getParcel = async (req, res) => {
   }
 };
 
-
-export const getZoningSims = async (req, res) => {
-  const query = `SELECT DISTINCT zoning_sim FROM \`norse-fiber-418004.map.zoning-districts\` ORDER BY zoning_sim`;
-
-  try {
-    const [rows] = await bigQuery.query(query);
-
-    const zoningColor = rows.reduce((acc, row, index) => {
-      acc[row.zoning_sim] = colors[index % colors.length];
-      return acc;
-    }, {});
-
-    res.json(zoningColor);
-  } catch (error) {
-    console.error(`Failed to query BigQuery for unique zoning_sim values: ${error}`);
-    res.status(500).json({ error: 'Failed to fetch unique zoning_sim values' });
-  }
-};
-
 const fsp = fs.promises;
-const BATCH_SIZE = 500;
+const BATCH_SIZE = 10000;
 
 export const parseParcels = async (req, res) => {
   let allData = []; // Use this to collect all parcel data first
 
   try {
-    const csvData = await fsp.readFile('./data/cleaned_parcels.csv', 'utf8');
+    const csvData = await fsp.readFile('./data/joined-tables.csv', 'utf8');
 
     // Synchronously collect data
     Papa.parse(csvData, {
       header: true,
-      dynamicTyping: true,
+      dynamicTyping: false,
       skipEmptyLines: true,
       step: (row) => {
-        if (row.data.active) {
+        if (row.data.blklot) {
           allData.push(createParcel(row.data));
         } else {
-          console.log(`Skipping row with inactive status: ${JSON.stringify(row.data)}`);
+          console.log(`Skipping row with no blklot: ${JSON.stringify(row.data)}`);
         }
       },
       complete: async () => {
@@ -89,16 +68,22 @@ export const parseParcels = async (req, res) => {
 };
 
 function createParcel(data) {
-  const toBoolean = (val) => val === "True";
+  // Helper function to convert string values to boolean
+  const toBoolean = (val) => val === 'true'; // Assuming the CSV has 'true'/'false' as boolean strings
 
+  // Helper function to safely convert strings to numbers
+  const toNumber = (val) => {
+    const parsed = Number(val);
+    return isNaN(parsed) ? null : parsed; // or return null if you want to preserve non-numeric as null
+  };
 
   return new Parcel({
     mapblklot: data.mapblklot,
     blklot: data.blklot,
     block_num: data.block_num,
     lot_num: data.lot_num,
-    from_address_num: data.from_address_num,
-    to_address_num: data.to_address_num,
+    from_address_num: toNumber(data.from_address_num),
+    to_address_num: toNumber(data.to_address_num),
     street_name: data.street_name,
     street_type: data.street_type,
     in_asr_secured_roll: toBoolean(data.in_asr_secured_roll),
@@ -110,14 +95,32 @@ function createParcel(data) {
     date_map_add: data.date_map_add,
     date_map_drop: data.date_map_drop,
     active: toBoolean(data.active),
-    centroid: data.centroid,
-    centroid_latitude: data.centroid_latitude,
-    centroid_longitude: data.centroid_longitude,
-    supervisor_district: data.supervisor_district,
-    supervisor_name: data.supervisor_name,
-    analysis_neighborhood: data.analysis_neighborhood
+    shape: data.shape,
+    centroid_latitude: toNumber(data.centroid_latitude),
+    centroid_longitude: toNumber(data.centroid_longitude),
+    supervisor_district: toNumber(data.supervisor_district),
+    supervisor_name: data.supname,
+    analysis_neighborhood: data.analysis_neighborhood,
+    bldgsqft: toNumber(data.bldgsqft),
+    cie: toNumber(data.cie),
+    landuse: data.landuse,
+    landval: toNumber(data.landval),
+    med: toNumber(data.med),
+    mips: toNumber(data.mips),
+    mixed_use: data.mixed_use,
+    pdr: toNumber(data.pdr),
+    restype: data.restype,
+    resunits: toNumber(data.resunits),
+    retail: toNumber(data.retail),
+    st_area_sh: toNumber(data.st_area_sh),
+    st_length: toNumber(data.st_length),
+    strucval: toNumber(data.strucval),
+    usetype: data.usetype,
+    visitor: toNumber(data.visitor),
+    yrbuilt: toNumber(data.yrbuilt),
   });
 }
+
 
 async function saveBatch(batch) {
   return Parcel.insertMany(batch);
@@ -175,3 +178,4 @@ async function executeBatchUpdates(updateOperations, res) {
     res.status(400).json({ message: error.message });
   }
 }
+

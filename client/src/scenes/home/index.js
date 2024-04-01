@@ -4,7 +4,7 @@ import { Box, InputBase, Paper, IconButton, Typography, useTheme } from '@mui/ma
 import { Search } from '@mui/icons-material';
 import { useInteractWithAssistantMutation } from 'state/api';
 import FlexBetween from 'components/FlexBetween';
-import login from "assets/login.png";
+import logo from "assets/logo.png";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,7 +32,7 @@ const Home = () => {
         minHeight="75vh"
       >
         <Box display="flex" justifyContent="center" alignItems="center" mb="2rem">
-          <img src={login} alt="Aleth Logo" height="100px" />
+          <img src={logo} alt="Aleth Logo" height="100px" />
         </Box>
 
         <FlexBetween
