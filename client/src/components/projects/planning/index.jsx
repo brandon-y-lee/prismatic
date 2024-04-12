@@ -4,7 +4,7 @@ import { Box, Paper, Typography, Button, Stack, useMediaQuery, Grid, IconButton,
 import { Add, MoreHorizOutlined, CreateOutlined, Circle, GroupOutlined } from '@mui/icons-material';
 import FlexBetween from 'components/FlexBetween';
 import UploadDocument from './UploadDocument';
-import { useParseParcelsMutation, useParseLandUseMutation } from 'state/api';
+import { useParseParcelsMutation, useParseLandUseMutation, useParseBuildingsMutation } from 'state/api';
 
 const Planning = () => {
   const navigate = useNavigate();

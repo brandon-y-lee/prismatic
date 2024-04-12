@@ -101,3 +101,21 @@ export const stringToColor = (str) => {
       .toUpperCase();
   return "#" + "00000".substring(0, 6 - color.length) + color;
 };
+
+export const displayValueOrPlaceholder = (value, placeholder = 'N/A') => value ? value.toString() : placeholder;
+
+export const formatNumber = (value, placeholder = 'N/A') => {
+  return value ? Number.parseFloat(value).toFixed(2) : placeholder;
+};
+
+export const formatAddress = (fromNum, toNum, streetName, streetType) => {
+  let address = `${displayValueOrPlaceholder(streetName)} ${displayValueOrPlaceholder(streetType)}`;
+  if (fromNum && toNum && fromNum === toNum) {
+    return `${fromNum} ${address}`;
+  } else if (fromNum && toNum) {
+    return `${fromNum}-${toNum} ${address}`;
+  } else {
+    return 'N/A';
+  }
+  return address;
+};

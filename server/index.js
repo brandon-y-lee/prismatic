@@ -17,6 +17,7 @@ import generalRoutes from "./routes/general.js";
 import managementRoutes from "./routes/management.js";
 import salesRoutes from "./routes/sales.js";
 import parcelRoutes from './routes/parcels.js';
+import networkRoutes from './routes/network.js';
 
 /* CONFIGURATION */
 dotenv.config();
@@ -41,6 +42,7 @@ app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
 app.use("/sales", salesRoutes);
 app.use('/parcels', parcelRoutes);
+app.use('/network', networkRoutes);
 app.use('/data', express.static('./data'));
 
 

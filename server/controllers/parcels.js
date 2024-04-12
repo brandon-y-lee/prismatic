@@ -3,6 +3,7 @@ import fs from 'fs';
 import Papa from 'papaparse';
 import { parse as originalParse } from 'wellknown';
 import Parcel from '../models/Parcel.js';
+import Building from '../models/Building.js';
 
 const bigQuery = new BigQuery();
 
@@ -10,15 +11,29 @@ export const getParcel = async (req, res) => {
   const { blklot } = req.query;
 
   try {
-    const parcels = await Parcel.find({ blklot: blklot });
+    const pipeline = [
+      {
+        $match: { blklot: blklot }
+      },
+      {
+        $lookup: {
+          from: "buildings",
+          localField: "buildings",
+          foreignField: "sf16_bldgid",
+          as: "buildingDetails"
+        }
+      },
+    ];
+
+    const parcelsWithBuildings = await Parcel.aggregate(pipeline);
     
-    if (!parcels) {
+    if (!parcelsWithBuildings.length) {
       return res.status(404).json({ message: 'No parcels found.' });
     }
 
-    res.status(200).json(parcels);
+    res.status(200).json(parcelsWithBuildings);
   } catch (error) {
-    return res.json({message: error.message});
+    return res.status(500).json({message: error.message});
   }
 };
 
@@ -29,9 +44,8 @@ export const parseParcels = async (req, res) => {
   let allData = []; // Use this to collect all parcel data first
 
   try {
-    const csvData = await fsp.readFile('./data/joined-tables.csv', 'utf8');
+    const csvData = await fsp.readFile('./data/joined_parcels_buildings.csv', 'utf8');
 
-    // Synchronously collect data
     Papa.parse(csvData, {
       header: true,
       dynamicTyping: false,
@@ -67,15 +81,16 @@ export const parseParcels = async (req, res) => {
   }
 };
 
-function createParcel(data) {
-  // Helper function to convert string values to boolean
-  const toBoolean = (val) => val === 'true'; // Assuming the CSV has 'true'/'false' as boolean strings
 
-  // Helper function to safely convert strings to numbers
+function createParcel(data) {
+  const toBoolean = (val) => val === 'true';
+
   const toNumber = (val) => {
     const parsed = Number(val);
-    return isNaN(parsed) ? null : parsed; // or return null if you want to preserve non-numeric as null
+    return isNaN(parsed) ? null : parsed;
   };
+
+  const buildingIds = data.buildings ? data.buildings.split(',').map(id => id.trim()) : [];
 
   return new Parcel({
     mapblklot: data.mapblklot,
@@ -118,9 +133,9 @@ function createParcel(data) {
     usetype: data.usetype,
     visitor: toNumber(data.visitor),
     yrbuilt: toNumber(data.yrbuilt),
+    buildings: buildingIds,
   });
 }
-
 
 async function saveBatch(batch) {
   return Parcel.insertMany(batch);
@@ -179,3 +194,73 @@ async function executeBatchUpdates(updateOperations, res) {
   }
 }
 
+
+
+export const parseBuildings = async (req, res) => {
+  let allData = []; // Use this to collect all parcel data first
+
+  try {
+    const csvData = await fsp.readFile('./data/calculated_building_footprints.csv', 'utf8');
+
+    // Synchronously collect data
+    Papa.parse(csvData, {
+      header: true,
+      dynamicTyping: false,
+      skipEmptyLines: true,
+      step: (row) => {
+        if (row.data.mapblklot) {
+          allData.push(createBuilding(row.data));
+        } else {
+          console.log(`Skipping row with no mapblklot: ${JSON.stringify(row.data)}`);
+        }
+      },
+      complete: async () => {
+        // Now, process allData in batches after parsing is complete
+        try {
+          for (let i = 0; i < allData.length; i += BATCH_SIZE) {
+            const batch = allData.slice(i, i + BATCH_SIZE);
+            await saveBuildingBatch(batch);
+          }
+          res.status(200).json({ message: `${allData.length} parcels parsed and saved successfully.` });
+        } catch (error) {
+          console.error('Batch processing error:', error);
+          res.status(400).json({ message: error.message });
+        }
+      },
+      error: (error) => {
+        console.error('Parsing error:', error);
+        res.status(400).json({ message: error.message });
+      }
+    });
+  } catch (error) {
+    console.error('Error reading the CSV file:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+function createBuilding(data) {
+  // Helper function to convert string values to boolean
+  const toBoolean = (val) => val === 'true'; // Assuming the CSV has 'true'/'false' as boolean strings
+
+  // Helper function to safely convert strings to numbers
+  const toNumber = (val) => {
+    const parsed = Number(val);
+    return isNaN(parsed) ? null : parsed; // or return null if you want to preserve non-numeric as null
+  };
+
+  return new Building({
+    sf16_bldgid: data.sf16_bldgid,
+    area_id: data.area_id,
+    mapblklot: data.mapblklot,
+    area: toNumber(data.area),
+    perimeter: toNumber(data.perimeter),
+    shape: data.shape,
+    data_as_of: data.data_as_of,
+    data_loaded_at: data.data_loaded_at,
+  });
+}
+
+
+async function saveBuildingBatch(batch) {
+  return Building.insertMany(batch);
+}

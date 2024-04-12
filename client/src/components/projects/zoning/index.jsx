@@ -35,7 +35,7 @@ const Zoning = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gridColumn: 'span 8',
+            gridColumn: 'span 7',
             boxShadow: 'none',
             borderColor: 'grey.400',
             borderWidth: '1px',
@@ -49,7 +49,7 @@ const Zoning = () => {
             height: '70vh',
             display: 'flex',
             flexDirection: 'column',
-            gridColumn: 'span 4',
+            gridColumn: 'span 5',
             boxShadow: 'none',
             gap: '1rem'
           }}

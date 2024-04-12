@@ -122,7 +122,7 @@ const Projects = () => {
           },
         }}
       >
-        <Box sx={{ gridColumn: "span 12", m: "1.5rem 2.5rem" }}>
+        <Box sx={{ gridColumn: 'span 12', mt: '1.5rem', mb: '1rem', mx: '2.5rem' }}>
           <FlexBetween>
             <Header title="Projects" />
             <FlexBetween sx={{ gap: 3 }}>

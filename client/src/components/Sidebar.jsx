@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRightOutlined,
   CreditCardOutlined,
+  GroupOutlined,
   HomeOutlined,
   Search,
   ShoppingCartOutlined,
@@ -30,6 +31,14 @@ const navItems = [
   {
     text: "Home",
     icon: <Search />
+  },
+  {
+    text: "Prospects",
+    icon: <Search />
+  },
+  {
+    text: "Network",
+    icon: <GroupOutlined />
   },
   {
     text: "Funds",

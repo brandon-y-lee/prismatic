@@ -74,6 +74,28 @@ export const api = createApi({
         method: 'POST',
       }),
     }),
+    parseBuildings: build.mutation({
+      query: () => ({
+        url: 'parcels/parse-buildings',
+        method: 'POST',
+      })
+    }),
+
+    /* Network */
+    getInvitesSent: build.query({
+      query: ({ userId }) => ({
+        url: 'network/get-invites-sent',
+        method: 'GET',
+        params: { userId },
+      }),
+    }),
+    getInvitesReceived: build.query({
+      query: ({ userId }) => ({
+        url: 'network/get-invites-received',
+        method: 'GET',
+        params: { userId },
+      }),
+    }),
 
     /* Projects */
     getProjects: build.query({
@@ -425,7 +447,11 @@ export const {
   useGetParcelQuery,
   useParseParcelsMutation,
   useParseLandUseMutation,
+  useParseBuildingsMutation,
 
+  useGetInvitesSentQuery,
+  useGetInvitesReceivedQuery,
+  
   useGetProjectsQuery,
   useCreateProjectMutation,
   useViewProjectQuery,

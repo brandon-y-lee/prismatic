@@ -46,7 +46,7 @@ const MapBox = ({ parcelData, onSearch }) => {
     if (mapContainerRef.current && !mapRef.current) {
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
+        style: 'mapbox://styles/mapbox/light-v11',
         center: [-122.430, 37.768],
         zoom: 11,
       });
@@ -148,6 +148,35 @@ const MapBox = ({ parcelData, onSearch }) => {
             'line-width': 0.5
           },
           minzoom: 14
+        });
+
+        mapRef.current.addSource('buildings', {
+          type: 'geojson',
+          data: 'http://localhost:5001/data/building_footprints.geojson'
+        });
+
+        mapRef.current.addLayer({
+          id: 'buildings',
+          type: 'fill',
+          source: 'buildings',
+          layout: {},
+          paint: {
+            'fill-color': '#ADD8E6',
+            'fill-opacity': 0.4
+          },
+          minzoom: 16
+        });
+
+        mapRef.current.addLayer({
+          'id': 'buildings-outline',
+          'type': 'line',
+          'source': 'buildings',
+          'layout': {},
+          'paint': {
+            'line-color': '#A9A9A9',
+            'line-width': 1
+          },
+          minzoom: 16
         });
       });
 

@@ -121,7 +121,10 @@ const ParcelSchema = new mongoose.Schema(
     },
     yrbuilt: {
       type: Number,
-    }
+    },
+    buildings: [{
+      type: String
+    }]
   },
   { timestamps: true }
 );

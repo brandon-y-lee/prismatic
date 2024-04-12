@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Box, Accordion, AccordionSummary, AccordionDetails, Typography } from "@mui/material";
 import { ExpandMore } from '@mui/icons-material';
 import FlexBetween from 'components/FlexBetween';
+import BuildingAccordion from 'components/projects/zoning/Building';
+import { displayValueOrPlaceholder, formatNumber, formatAddress } from 'utils/parcels';
 
 const Parcel = ({ parcelData }) => {
   if (!parcelData) {
@@ -10,24 +12,6 @@ const Parcel = ({ parcelData }) => {
 
   const parcel = parcelData[0];
   console.log('parcelData at Parcel: ', parcelData);
-
-  const displayValueOrPlaceholder = (value, placeholder = 'N/A') => value ? value.toString() : placeholder;
-
-  const formatNumber = (value, placeholder = 'N/A') => {
-    return value ? Number.parseFloat(value).toFixed(2) : placeholder;
-  };
-
-  const formatAddress = (fromNum, toNum, streetName, streetType) => {
-    let address = `${displayValueOrPlaceholder(streetName)} ${displayValueOrPlaceholder(streetType)}`;
-    if (fromNum && toNum && fromNum === toNum) {
-      return `${fromNum} ${address}`;
-    } else if (fromNum && toNum) {
-      return `${fromNum}-${toNum} ${address}`;
-    } else {
-      return 'N/A';
-    }
-    return address;
-  };
 
   return (
     /* Enable overflow */
@@ -41,10 +25,9 @@ const Parcel = ({ parcelData }) => {
           <FlexBetween>
             <Typography>
               Address(es)<br />
-              Assessor Parcel Number (APN)<br />
+              Assessor Parcel Number<br />
               Block<br />
               Lot<br />
-              Lot/Parcel Area<br />
               Year Built<br />
             </Typography>
             <Typography sx={{ textAlign: 'right' }}>
@@ -52,7 +35,6 @@ const Parcel = ({ parcelData }) => {
               {displayValueOrPlaceholder(parcel.blklot)}<br />
               {displayValueOrPlaceholder(parcel.block_num)}<br />
               {displayValueOrPlaceholder(parcel.lot_num)}<br />
-              {parcel.bldgsqft} (sq ft)<br />
               {displayValueOrPlaceholder(parcel.yrbuilt)}<br />
             </Typography>
           </FlexBetween>
@@ -72,13 +54,19 @@ const Parcel = ({ parcelData }) => {
               Zoning Code<br />
               Zoning District<br />
               Land Use<br />
-              Street Length<br />
+              Parcel Area<br />
+              Parcel Perimeter<br />
+              Assessed Land Val.<br />
+              Assessed Building Val.<br />
             </Typography>
             <Typography sx={{ textAlign: 'right' }}>
               {displayValueOrPlaceholder(parcel.zoning_code)}<br />
               {displayValueOrPlaceholder(parcel.zoning_district)}<br />
               {displayValueOrPlaceholder(parcel.landuse)}<br />
+              {formatNumber(parcel.st_area_sh)} (sq ft)<br />
               {formatNumber(parcel.st_length)} (ft)<br />
+              {parcel.landval ? `$${formatNumber(parcel.landval)}` : formatNumber(parcel.landval)}<br />
+              {parcel.strucval ? `$${formatNumber(parcel.strucval)}` : formatNumber(parcel.strucval)}<br />
             </Typography>
           </FlexBetween>
         </AccordionDetails>
@@ -99,9 +87,9 @@ const Parcel = ({ parcelData }) => {
               Neighborhood<br />
             </Typography>
             <Typography sx={{ textAlign: 'right' }}>
-              District {parcel.supervisor_district}<br />
-              {parcel.supervisor_name}<br />
-              {parcel.analysis_neighborhood}<br />
+              {parcel.supervisor_district ? `District ${displayValueOrPlaceholder(parcel.supervisor_district)}` : displayValueOrPlaceholder(parcel.supervisor_district)}<br />
+              {displayValueOrPlaceholder(parcel.supervisor_name)}<br />
+              {displayValueOrPlaceholder(parcel.analysis_neighborhood)}<br />
             </Typography>
           </FlexBetween>
         </AccordionDetails>
@@ -109,22 +97,19 @@ const Parcel = ({ parcelData }) => {
       <Accordion disableGutters square>
         <AccordionSummary
           expandIcon={<ExpandMore />}
-          aria-controls="panel2-content"
-          id="panel2-header"
+          aria-controls="buildings-content"
+          id="buildings-header"
         >
-          <Typography fontWeight={550}>Additional</Typography>
+          <Typography fontWeight={550}>Buildings ({parcel.buildingDetails?.length || 0})</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <FlexBetween>
-            <Typography>
-              Assessed Land Val.<br />
-              Assessed Building Val.<br />
-            </Typography>
-            <Typography sx={{ textAlign: 'right' }}>
-              ${parcel.landval}<br />
-              ${parcel.strucval}<br />
-            </Typography>
-          </FlexBetween>
+          {parcel.buildingDetails && parcel.buildingDetails.length > 0 ? (
+            parcel.buildingDetails.map(building => (
+              <BuildingAccordion key={building._id} building={building} />
+            ))
+          ) : (
+            <Typography>No buildings associated with this parcel.</Typography>
+          )}
         </AccordionDetails>
       </Accordion>
     </Box>
